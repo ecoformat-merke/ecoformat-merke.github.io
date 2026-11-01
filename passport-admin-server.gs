@@ -454,6 +454,9 @@ function admin60Dashboard(){
    canDecide:passportAdmin60IsPendingContribution_(status)&&!isTest
   });
  }
+ const registered=book.getSheetByName(PASSPORT_ADMIN54.roster);
+ const activeRosterKeys=new Set(registered?registered.getDataRange().getValues().slice(1)
+   .filter(r=>r[0]&&r[4]!==false).map(r=>passportAdminIdentity_(r[1],r[2])):[]);
  const applications=[];let pendingApplications=0,acceptedApps=0;
  for(let i=1;i<apps.length;i++){
   const r=apps[i];if(!r.some(v=>v!==''&&v!=null))continue;
@@ -465,15 +468,33 @@ function admin60Dashboard(){
    row:i+1,stamp:passportAdmin60Stamp_('application',r),
    date:passportAdmin60Text_(r[0]),name:passportAdmin60Text_(r[1]),className:passportAdmin60Text_(r[2]),
    direction:passportAdmin60Text_(r[4]),notes:passportAdmin60Text_(r[5]),status,
-   requestIdPresent:!!r[8],canDecide:pending&&!/тест/i.test(String(r[1]||''))
+   requestIdPresent:!!r[8],canDecide:pending&&!/тест/i.test(String(r[1]||'')),
+   registered:activeRosterKeys.has(passportAdminIdentity_(r[1],r[2])),
+   canEnroll:/^принят$/i.test(status)&&
+     !activeRosterKeys.has(passportAdminIdentity_(r[1],r[2]))&&
+     !/тест/i.test(String(r[1]||''))
   });
  }
  const eventList=[];
+ let pendingEvents=0,publishedEvents=0,rejectedEvents=0;
  for(let i=1;i<events.length;i++){
   const r=events[i];if(!r.some(v=>v!==''&&v!=null))continue;
-  eventList.push({date:passportAdmin60Text_(r[9]),nameRu:passportAdmin60Text_(r[3]),
-    nameKk:passportAdmin60Text_(r[4]),className:passportAdmin60Text_(r[8]),
-    category:passportAdmin60Text_(r[7]),status:passportAdmin60Text_(r[12])});
+  const status=String(r[12]||'').trim();
+  const pending=passportAdmin64EventPending_(status);
+  if(pending)pendingEvents++;
+  else if(passportAdmin64EventPublished_(status))publishedEvents++;
+  else if(passportAdmin64EventRejected_(status))rejectedEvents++;
+  eventList.push({
+    row:i+1,stamp:passportAdmin60Stamp_('event',r),
+    eventId:passportAdmin60Text_(r[0]),date:passportAdmin60Text_(r[9]),
+    submittedAt:passportAdmin60Text_(r[1]),
+    nameRu:passportAdmin60Text_(r[3]),nameKk:passportAdmin60Text_(r[4]),
+    descRu:passportAdmin60Text_(r[5]),descKk:passportAdmin60Text_(r[6]),
+    className:passportAdmin60Text_(r[8]),category:passportAdmin60Text_(r[7]),
+    instagram:passportAdmin60Text_(r[10]),photoUrls:passportAdmin64EventImages_(r[11]),
+    status,canDecide:pending,canPublish:pending&&passportAdmin64EventValid_(r),
+    decisionReason:passportAdmin60Text_(r[15])
+  });
  }
  const auditTrail=actions.slice(1).filter(r=>r.some(v=>v!==''&&v!=null)).slice(-30).reverse()
  .map(r=>({date:passportAdmin60Text_(r[0]),action:passportAdmin60Text_(r[2]),
@@ -484,7 +505,8 @@ function admin60Dashboard(){
   summary:{
    participants:rosterSize,applications:applications.length,pendingApplications,acceptedApps,
    approvedContributions:approved,pendingContributions,rejectedContributions:rejected,
-   paperKg:Math.round(paper*1000)/1000,capsCount:caps,unlinked,events:eventList.length
+   paperKg:Math.round(paper*1000)/1000,capsCount:caps,unlinked,events:eventList.length,
+   pendingEvents,publishedEvents,rejectedEvents
   },
   classes:Array.from(classes.values()).sort((a,b)=>b.score-a.score).map(x=>({
    ...x,paperKg:Math.round(x.paperKg*1000)/1000,score:Math.round(x.score*10)/10
@@ -671,7 +693,7 @@ function passportAdmin64EventValid_(r){
  const title=String(r[3]||'').trim();
  const category=String(r[7]||'').trim();
  const date=r[9];
- return /^EV-[A-Za-z0-9-]{5,80}$/.test(eventId)&&title.length>=3&&title.length<=200&&
+ return /^EV-[A-Za-z0-9-]{1,80}$/.test(eventId)&&title.length>=3&&title.length<=200&&
   !!category&&!!date;
 }
 function passportAdmin64EventImages_(raw){
