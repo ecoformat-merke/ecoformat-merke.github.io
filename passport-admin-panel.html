@@ -74,7 +74,7 @@ footer{border-top:1px solid #ffffff21;color:#93b7a0;font-size:12px;padding:25px;
 </style></head>
 <body>
 <main>
-<header class="top"><strong class="logo">🌿 ECO CLUB / ADMIN</strong><span class="tag">ECO CLUB HUB 6.4.1 · PRIVATE</span></header>
+<header class="top"><strong class="logo">🌿 ECO CLUB / ADMIN</strong><span class="tag">ECO CLUB HUB 6.4.2 · PRIVATE</span></header>
 <h1>Eco Club | Цифровой кабинет</h1>
 <p class="intro">Единое рабочее пространство руководителя Eco Club: показатели, учащиеся, заявки, вклады, паспорта и сайт.</p>
 
@@ -144,6 +144,7 @@ footer{border-top:1px solid #ffffff21;color:#93b7a0;font-size:12px;padding:25px;
 <button data-event-filter="pending" aria-pressed="true" type="button">На проверке <span id="hub-ev-pending"></span></button>
 <button data-event-filter="published" aria-pressed="false" type="button">Опубликованные <span id="hub-ev-published"></span></button>
 <button data-event-filter="rejected" aria-pressed="false" type="button">Отклонённые <span id="hub-ev-rejected"></span></button>
+<button data-event-filter="unpublished" aria-pressed="false" type="button">Снятые <span id="hub-ev-unpublished"></span></button>
 <button data-event-filter="all" aria-pressed="false" type="button">Все <span id="hub-ev-all"></span></button>
 </div>
 <div class="hub-app-searchbar"><input id="hub-ev-search" class="search" type="search" placeholder="Поиск по названию, классу и категории"><button id="hub-ev-clear" class="action secondary" type="button">Очистить</button></div>
@@ -431,7 +432,11 @@ function refresh(){
  apiCall('dashboard',[],response=>{
   if(!response||!response.ok){feedback('Показатели не загрузились.',true);return;}
   hub=response;
-  render();
+  try{render();}
+  catch(err){
+   feedback('Ошибка отображения: '+String(err&&err.message||err)+'. Обновите страницу или свяжитесь с администратором.',true);
+   return;
+  }
   // Populate member cards directly from existing owner-only backend.
   apiCall('members',[],response2=>{
    if(response2&&response2.ok)people=Array.isArray(response2.participants)?response2.participants:[];
@@ -747,6 +752,7 @@ function eventStatus(x){
  if(x.canDecide||['на проверке','на модерации','ожидает','ожидает проверки','ожидает подтверждения','на рассмотрении','отправлено','новая публикация','новое мероприятие','pending','submitted'].includes(s))return 'pending';
  if(['опубликовано','одобрено','утверждено','published','approved'].includes(s))return 'published';
  if(['отклонено','отклонён','отклонена','отказано','rejected'].includes(s))return 'rejected';
+ if(['снято с публикации','unpublished'].includes(s))return 'unpublished';
  return 'other';
 }
 function eventFiltered(all,filter,q){
@@ -757,9 +763,9 @@ function eventFiltered(all,filter,q){
 }
 function renderEventItems(){
  if(!hub)return;
- const all=hub.events||[],counts={pending:0,published:0,rejected:0,other:0};
+ const all=hub.events||[],counts={pending:0,published:0,rejected:0,unpublished:0,other:0};
  all.forEach(x=>counts[eventStatus(x)]++);
- ['pending','published','rejected'].forEach(x=>get('hub-ev-'+x).textContent=counts[x]);
+ ['pending','published','rejected','unpublished'].forEach(x=>get('hub-ev-'+x).textContent=counts[x]);
  get('hub-ev-all').textContent=all.length;
  document.querySelectorAll('[data-event-filter]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.eventFilter===eventFilter)));
  const shown=eventFiltered(all,eventFilter,get('hub-ev-search').value);
@@ -790,7 +796,9 @@ function renderEventItems(){
   if(x.canDeleteTest){
    const cleanup=element('button','action danger','Удалить тест и фото');
    cleanup.type='button';cleanup.onclick=()=>deleteTestEvent(x);
-   c.append(element('div','hub-actions')).lastChild.append(cleanup);
+   const cleanupActions=element('div','hub-actions');
+   cleanupActions.append(cleanup);
+   c.append(cleanupActions);
   }
   if(x.canUnpublish){
    const actions=element('div','hub-actions');
