@@ -493,6 +493,7 @@ function admin60Dashboard(){
     descRu:passportAdmin60Text_(r[5]),descKk:passportAdmin60Text_(r[6]),
     className:passportAdmin60Text_(r[8]),category:passportAdmin60Text_(r[7]),
     instagram:passportAdmin60Text_(r[10]),photoUrls:passportAdmin64EventImages_(r[11]),
+    photoIds:String(r[11]||'').split(',').map(x=>x.trim()).filter(x=>/^[A-Za-z0-9_-]{15,150}$/.test(x)).slice(0,3),
     status,canDecide:pending,canPublish:pending&&passportAdmin64EventValid_(r),
     canEdit:pending||passportAdmin64EventRejected_(status)||String(status).trim()==='Снято с публикации',
     canUploadPhoto:pending||passportAdmin64EventRejected_(status)||String(status).trim()==='Снято с публикации',
@@ -1138,7 +1139,8 @@ function admin66SaveEvent(payload,rowNumber,expectedStamp){
   passportAdmin66Audit_(store.book,row,action,'HUB 6.6 · draft, not published');
   SpreadsheetApp.flush();
   return {ok:true,eventId:id,row:create?sh.getLastRow():rowNumber,
-   status:'Ожидает',needsReview:true};
+   status:'Ожидает',needsReview:true,
+   stamp:passportAdmin60Stamp_('event',sh.getRange(create?sh.getLastRow():rowNumber,1,1,16).getValues()[0])};
  }finally{lock.releaseLock();}
 }
 /** Private upload for pending/unpublished events. Maximum 3 files, 3 MiB each.
@@ -1149,7 +1151,7 @@ function admin66UploadEventPhoto(rowNumber,expectedStamp,payload){
  const name=String(payload.name||'').trim().slice(0,100);
  const mime=String(payload.mime||'').trim().toLowerCase();
  const base64=String(payload.base64||'');
- if(!/^[\w .()-]{1,100}$/u.test(name)||!/\.(?:jpg|jpeg|png|webp)$/i.test(name))
+ if(name.length<5||name.length>100||!/\.(?:jpg|jpeg|png|webp)$/i.test(name))
   throw new Error('INVALID_IMAGE_NAME');
  if(!['image/jpeg','image/png','image/webp'].includes(mime))
   throw new Error('INVALID_IMAGE_TYPE');
@@ -1186,7 +1188,8 @@ function admin66UploadEventPhoto(rowNumber,expectedStamp,payload){
   sh.getRange(rowNumber,12).setValue(ids.join(','));
   passportAdmin66Audit_(store.book,row,'ADD_PHOTO','Image uploaded privately');
   SpreadsheetApp.flush();
-  return {ok:true,eventId:String(row[0]),fileId:file.getId(),count:ids.length};
+  return {ok:true,eventId:String(row[0]),fileId:file.getId(),count:ids.length,
+   stamp:passportAdmin60Stamp_('event',sh.getRange(rowNumber,1,1,16).getValues()[0])};
  }catch(err){
   if(file){try{file.setTrashed(true)}catch(e){console.error('Failed to trash unused upload',e)}}
   throw err;
@@ -1215,6 +1218,7 @@ function admin66RemoveEventPhoto(rowNumber,expectedStamp,fileId){
    try{file.setTrashed(true)}catch(err){console.error('Failed to trash detached HUB photo',err)}
   passportAdmin66Audit_(store.book,row,'REMOVE_PHOTO','Detached photo');
   SpreadsheetApp.flush();
-  return {ok:true,eventId:String(row[0]),count:ids.length-1};
+  return {ok:true,eventId:String(row[0]),count:ids.length-1,
+   stamp:passportAdmin60Stamp_('event',sh.getRange(rowNumber,1,1,16).getValues()[0])};
  }finally{lock.releaseLock();}
 }
