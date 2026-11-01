@@ -189,8 +189,8 @@ function admin54Issue(name,className){
   if(people.length!==1)throw new Error('INVALID_PARTICIPANT');
   const id=String(people[0][0]||'').trim();
   if(!id||/тест/i.test(String(name)))throw new Error('INVALID_PARTICIPANT');
-  if(!rows.slice(1).some(r=>String(r[12]||'').trim()===id&&passportAdminConfirmed_(r[7])))
-   throw new Error('NO_LINKED_CONFIRMED_CONTRIBUTIONS');
+  // HUB 6.4: an accepted student has a passport even before the first contribution.
+  // Profile starts with zero contributions and no awards; code is issued only on click.
   const code=(Utilities.getUuid()+Utilities.getUuid()).replace(/-/g,'').toLowerCase();
   const now=new Date(),expires=new Date(now.getTime()+PASSPORT_ADMIN54.days*24*3600000);
   const previous=access.getDataRange().getValues();
@@ -522,6 +522,11 @@ function admin60Decide(kind,rowNumber,expectedStamp,decision,reason){
   if(kind==='contribution'&&!passportAdmin60IsPendingContribution_(data[7]))
    throw new Error('ALREADY_REVIEWED');
   if(/тест/i.test(String(data[1]||'')))throw new Error('TEST_RECORD_REVIEW_REQUIRED');
+  let enrolled=null;
+  if(kind==='application'&&decision==='approve'){
+    // Registration must succeed before the application status changes.
+    enrolled=passportAdmin64EnsureParticipant_(book,data[1],data[2]);
+  }
   const email=Session.getActiveUser().getEmail(),when=new Date();
   const status=kind==='application'?(decision==='approve'?'Принят':'Отклонён'):
    (decision==='approve'?'✅ Подтверждено':'❌ Отклонено');
@@ -539,6 +544,8 @@ function admin60Decide(kind,rowNumber,expectedStamp,decision,reason){
    String(data[1]||''),String(data[2]||''),kind==='contribution'?data[3]:'',
    kind==='contribution'?data[4]:'',why]);
   return {ok:true,kind,row:rowNumber,status,
+   registered:enrolled?{created:enrolled.created,
+    participantRef:'ECO-'+enrolled.id.slice(0,8).toUpperCase()}:null,
    needsSync:kind==='contribution'&&decision==='approve'};
  }finally{lock.releaseLock();}
 }
@@ -553,7 +560,7 @@ function passportAdmin60Text_(value){
   String(value??'').slice(0,400);
 }
 function passportAdmin60Stamp_(kind,row){
- const selected=kind==='application'?row.slice(0,9):row.slice(0,13);
+ const selected=kind==='application'?row.slice(0,9):kind==='event'?row.slice(0,16):row.slice(0,13);
  const normalized=selected.map(v=>v instanceof Date?v.toISOString():String(v??'')).join('\u241e');
  return Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256,kind+'\u241f'+normalized,Utilities.Charset.UTF_8)
   .map(v=>(v&255).toString(16).padStart(2,'0')).join('');
@@ -622,4 +629,110 @@ function admin63MemberProfile(participantId){
   credentialStatus:credential.status,expiryDate:credential.expiryDate,
   daysUntilExpiry:credential.daysUntilExpiry
  };
+}
+
+
+function passportAdmin64RosterIdentity_(name,className){
+ const key=passportAdminIdentity_(name,className);
+ if(!key||String(name).trim().length<3||String(className).trim().length<1)throw new Error('INVALID_STUDENT_IDENTITY');
+ return key;
+}
+function passportAdmin64EnsureParticipant_(book,name,className){
+ const key=passportAdmin64RosterIdentity_(name,className);
+ const roster=passportAdminSheet_(book,PASSPORT_ADMIN54.roster);
+ const rows=roster.getDataRange().getValues().slice(1);
+ const matching=rows.filter(r=>passportAdminIdentity_(r[1],r[2])===key);
+ if(matching.length>1)throw new Error('AMBIGUOUS_PARTICIPANT');
+ if(matching.length===1){
+   if(matching[0][4]===false)throw new Error('INACTIVE_PARTICIPANT');
+   const existing=String(matching[0][0]||'').trim();
+   if(!/^[0-9a-f]{32}$/i.test(existing))throw new Error('INVALID_ROSTER_ID');
+   return {id:existing,created:false};
+ }
+ const id=Utilities.getUuid().replace(/-/g,'').toLowerCase();
+ roster.appendRow([id,String(name).trim(),String(className).trim(),new Date(),true]);
+ return {id,created:true};
+}
+function passportAdmin64EventPending_(status){
+ const s=String(status||'').normalize('NFKC').trim().toLowerCase().replace(/^⏳\s*/,'');
+ return ['на проверке','на модерации','ожидает','ожидает проверки','ожидает подтверждения',
+   'на рассмотрении','отправлено','новая публикация','новое мероприятие','pending','submitted'].includes(s);
+}
+function passportAdmin64EventPublished_(status){
+ const s=String(status||'').normalize('NFKC').trim().toLowerCase().replace(/^✅\s*/,'');
+ return ['опубликовано','одобрено','утверждено','published','approved'].includes(s);
+}
+function passportAdmin64EventRejected_(status){
+ const s=String(status||'').normalize('NFKC').trim().toLowerCase().replace(/^❌\s*/,'');
+ return ['отклонено','отклонён','отклонена','отказано','rejected'].includes(s);
+}
+function passportAdmin64EventValid_(r){
+ const eventId=String(r[0]||'').trim();
+ const title=String(r[3]||'').trim();
+ const category=String(r[7]||'').trim();
+ const date=r[9];
+ return /^EV-[A-Za-z0-9-]{5,80}$/.test(eventId)&&title.length>=3&&title.length<=200&&
+  !!category&&!!date;
+}
+function passportAdmin64EventImages_(raw){
+ const text=String(raw||'').trim();
+ let items=[];
+ if(text.startsWith('[')){
+   try{const val=JSON.parse(text);if(Array.isArray(val))items=val;}catch(e){}
+ }
+ if(!items.length)items=text.split(/[,;\s]+/);
+ return items.map(x=>String(x||'').trim())
+  .filter(x=>/^[A-Za-z0-9_-]{15,150}$/.test(x))
+  .slice(0,12)
+  .map(id=>'https://drive.google.com/thumbnail?id='+encodeURIComponent(id)+'&sz=w500');
+}
+function passportAdmin64AuditEvent_(book,row,status,email,reason){
+ const log=passportAdminSheet_(book,ECO_HUB60.decisions);
+ log.appendRow([new Date(),email,'HUB_EVENT_'+(passportAdmin64EventPublished_(status)?'PUBLISH':'REJECT'),
+  status,'',String(row[0]||''),String(row[3]||''),String(row[8]||''),'','',reason]);
+}
+/** Approve or reject a submitted teacher event, with optimistic concurrency. */
+function admin64DecideEvent(rowNumber,expectedStamp,decision,reason){
+ requirePassportAdmin_();
+ if(!Number.isSafeInteger(rowNumber)||rowNumber<2||rowNumber>10000)throw new Error('INVALID_ROW');
+ if(!['approve','reject'].includes(decision))throw new Error('INVALID_DECISION');
+ if(!/^[a-f0-9]{64}$/.test(String(expectedStamp||'')))throw new Error('INVALID_STAMP');
+ const explanation=String(reason||'').trim().slice(0,300);
+ if(decision==='reject'&&explanation.length<3)throw new Error('REJECTION_REASON_REQUIRED');
+ const lock=LockService.getScriptLock();lock.waitLock(30000);
+ try{
+  const book=passportAdminBook_();
+  const sheet=passportAdminSheet_(book,ECO_HUB60.events);
+  if(rowNumber>sheet.getLastRow())throw new Error('ROW_NOT_FOUND');
+  const r=sheet.getRange(rowNumber,1,1,16).getValues()[0];
+  if(passportAdmin60Stamp_('event',r)!==expectedStamp)throw new Error('ROW_CHANGED_REFRESH');
+  if(!passportAdmin64EventPending_(r[12]))throw new Error('ALREADY_REVIEWED');
+  if(decision==='approve'&&!passportAdmin64EventValid_(r))throw new Error('EVENT_REQUIRED_FIELDS_MISSING');
+  // Stable published status used by the current public events endpoint.
+  const status=decision==='approve'?'Опубликовано':'Отклонено';
+  const when=new Date(),email=Session.getActiveUser().getEmail();
+  sheet.getRange(rowNumber,13,1,3).setValues([[status,when,email]]);
+  if(decision==='reject')sheet.getRange(rowNumber,16).setValue(explanation);
+  passportAdmin64AuditEvent_(book,r,status,email,explanation);
+  return {ok:true,status,eventId:String(r[0]||''),publicationPendingVerification:decision==='approve'};
+ }finally{lock.releaseLock();}
+}
+/** Explicitly register an already-accepted applicant from earlier submissions. */
+function admin64EnrollAccepted(rowNumber,expectedStamp){
+ requirePassportAdmin_();
+ if(!Number.isSafeInteger(rowNumber)||rowNumber<2||rowNumber>10000)throw new Error('INVALID_ROW');
+ if(!/^[a-f0-9]{64}$/.test(String(expectedStamp||'')))throw new Error('INVALID_STAMP');
+ const lock=LockService.getScriptLock();lock.waitLock(30000);
+ try{
+  const book=passportAdminBook_();
+  const sheet=passportAdminSheet_(book,ECO_HUB60.applications);
+  if(rowNumber>sheet.getLastRow())throw new Error('ROW_NOT_FOUND');
+  const r=sheet.getRange(rowNumber,1,1,9).getValues()[0];
+  if(passportAdmin60Stamp_('application',r)!==expectedStamp)throw new Error('ROW_CHANGED_REFRESH');
+  if(!/^принят$/i.test(String(r[7]||'').trim()))throw new Error('NOT_ACCEPTED');
+  if(/тест/i.test(String(r[1]||'')))throw new Error('TEST_RECORD_REVIEW_REQUIRED');
+  const result=passportAdmin64EnsureParticipant_(book,r[1],r[2]);
+  if(result.created)passportAdminLog_('HUB_ENROLL',result.id,'OK','accepted applicant registration');
+  return {ok:true,participantRef:'ECO-'+result.id.slice(0,8).toUpperCase(),created:result.created};
+ }finally{lock.releaseLock();}
 }
