@@ -1081,6 +1081,10 @@ function renderEventEditorPhotos(){
   photo.append(b);wrap.append(photo);
  });
 }
+function eventEditorTodayISO_(){
+ const d=new Date();
+ return [d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-');
+}
 function openEventEditor(x){
  if(busy)return;
  const value=x||{};
@@ -1090,7 +1094,7 @@ function openEventEditor(x){
  const fields={'title-ru':value.nameRu||'','title-kk':value.nameKk||'',
   'desc-ru':value.descRu||'','desc-kk':value.descKk||'',
   category:value.category||'education',class:value.className||'',
-  date:value.dateISO||(x?'':new Date().toLocaleDateString('en-CA')),instagram:value.instagram||''};
+  date:value.dateISO||(x?'':eventEditorTodayISO_()),instagram:value.instagram||''};
  Object.entries(fields).forEach(([key,val])=>{const field=editorField(key);if(field)field.value=val;});
  get('hub-ev-f-photos').value='';
  get('hub-ev-editor-title').textContent=x?'Изменить: '+value.nameRu:'Новое мероприятие';
