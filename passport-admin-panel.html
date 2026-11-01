@@ -423,6 +423,7 @@ function apiCall(method,args,onSuccess){
  if(method==='decide')runner.admin60Decide(...args);
  if(method==='enroll')runner.admin64EnrollAccepted(...args);
  if(method==='eventDecide')runner.admin64DecideEvent(...args);
+ if(method==='deleteTestEvent')runner.admin65DeleteTestEvent(...args);
 }
 function refresh(){
  if(busy)return;
@@ -786,6 +787,11 @@ function renderEventItems(){
    const reject=element('button','action danger','Отклонить');reject.type='button';reject.onclick=()=>decideEvent(x,'reject');
    actions.append(approve,reject);c.append(actions);
   }
+  if(x.canDeleteTest){
+   const cleanup=element('button','action danger','Удалить тест и фото');
+   cleanup.type='button';cleanup.onclick=()=>deleteTestEvent(x);
+   c.append(element('div','hub-actions')).lastChild.append(cleanup);
+  }
   if(x.canUnpublish){
    const actions=element('div','hub-actions');
    const unpublish=element('button','action danger','Снять с публикации');
@@ -794,6 +800,22 @@ function renderEventItems(){
   }
   if(eventStatus(x)==='rejected'&&x.decisionReason)c.append(line('Причина отклонения',x.decisionReason));
   list.append(c);
+ });
+}
+function deleteTestEvent(x){
+ if(busy||!x.canDeleteTest)return;
+ if(!confirm('Удалить ТЕСТОВОЕ мероприятие «'+x.nameRu+'» из реестра и отправить его фотографии в корзину Google Drive? Операция необратима из кабинета.'))return;
+ const typed=prompt('Для подтверждения введите полностью номер события:', '');
+ if(typed===null||typed.trim()!==x.eventId){
+   feedback('Удаление отменено: номер события не совпадает.',true);return;
+ }
+ feedback('Удаляем тестовую запись и фотографии…');
+ apiCall('deleteTestEvent',[x.row,x.stamp,x.eventId],r=>{
+  if(!r?.ok){feedback('Тест не удалён.',true);return;}
+  refresh();
+  feedback('Тестовая запись удалена. '+(r.photoCleanupFailures?
+    'Не удалось убрать некоторые фото из Google Drive: '+r.photoCleanupFailures+'. Проверьте папку загрузок вручную.':
+    'Фотографии перенесены в корзину. Обновите основной сайт.'));
  });
 }
 function decideEvent(x,action){
