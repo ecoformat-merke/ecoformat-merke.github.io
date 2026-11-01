@@ -680,6 +680,45 @@ function passportAdmin64EnsureParticipant_(book,name,className){
  return {id,created:true};
 }
 /** Separate existing teacher-submission spreadsheet; no private ID in GitHub. */
+
+/**
+ * HUB 6.4.3 public-feed bridge. The public v7 backend reads the MAIN
+ * spreadsheet's "Мероприятия" sheet, NOT the teacher-submission sheet.
+ * This is an export of approved publication fields only, not teacher identity.
+ */
+function passportAdmin643PublicSheet_(main){
+ const sh=passportAdminSheet_(main,'Мероприятия');
+ if(sh.getLastRow()===0)sh.appendRow([
+  'ID','Дата заявки','Email учителя','Название RU','Название KZ',
+  'Описание RU','Описание KZ','Категория','Класс','Дата мероприятия',
+  'Instagram','ID фотографий','Статус','Решение от','Решение кем','Причина'
+ ]);
+ return sh;
+}
+function passportAdmin643MirrorIndex_(sheet,id){
+ const n=sheet.getLastRow();
+ if(n<2)return 0;
+ const values=sheet.getRange(2,1,n-1,1).getDisplayValues();
+ const found=[];
+ values.forEach((row,i)=>{if(String(row[0]||'').trim()===id)found.push(i+2);});
+ if(found.length>1)throw new Error('DUPLICATE_PUBLIC_EVENT_ID');
+ return found[0]||0;
+}
+function passportAdmin643PublicRow_(source,status,at){
+ return [
+  String(source[0]||''),source[1]||'','',String(source[3]||''),String(source[4]||''),
+  String(source[5]||''),String(source[6]||''),String(source[7]||''),
+  String(source[8]||''),source[9]||'',String(source[10]||''),
+  String(source[11]||''),status,at||'','',''
+ ];
+}
+function passportAdmin643HideMirror_(main,id,status){
+ const sheet=passportAdmin643PublicSheet_(main);
+ const pos=passportAdmin643MirrorIndex_(sheet,id);
+ if(pos)sheet.getRange(pos,13).setValue(status);
+ return {sheet,pos};
+}
+
 function passportAdmin65EventsBook_(){
  const id=String(PropertiesService.getScriptProperties()
    .getProperty('ECO_EVENTS_SPREADSHEET_ID')||'').trim();
@@ -758,38 +797,86 @@ function admin64DecideEvent(rowNumber,expectedStamp,decision,reason){
   if(decision==='unpublish'?!passportAdmin64EventPublished_(current):
      !passportAdmin64EventPending_(current))throw new Error('ALREADY_REVIEWED');
   if(decision==='approve'&&!passportAdmin64EventValid_(r))throw new Error('EVENT_REQUIRED_FIELDS_MISSING');
-  // Only approved event images may become publicly accessible.
-  const files=(decision==='approve'||decision==='unpublish')
-    ?passportAdmin65PhotoFiles_(r):[];
-  const previous=[],changed=[];
-  try{
-   for(const file of files){
-    const access=file.getSharingAccess(),permission=file.getSharingPermission();
-    previous.push({file,access,permission});
-    if(decision==='approve')file.setSharing(DriveApp.Access.ANYONE_WITH_LINK,DriveApp.Permission.VIEW);
-    else file.setSharing(DriveApp.Access.PRIVATE,DriveApp.Permission.NONE);
-    changed.push(file);
-   }
-  }catch(err){
-   previous.slice(0,changed.length).forEach(x=>{try{x.file.setSharing(x.access,x.permission)}catch(ignore){}});
-   throw new Error('PHOTO_PERMISSION_CHANGE_FAILED: '+String(err.message||err));
-  }
+  const id=String(r[0]||'');
   const status=decision==='approve'?'Опубликовано':decision==='reject'?'Отклонено':'Снято с публикации';
   const when=new Date(),email=Session.getActiveUser().getEmail();
+  const publicSheet=passportAdmin643PublicSheet_(main);
+  const mirrorPos=passportAdmin643MirrorIndex_(publicSheet,id);
+  // Existing real publication for same ID must not be silently overwritten.
+  if(decision==='approve'&&mirrorPos&&
+     String(publicSheet.getRange(mirrorPos,13).getValue())==='Опубликовано')
+    throw new Error('EVENT_ALREADY_PUBLISHED_IN_PUBLIC_FEED');
+  // Capture public record before any changes for compensating rollback.
+  const oldMirror=mirrorPos?publicSheet.getRange(mirrorPos,1,1,16).getValues()[0]:null;
+  let publicRow=mirrorPos,createdPublicRow=false;
+  const photos=(decision==='approve'||decision==='unpublish')
+    ?passportAdmin65PhotoFiles_(r):[];
+  const prevPermissions=[];
+  function restorePhotos(){
+   prevPermissions.forEach(x=>{
+    try{x.file.setSharing(x.access,x.permission)}catch(err){console.error('Photo rollback failed',err)}
+   });
+  }
+  function restoreMirror(){
+   try{
+    if(createdPublicRow)publicSheet.deleteRow(publicRow);
+    else if(oldMirror)publicSheet.getRange(publicRow,1,1,16).setValues([oldMirror]);
+   }catch(err){console.error('Public mirror rollback failed',err)}
+  }
+  // First hide on unpublish, before any Drive changes; never republish if closing
+  // photo permissions fails (failure leaves the public feed hidden).
+  if(decision==='unpublish'&&mirrorPos)
+   publicSheet.getRange(mirrorPos,13).setValue('Снято с публикации');
+  try{
+   for(const file of photos){
+    const access=file.getSharingAccess(),permission=file.getSharingPermission();
+    prevPermissions.push({file,access,permission});
+    if(decision==='approve')file.setSharing(DriveApp.Access.ANYONE_WITH_LINK,DriveApp.Permission.VIEW);
+    else file.setSharing(DriveApp.Access.PRIVATE,DriveApp.Permission.NONE);
+   }
+  }catch(err){
+   // When unpublishing, keep public feed hidden even if a photo access change fails.
+   if(decision==='approve')restorePhotos();
+   throw new Error('PHOTO_PERMISSION_CHANGE_FAILED: '+String(err.message||err));
+  }
+  if(decision==='approve'){
+   // Stage as non-public until teacher registry also records the decision.
+   try{
+    const data=passportAdmin643PublicRow_(r,'Ожидает',when);
+    if(mirrorPos)publicSheet.getRange(mirrorPos,1,1,16).setValues([data]);
+    else{
+     publicSheet.appendRow(data);
+     publicRow=publicSheet.getLastRow();
+     createdPublicRow=true;
+    }
+   }catch(err){restorePhotos();throw new Error('PUBLIC_FEED_PREPARATION_FAILED: '+String(err.message||err));}
+  }
   try{
    sheet.getRange(rowNumber,13,1,4).setValues([[status,when,email,explanation]]);
   }catch(err){
-   previous.forEach(x=>{try{x.file.setSharing(x.access,x.permission)}catch(ignore){}});
+   if(decision==='approve'){restoreMirror();restorePhotos();}
    throw err;
   }
-  // Decision is already saved. Audit failures must never trigger a duplicate mutation.
+  if(decision==='approve'){
+   // Final switch visible to the public endpoint. If this fails, revert the
+   // teacher status so the operation can be safely retried from HUB.
+   try{publicSheet.getRange(publicRow,13).setValue('Опубликовано')}
+   catch(err){
+    try{sheet.getRange(rowNumber,13,1,4).setValues([[current,r[13]||'',r[14]||'',r[15]||'']])}
+    catch(e){console.error('Teacher status rollback failed',e)}
+    restoreMirror();restorePhotos();
+    throw new Error('PUBLIC_FEED_PUBLICATION_FAILED: '+String(err.message||err));
+   }
+  }
+  // Rejecting pending entries should not create a public row. Any stalled
+  // mirror left by an interrupted attempt is made explicitly non-public.
+  if(decision==='reject'&&mirrorPos)publicSheet.getRange(mirrorPos,13).setValue('Отклонено');
   try{passportAdmin65ExternalAudit_(eventsBook,r,decision,email,explanation)}
-  catch(err){console.error('Event external audit failed',err)}
+  catch(err){console.error('Event audit failed',err)}
   try{passportAdmin64AuditEvent_(main,r,status,email,explanation)}
-  catch(err){console.error('Hub audit failed',err)}
+  catch(err){console.error('Hub event audit failed',err)}
   SpreadsheetApp.flush();
-  return {ok:true,status,eventId:String(r[0]||''),
-   publicationPendingVerification:decision==='approve'};
+  return {ok:true,status,eventId:id,publicFeedSynchronized:true};
  }finally{lock.releaseLock();}
 }
 /**
@@ -817,7 +904,12 @@ function admin65DeleteTestEvent(rowNumber,expectedStamp,eventId){
   const email=Session.getActiveUser().getEmail();
   const auditSheet=passportAdminSheet_(book,'Мероприятия — журнал');
   auditSheet.appendRow([new Date(),email,'DELETE_TEST',String(r[0]),'Удаление тестовой записи с закрытием фото']);
-  // Permanently remove public visibility in source before trashing test uploads.
+  // Remove any public copy of this TEST publication before deleting the
+  // source. Public endpoint must never display a deleted TEST entry.
+  const main=passportAdminBook_();
+  const feed=passportAdmin643PublicSheet_(main);
+  const mirrorIndex=passportAdmin643MirrorIndex_(feed,eventId);
+  if(mirrorIndex)feed.deleteRow(mirrorIndex);
   sheet.deleteRow(rowNumber);
   let failed=0;
   photos.forEach(file=>{
