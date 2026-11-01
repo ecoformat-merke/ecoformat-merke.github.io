@@ -74,7 +74,7 @@ footer{border-top:1px solid #ffffff21;color:#93b7a0;font-size:12px;padding:25px;
 </style></head>
 <body>
 <main>
-<header class="top"><strong class="logo">🌿 ECO CLUB / ADMIN</strong><span class="tag">ECO CLUB HUB 6.4 · PRIVATE</span></header>
+<header class="top"><strong class="logo">🌿 ECO CLUB / ADMIN</strong><span class="tag">ECO CLUB HUB 6.4.1 · PRIVATE</span></header>
 <h1>Eco Club | Цифровой кабинет</h1>
 <p class="intro">Единое рабочее пространство руководителя Eco Club: показатели, учащиеся, заявки, вклады, паспорта и сайт.</p>
 
@@ -786,23 +786,39 @@ function renderEventItems(){
    const reject=element('button','action danger','Отклонить');reject.type='button';reject.onclick=()=>decideEvent(x,'reject');
    actions.append(approve,reject);c.append(actions);
   }
+  if(x.canUnpublish){
+   const actions=element('div','hub-actions');
+   const unpublish=element('button','action danger','Снять с публикации');
+   unpublish.type='button';unpublish.onclick=()=>decideEvent(x,'unpublish');
+   actions.append(unpublish);c.append(actions);
+  }
   if(eventStatus(x)==='rejected'&&x.decisionReason)c.append(line('Причина отклонения',x.decisionReason));
   list.append(c);
  });
 }
 function decideEvent(x,action){
  if(busy)return;
- if(!confirm(action==='approve'?'Опубликовать мероприятие «'+x.nameRu+'»? Проверьте согласия на фотографии.':'Отклонить мероприятие «'+x.nameRu+'»?'))return;
+ const prompts={
+  approve:'Опубликовать мероприятие «'+x.nameRu+'»? Фотографии станут доступны по ссылке на публичном сайте. Проверьте согласия на публикацию.',
+  reject:'Отклонить мероприятие «'+x.nameRu+'»?',
+  unpublish:'Снять мероприятие «'+x.nameRu+'» с сайта и закрыть доступ по ссылке к его фотографиям?'
+ };
+ if(!prompts[action]||!confirm(prompts[action]))return;
  let reason='';
- if(action==='reject'){
-  const value=prompt('Причина отклонения (минимум 3 символа):','');
+ if(action!=='approve'){
+  const value=prompt('Причина (минимум 5 символов):',action==='unpublish'?'Завершение теста':'');
   if(value===null)return;reason=value.trim();
-  if(reason.length<3){feedback('Укажите причину отклонения.',true);return;}
+  if(reason.length<5){feedback('Укажите причину длиной не менее 5 символов.',true);return;}
  }
  apiCall('eventDecide',[x.row,x.stamp,action,reason],res=>{
   if(!res?.ok){feedback('Решение не сохранено.',true);return;}
   refresh();
-  feedback(action==='approve'?'Статус «Опубликовано» записан. Проверьте появление материала на основном сайте.':'Мероприятие отклонено, причина сохранена.');
+  const texts={
+   approve:'Статус «Опубликовано» сохранён. Проверьте появление карточки на основном сайте.',
+   reject:'Публикация отклонена. Причина сохранена.',
+   unpublish:'Мероприятие снято с публикации, доступ к фото по ссылке закрыт. Проверьте сайт.'
+  };
+  feedback(texts[action]);
  });
 }
 document.querySelectorAll('#hub-nav button[data-target]').forEach(btn=>
