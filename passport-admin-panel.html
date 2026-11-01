@@ -42,6 +42,9 @@ footer{border-top:1px solid #ffffff21;color:#93b7a0;font-size:12px;padding:25px;
 .hub-class-select{min-height:44px;max-width:240px;min-width:145px;border:1px solid #b7e5ad65;border-radius:11px;background:#123c2d;color:#ecffec;padding:9px 12px;font:inherit;font-size:13px}
 .hub-class-select:focus-visible{outline:3px solid var(--green);outline-offset:2px}
 .hub-con-toolbar .action{min-height:44px}
+.hub-ev-photos{display:flex;gap:8px;overflow-x:auto;margin:10px 0}.hub-ev-photos img{height:92px;width:120px;object-fit:cover;border-radius:10px;border:1px solid #b2daa6}
+.hub-ev-desc{white-space:pre-wrap;font-size:12px;line-height:1.5;color:#cfe9d2}
+.hub-ev-hint{border:1px solid #b6e1a76b;padding:9px;border-radius:9px;font-size:12px}
 .hub-member-tools{display:flex;align-items:center;flex-wrap:wrap;gap:9px;margin:12px 0}
 .hub-member-tools .search{max-width:540px}
 .hub-member-tools .action{min-height:44px}
@@ -71,7 +74,7 @@ footer{border-top:1px solid #ffffff21;color:#93b7a0;font-size:12px;padding:25px;
 </style></head>
 <body>
 <main>
-<header class="top"><strong class="logo">🌿 ECO CLUB / ADMIN</strong><span class="tag">ECO CLUB HUB 6.3 · PRIVATE</span></header>
+<header class="top"><strong class="logo">🌿 ECO CLUB / ADMIN</strong><span class="tag">ECO CLUB HUB 6.4 · PRIVATE</span></header>
 <h1>Eco Club | Цифровой кабинет</h1>
 <p class="intro">Единое рабочее пространство руководителя Eco Club: показатели, учащиеся, заявки, вклады, паспорта и сайт.</p>
 
@@ -134,7 +137,19 @@ footer{border-top:1px solid #ffffff21;color:#93b7a0;font-size:12px;padding:25px;
 <p id="hub-con-context" class="subnote" aria-live="polite"></p>
 <div id="hub-con-list" class="hub-list"></div>
 </section>
-<section id="hub-events" class="hub-view" hidden><h2>Мероприятия</h2><p class="subnote">Реестр мероприятий из Google Sheets.</p><div id="hub-event-list" class="hub-list"></div></section>
+<section id="hub-events" class="hub-view" hidden>
+<h2>Мероприятия · модерация публикаций</h2>
+<p class="subnote">Педагоги отправляют события с основного сайта. Перед публикацией проверьте тексты, фотографии и разрешения на их размещение.</p>
+<div class="hub-filterbar" aria-label="Фильтр публикаций">
+<button data-event-filter="pending" aria-pressed="true" type="button">На проверке <span id="hub-ev-pending"></span></button>
+<button data-event-filter="published" aria-pressed="false" type="button">Опубликованные <span id="hub-ev-published"></span></button>
+<button data-event-filter="rejected" aria-pressed="false" type="button">Отклонённые <span id="hub-ev-rejected"></span></button>
+<button data-event-filter="all" aria-pressed="false" type="button">Все <span id="hub-ev-all"></span></button>
+</div>
+<div class="hub-app-searchbar"><input id="hub-ev-search" class="search" type="search" placeholder="Поиск по названию, классу и категории"><button id="hub-ev-clear" class="action secondary" type="button">Очистить</button></div>
+<p class="subnote" id="hub-ev-context" aria-live="polite"></p>
+<div id="hub-event-list" class="hub-list"></div>
+</section>
 <section id="hub-quality" class="hub-view" hidden><h2>Контроль качества данных</h2><div id="hub-quality-kpis" class="hub-kpis"></div><h3>Последние решения</h3><div id="hub-audit-list" class="hub-list"></div></section>
 <section id="hub-site" class="hub-view" hidden><h2>Публичный сайт</h2><p class="subnote">Предпросмотр опубликованного Eco Club в этом же кабинете. Изменения дизайна сайта по-прежнему выполняются через GitHub.</p><div class="hub-site-tools" role="group" aria-label="Просмотр разделов публичного сайта"><button type="button" class="action" data-preview="home">Главная</button><button type="button" class="action secondary" data-preview="world">ECO WORLD</button><button type="button" class="action secondary" data-preview="passport">Паспорт · демо</button></div>
 <iframe id="hub-iframe" title="Предпросмотр Eco Club" loading="lazy" referrerpolicy="no-referrer" src="https://gulyantsdanil-oss.github.io/eco-club-m.auezov/"></iframe><p><a href="https://gulyantsdanil-oss.github.io/eco-club-m.auezov/" target="_blank" rel="noopener" style="color:var(--green)">Открыть сайт отдельно, если предпросмотр недоступен</a></p></section>
@@ -352,7 +367,7 @@ load();
 'use strict';
 const get=id=>document.getElementById(id);
 const tabs=['overview','members','applications','contributions','events','passports','quality','site'];
-let current='overview',hub=null,people=[],busy=false,appFilter='pending',conFilter='pending';
+let current='overview',hub=null,people=[],busy=false,appFilter='pending',conFilter='pending',eventFilter='pending';
 const format=(n,d=0)=>Number.isFinite(Number(n))?new Intl.NumberFormat('ru-RU',{maximumFractionDigits:d}).format(Number(n)):'—';
 function element(tag,cls,content){
  const e=document.createElement(tag);
@@ -406,6 +421,8 @@ function apiCall(method,args,onSuccess){
  if(method==='members')runner.admin54Overview();
  if(method==='profile')runner.admin63MemberProfile(args[0]);
  if(method==='decide')runner.admin60Decide(...args);
+ if(method==='enroll')runner.admin64EnrollAccepted(...args);
+ if(method==='eventDecide')runner.admin64DecideEvent(...args);
 }
 function refresh(){
  if(busy)return;
@@ -433,7 +450,7 @@ function render(){
   [format(s.approvedContributions),'Подтверждённых вкладов'],
   [format(s.pendingApplications),'Новых заявок'],
   [format(s.pendingContributions),'Вкладов ожидают проверки'],
-  [format(s.events),'Мероприятий'],
+  [format(s.pendingEvents||0),'Публикаций на проверке'],
   [format(s.unlinked),'Вкладов без ID участника']
  ].forEach(item=>kpi(kp,item[0],item[1]));
  const ranks=get('hub-classes');ranks.replaceChildren();
@@ -453,6 +470,7 @@ function render(){
  let count=0;
  [[s.pendingApplications,'Новые заявки','applications'],
  [s.pendingContributions,'Вклады на проверке','contributions'],
+ [s.pendingEvents||0,'Мероприятия на модерации','events'],
  [s.unlinked,'Подтверждённые вклады без ID','passports']].forEach(([v,title,tab])=>{
    if(v<1)return;
    count++;
@@ -463,17 +481,12 @@ function render(){
  if(!count)attention.append(element('p','subnote','Новых задач, ожидающих решения, нет.'));
  renderItems('application');
  renderItems('contribution');
- const events=get('hub-event-list');events.replaceChildren();
- if(!hub.events.length)events.append(element('p','empty','Зарегистрированных мероприятий пока нет.'));
- hub.events.forEach(x=>{
-  const c=card(x.nameRu||x.nameKk||'Без названия');
-  c.append(line('Дата',x.date),line('Класс',x.className),line('Категория',x.category),line('Статус',x.status));
-  events.append(c);
- });
+ renderEventItems();
  const control=get('hub-quality-kpis');control.replaceChildren();
  [[s.pendingApplications,'Новые заявки'],
  [s.pendingContributions,'Непроверенные вклады'],
  [s.unlinked,'Подтверждённые без ID'],
+ [s.pendingEvents||0,'Мероприятия на проверке'],
  [s.rejectedContributions,'Отклонённые вклады']].forEach(([v,t])=>kpi(control,format(v),t));
  const log=get('hub-audit-list');log.replaceChildren();
  if(!hub.audit.length)log.append(element('p','empty','Журнал решений пока пуст.'));
@@ -680,7 +693,17 @@ function renderItems(type){
  filtered.forEach(x=>{
   const c=card(x.name||'Без имени');
   c.append(line('Дата',x.date),line('Класс',x.className));
-  if(app)c.append(line('Направление',x.direction),line('Мотивация',x.notes));
+  if(app){
+   c.append(line('Направление',x.direction),line('Мотивация',x.notes));
+   if(x.registered)c.append(line('EcoPassport','Подготовлен — код выдаётся отдельно'));
+   else if(x.canEnroll){
+     const b=element('button','action secondary','Подготовить EcoPassport');
+     b.type='button';b.onclick=()=>{
+       if(busy||!confirm('Зарегистрировать принятого ученика и создать его постоянный ID без выдачи кода?'))return;
+       apiCall('enroll',[x.row,x.stamp],r=>{if(r?.ok)refresh();});
+     };c.append(b);
+   }
+  }
   else{
    c.append(line('Макулатура',format(x.paperKg,2)+' кг'),
      line('Крышки',format(x.capsCount)+' шт.'),
@@ -716,6 +739,70 @@ function decide(kind,record,action){
   if(!r||!r.ok){feedback('Решение не сохранено.',true);return;}
   feedback('Решение сохранено. '+(r.needsSync?'Для отображения нового подтверждённого вклада в паспорте синхронизируйте ID в разделе «Паспорта».':''));
   refresh();
+ });
+}
+function eventStatus(x){
+ const s=String(x.status||'').normalize('NFKC').trim().toLowerCase().replace(/^[✅❌⏳]\s*/,'');
+ if(x.canDecide||['на проверке','на модерации','ожидает','ожидает проверки','ожидает подтверждения','на рассмотрении','отправлено','новая публикация','новое мероприятие','pending','submitted'].includes(s))return 'pending';
+ if(['опубликовано','одобрено','утверждено','published','approved'].includes(s))return 'published';
+ if(['отклонено','отклонён','отклонена','отказано','rejected'].includes(s))return 'rejected';
+ return 'other';
+}
+function eventFiltered(all,filter,q){
+ const search=String(q||'').trim().toLowerCase();
+ return all.filter(x=>(filter==='all'||eventStatus(x)===filter)&&
+  [x.nameRu,x.nameKk,x.category,x.className,x.descRu].join(' ').toLowerCase().includes(search))
+  .sort((a,b)=>filter==='all'&&(eventStatus(a)==='pending')!==(eventStatus(b)==='pending')?(eventStatus(a)==='pending'?-1:1):b.row-a.row);
+}
+function renderEventItems(){
+ if(!hub)return;
+ const all=hub.events||[],counts={pending:0,published:0,rejected:0,other:0};
+ all.forEach(x=>counts[eventStatus(x)]++);
+ ['pending','published','rejected'].forEach(x=>get('hub-ev-'+x).textContent=counts[x]);
+ get('hub-ev-all').textContent=all.length;
+ document.querySelectorAll('[data-event-filter]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.eventFilter===eventFilter)));
+ const shown=eventFiltered(all,eventFilter,get('hub-ev-search').value);
+ get('hub-ev-context').textContent='Найдено публикаций: '+shown.length+(counts.other?' · Неизвестный статус: '+counts.other:'');
+ const list=get('hub-event-list');list.replaceChildren();
+ if(!shown.length){list.append(element('p','empty',eventFilter==='pending'?'Новых мероприятий для проверки нет.':'По выбранному фильтру публикаций нет.'));return;}
+ shown.forEach(x=>{
+  const c=card(x.nameRu||x.nameKk||'Без названия');
+  if(x.nameKk)c.append(line('Название ҚАЗ',x.nameKk));
+  if(x.descRu)c.append(element('p','hub-ev-desc',x.descRu));
+  if(x.descKk)c.append(line('Описание ҚАЗ',x.descKk));
+  c.append(line('Класс',x.className),line('Дата',x.date),line('Категория',x.category),line('Статус',x.status));
+  if(Array.isArray(x.photoUrls)&&x.photoUrls.length){
+   const strip=element('div','hub-ev-photos');
+   x.photoUrls.forEach((u,i)=>{if(!/^https:\/\/drive\.google\.com\/thumbnail\?id=[\w-]+&sz=w500$/.test(u))return;
+     const link=element('a');link.href=u;link.target='_blank';link.rel='noopener noreferrer';
+     const img=element('img');img.src=u;img.loading='lazy';img.alt='Фотография '+(i+1);link.append(img);strip.append(link);
+   });c.append(strip);
+  }
+  if(x.canDecide){
+   if(!x.canPublish)c.append(element('p','hub-ev-hint','Для публикации необходимы правильные ID, заголовок, категория и дата. Отклонение доступно с причиной.'));
+   const actions=element('div','hub-actions');
+   const approve=element('button','action','Опубликовать на сайте');approve.disabled=!x.canPublish;approve.type='button';
+   approve.onclick=()=>decideEvent(x,'approve');
+   const reject=element('button','action danger','Отклонить');reject.type='button';reject.onclick=()=>decideEvent(x,'reject');
+   actions.append(approve,reject);c.append(actions);
+  }
+  if(eventStatus(x)==='rejected'&&x.decisionReason)c.append(line('Причина отклонения',x.decisionReason));
+  list.append(c);
+ });
+}
+function decideEvent(x,action){
+ if(busy)return;
+ if(!confirm(action==='approve'?'Опубликовать мероприятие «'+x.nameRu+'»? Проверьте согласия на фотографии.':'Отклонить мероприятие «'+x.nameRu+'»?'))return;
+ let reason='';
+ if(action==='reject'){
+  const value=prompt('Причина отклонения (минимум 3 символа):','');
+  if(value===null)return;reason=value.trim();
+  if(reason.length<3){feedback('Укажите причину отклонения.',true);return;}
+ }
+ apiCall('eventDecide',[x.row,x.stamp,action,reason],res=>{
+  if(!res?.ok){feedback('Решение не сохранено.',true);return;}
+  refresh();
+  feedback(action==='approve'?'Статус «Опубликовано» записан. Проверьте появление материала на основном сайте.':'Мероприятие отклонено, причина сохранена.');
  });
 }
 document.querySelectorAll('#hub-nav button[data-target]').forEach(btn=>
@@ -765,6 +852,11 @@ get('hub-con-clear').addEventListener('click',()=>{
  renderItems('contribution');
  get('hub-con-search').focus();
 });
+document.querySelectorAll('[data-event-filter]').forEach(b=>b.addEventListener('click',()=>{
+ eventFilter=b.dataset.eventFilter;get('hub-ev-search').value='';renderEventItems();
+}));
+get('hub-ev-search').addEventListener('input',renderEventItems);
+get('hub-ev-clear').addEventListener('click',()=>{get('hub-ev-search').value='';renderEventItems();});
 get('hub-con-search').addEventListener('input',()=>renderItems('contribution'));
 refresh();
 })();
