@@ -417,7 +417,7 @@ function passportAdmin56WeeklyDigest(e){
 const ECO_HUB60=Object.freeze({
  applications:'Заявки',
  contributions:'Вклад',
- events:'Мероприятия',
+ events:'Заявки мероприятий',
  decisions:'Журнал решений',
  limit:150
 });
@@ -426,7 +426,7 @@ function admin60Dashboard(){
  const book=passportAdminBook_();
  const apps=passportAdminSheet_(book,ECO_HUB60.applications).getDataRange().getValues();
  const gifts=passportAdminSheet_(book,ECO_HUB60.contributions).getDataRange().getValues();
- const events=passportAdminSheet_(book,ECO_HUB60.events).getDataRange().getValues();
+ const events=passportAdminSheet_(passportAdmin65EventsBook_(),ECO_HUB60.events).getDataRange().getValues();
  const actions=passportAdminSheet_(book,ECO_HUB60.decisions).getDataRange().getValues();
  const people=book.getSheetByName(PASSPORT_ADMIN54.roster);
  const classes=new Map();
@@ -493,6 +493,7 @@ function admin60Dashboard(){
     className:passportAdmin60Text_(r[8]),category:passportAdmin60Text_(r[7]),
     instagram:passportAdmin60Text_(r[10]),photoUrls:passportAdmin64EventImages_(r[11]),
     status,canDecide:pending,canPublish:pending&&passportAdmin64EventValid_(r),
+    canUnpublish:passportAdmin64EventPublished_(status),
     decisionReason:passportAdmin60Text_(r[15])
   });
  }
@@ -677,6 +678,26 @@ function passportAdmin64EnsureParticipant_(book,name,className){
  roster.appendRow([id,String(name).trim(),String(className).trim(),new Date(),true]);
  return {id,created:true};
 }
+/** Separate existing teacher-submission spreadsheet; no private ID in GitHub. */
+function passportAdmin65EventsBook_(){
+ const id=String(PropertiesService.getScriptProperties()
+   .getProperty('ECO_EVENTS_SPREADSHEET_ID')||'').trim();
+ if(!/^[A-Za-z0-9_-]{20,}$/.test(id))throw new Error('ECO_EVENTS_SPREADSHEET_ID_NOT_CONFIGURED');
+ return SpreadsheetApp.openById(id);
+}
+function passportAdmin65PhotoIds_(row){
+ const parts=String(row[11]||'').split(',').map(x=>x.trim()).filter(Boolean);
+ if(parts.length<1||parts.length>3||parts.some(x=>!/^[A-Za-z0-9_-]{15,150}$/.test(x)))
+   throw new Error('INVALID_EVENT_PHOTOS');
+ return parts;
+}
+function passportAdmin65PhotoFiles_(row){
+ return passportAdmin65PhotoIds_(row).map(id=>DriveApp.getFileById(id));
+}
+function passportAdmin65ExternalAudit_(book,row,action,actor,reason){
+ const sh=passportAdminSheet_(book,'Мероприятия — журнал');
+ sh.appendRow([new Date(),actor,action,String(row[0]||''),String(reason||'')]);
+}
 function passportAdmin64EventPending_(status){
  const s=String(status||'').normalize('NFKC').trim().toLowerCase().replace(/^⏳\s*/,'');
  return ['на проверке','на модерации','ожидает','ожидает проверки','ожидает подтверждения',
@@ -712,33 +733,62 @@ function passportAdmin64EventImages_(raw){
 }
 function passportAdmin64AuditEvent_(book,row,status,email,reason){
  const log=passportAdminSheet_(book,ECO_HUB60.decisions);
- log.appendRow([new Date(),email,'HUB_EVENT_'+(passportAdmin64EventPublished_(status)?'PUBLISH':'REJECT'),
+ const action=passportAdmin64EventPublished_(status)?'PUBLISH':status==='Снято с публикации'?'UNPUBLISH':'REJECT';
+ log.appendRow([new Date(),email,'HUB_EVENT_'+action,
   status,'',String(row[0]||''),String(row[3]||''),String(row[8]||''),'','',reason]);
 }
 /** Approve or reject a submitted teacher event, with optimistic concurrency. */
 function admin64DecideEvent(rowNumber,expectedStamp,decision,reason){
  requirePassportAdmin_();
  if(!Number.isSafeInteger(rowNumber)||rowNumber<2||rowNumber>10000)throw new Error('INVALID_ROW');
- if(!['approve','reject'].includes(decision))throw new Error('INVALID_DECISION');
+ if(!['approve','reject','unpublish'].includes(decision))throw new Error('INVALID_DECISION');
  if(!/^[a-f0-9]{64}$/.test(String(expectedStamp||'')))throw new Error('INVALID_STAMP');
  const explanation=String(reason||'').trim().slice(0,300);
- if(decision==='reject'&&explanation.length<3)throw new Error('REJECTION_REASON_REQUIRED');
+ if(decision!=='approve'&&explanation.length<5)throw new Error('REJECTION_REASON_REQUIRED');
  const lock=LockService.getScriptLock();lock.waitLock(30000);
  try{
-  const book=passportAdminBook_();
-  const sheet=passportAdminSheet_(book,ECO_HUB60.events);
+  const main=passportAdminBook_();
+  const eventsBook=passportAdmin65EventsBook_();
+  const sheet=passportAdminSheet_(eventsBook,ECO_HUB60.events);
   if(rowNumber>sheet.getLastRow())throw new Error('ROW_NOT_FOUND');
   const r=sheet.getRange(rowNumber,1,1,16).getValues()[0];
   if(passportAdmin60Stamp_('event',r)!==expectedStamp)throw new Error('ROW_CHANGED_REFRESH');
-  if(!passportAdmin64EventPending_(r[12]))throw new Error('ALREADY_REVIEWED');
+  const current=String(r[12]||'').trim();
+  if(decision==='unpublish'?!passportAdmin64EventPublished_(current):
+     !passportAdmin64EventPending_(current))throw new Error('ALREADY_REVIEWED');
   if(decision==='approve'&&!passportAdmin64EventValid_(r))throw new Error('EVENT_REQUIRED_FIELDS_MISSING');
-  // Stable published status used by the current public events endpoint.
-  const status=decision==='approve'?'Опубликовано':'Отклонено';
+  // Only approved event images may become publicly accessible.
+  const files=(decision==='approve'||decision==='unpublish')
+    ?passportAdmin65PhotoFiles_(r):[];
+  const previous=[],changed=[];
+  try{
+   for(const file of files){
+    const access=file.getSharingAccess(),permission=file.getSharingPermission();
+    previous.push({file,access,permission});
+    if(decision==='approve')file.setSharing(DriveApp.Access.ANYONE_WITH_LINK,DriveApp.Permission.VIEW);
+    else file.setSharing(DriveApp.Access.PRIVATE,DriveApp.Permission.NONE);
+    changed.push(file);
+   }
+  }catch(err){
+   previous.slice(0,changed.length).forEach(x=>{try{x.file.setSharing(x.access,x.permission)}catch(ignore){}});
+   throw new Error('PHOTO_PERMISSION_CHANGE_FAILED: '+String(err.message||err));
+  }
+  const status=decision==='approve'?'Опубликовано':decision==='reject'?'Отклонено':'Снято с публикации';
   const when=new Date(),email=Session.getActiveUser().getEmail();
-  sheet.getRange(rowNumber,13,1,3).setValues([[status,when,email]]);
-  if(decision==='reject')sheet.getRange(rowNumber,16).setValue(explanation);
-  passportAdmin64AuditEvent_(book,r,status,email,explanation);
-  return {ok:true,status,eventId:String(r[0]||''),publicationPendingVerification:decision==='approve'};
+  try{
+   sheet.getRange(rowNumber,13,1,4).setValues([[status,when,email,explanation]]);
+  }catch(err){
+   previous.forEach(x=>{try{x.file.setSharing(x.access,x.permission)}catch(ignore){}});
+   throw err;
+  }
+  // Decision is already saved. Audit failures must never trigger a duplicate mutation.
+  try{passportAdmin65ExternalAudit_(eventsBook,r,decision,email,explanation)}
+  catch(err){console.error('Event external audit failed',err)}
+  try{passportAdmin64AuditEvent_(main,r,status,email,explanation)}
+  catch(err){console.error('Hub audit failed',err)}
+  SpreadsheetApp.flush();
+  return {ok:true,status,eventId:String(r[0]||''),
+   publicationPendingVerification:decision==='approve'};
  }finally{lock.releaseLock();}
 }
 /** Explicitly register an already-accepted applicant from earlier submissions. */
