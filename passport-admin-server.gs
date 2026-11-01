@@ -583,6 +583,8 @@ function passportAdmin60Text_(value){
 }
 function passportAdmin60Stamp_(kind,row){
  const selected=kind==='application'?row.slice(0,9):kind==='event'?row.slice(0,16):row.slice(0,13);
+ // Empty column P is missing from getDataRange(), but present in 16-column row reads.
+ if(kind==='event')while(selected.length<16)selected.push('');
  const normalized=selected.map(v=>v instanceof Date?v.toISOString():String(v??'')).join('\u241e');
  return Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256,kind+'\u241f'+normalized,Utilities.Charset.UTF_8)
   .map(v=>(v&255).toString(16).padStart(2,'0')).join('');
