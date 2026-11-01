@@ -17,6 +17,37 @@ h1{font:normal clamp(34px,5vw,57px)/1.1 Georgia,serif;letter-spacing:-.04em;marg
 dialog{width:min(560px,calc(100vw - 30px));background:#123a2c;color:#eaffea;border:1px solid #b3ebb29b;border-radius:20px;padding:23px;box-shadow:0 25px 100px #000b}dialog::backdrop{background:#03150ebd;backdrop-filter:blur(4px)}dialog h2{font-size:24px;margin:0 0 10px}dialog p{font-size:13px;line-height:1.6;color:#d0e9d2}.code{width:100%;min-height:90px;border-radius:12px;padding:12px;word-break:break-all;resize:vertical;background:#eaf9e9;color:#123523;font-size:15px;border:0}.dialog-actions{display:flex;justify-content:flex-end;gap:9px;flex-wrap:wrap;margin-top:15px}.private-warning{font-weight:700;color:#ffddad}
 footer{border-top:1px solid #ffffff21;color:#93b7a0;font-size:12px;padding:25px;text-align:center}
 @media(max-width:720px){main{padding:20px 12px 60px}.metrics{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.metric{padding:12px}.items{grid-template-columns:1fr}.heading{flex-wrap:wrap}.toolbar{align-items:stretch}.search{max-width:none}.person{padding:13px}}
+/* ECO CLUB HUB 6.5 task center */
+.hub-task-head{display:flex;align-items:flex-start;justify-content:space-between;gap:15px;flex-wrap:wrap;margin-top:22px}
+.hub-task-head h2{margin:4px 0 8px!important;font-size:clamp(22px,2.6vw,29px)}
+.hub-task-head .subnote{max-width:720px;line-height:1.6}
+.hub-eyebrow{font-size:10px;letter-spacing:1.8px;color:#c2f7aa;font-weight:800}
+.hub-task-head button{min-height:44px;flex:none}
+.hub-task-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:15px 0}
+.hub-task-metric{border:1px solid #c2eeb755;border-radius:16px;background:linear-gradient(130deg,#1c503b,#0d3428);padding:15px;min-width:0}
+.hub-task-metric b{font-size:clamp(25px,3vw,36px);line-height:1.1;color:var(--green);display:block}
+.hub-task-metric span{display:block;color:#c4deca;font-size:12px;margin-top:7px}
+.hub-task-panel{border:1px solid #b4d9a84d;background:#0e3529bb;border-radius:18px;padding:18px;margin:15px 0 26px}
+.hub-task-panel-head{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.hub-task-panel-head h3{font-size:20px;margin:0 0 10px}
+.hub-task-filters{display:flex;gap:7px;flex-wrap:wrap;margin:12px 0}
+.hub-task-filters button{border:1px solid #bee1b859;background:#1a4837;color:#e2f7e4;padding:9px 13px;border-radius:10px;min-height:42px;font-size:12px;font-weight:750;cursor:pointer}
+.hub-task-filters button[aria-pressed="true"]{background:var(--green);color:#143922;border-color:var(--green)}
+.hub-task-filters button span:not(:empty){padding:2px 6px;border-radius:30px;background:#ffffff2b;margin-left:3px}
+.hub-task-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:14px 0}
+.hub-task-item{border:1px solid #d5f1c94a;background:linear-gradient(135deg,#21513d,#133c2e);border-radius:14px;padding:15px;min-width:0}
+.hub-task-item[data-urgency="critical"]{border-left:4px solid #f2bd79}
+.hub-task-item[data-urgency="high"]{border-left:4px solid #c4f39e}
+.hub-task-item[data-urgency="normal"]{border-left:4px solid #9ccacc}
+.hub-task-item-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.hub-task-item-title{font-size:14px;font-weight:800;margin:5px 0 7px;overflow-wrap:anywhere}
+.hub-task-pill{font-size:10px;border:1px solid #d2edbc72;border-radius:20px;color:#e1f8d5;padding:4px 8px;white-space:nowrap}
+.hub-task-item p{font-size:12px;color:#d0e4d1;margin:5px 0;line-height:1.5;overflow-wrap:anywhere}
+.hub-task-item .action{margin-top:9px;min-height:40px}
+.hub-task-empty{padding:16px;border:1px dashed #ccf6bd69;border-radius:12px;color:#d8f6d2;font-size:13px}
+.hub-overview-subtitle{margin:27px 0 8px}
+@media(max-width:820px){.hub-task-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.hub-task-list{grid-template-columns:1fr}.hub-task-panel{padding:13px}}
+@media(max-width:420px){.hub-task-metric{padding:11px}.hub-task-filters button{padding:8px 10px}}
 .hub-nav{display:flex;position:sticky;top:0;z-index:8;background:#081f18ef;backdrop-filter:blur(10px);gap:7px;overflow-x:auto;padding:11px 0;border-bottom:1px solid #ffffff2b}
 .hub-nav button{min-height:44px;flex:none;border-radius:11px;border:1px solid #b2dfa558;color:#daecdd;background:#225039a1;padding:9px 13px;font-size:13px;font-weight:750}
 .hub-nav button[aria-selected=true]{background:var(--green);color:#153823}
@@ -74,7 +105,7 @@ footer{border-top:1px solid #ffffff21;color:#93b7a0;font-size:12px;padding:25px;
 </style></head>
 <body>
 <main>
-<header class="top"><strong class="logo">🌿 ECO CLUB / ADMIN</strong><span class="tag">ECO CLUB HUB 6.4.3 · PRIVATE</span></header>
+<header class="top"><strong class="logo">🌿 ECO CLUB / ADMIN</strong><span class="tag">ECO CLUB HUB 6.5 · PRIVATE</span></header>
 <h1>Eco Club | Цифровой кабинет</h1>
 <p class="intro">Единое рабочее пространство руководителя Eco Club: показатели, учащиеся, заявки, вклады, паспорта и сайт.</p>
 
@@ -90,7 +121,28 @@ footer{border-top:1px solid #ffffff21;color:#93b7a0;font-size:12px;padding:25px;
 </nav>
 <p id="hub-message" class="feedback" role="status">Загрузка данных клуба…</p>
 <section id="hub-overview" class="hub-view">
-<h2>Обзор Eco Club</h2>
+<div class="hub-task-head">
+<div><div class="hub-eyebrow">ECO CLUB / ЕЖЕДНЕВНЫЙ КОНТРОЛЬ</div><h2>Центр задач руководителя</h2>
+<p class="subnote">Всё, что требует решения, в одной очереди. Переход к карточке не подтверждает заявку и не выдаёт код автоматически.</p></div>
+<button id="hub-task-refresh" class="action secondary" type="button">↻ Обновить задачи</button>
+</div>
+<div class="hub-task-kpis" id="hub-task-kpis"></div>
+<div class="hub-task-panel">
+<div class="hub-task-panel-head"><h3>Очередь действий</h3><span id="hub-task-updated" class="subnote"></span></div>
+<div class="hub-task-filters" role="group" aria-label="Фильтр задач">
+<button type="button" data-task-filter="all" aria-pressed="true">Все <span id="hub-task-count-all"></span></button>
+<button type="button" data-task-filter="important" aria-pressed="false">Срочные <span id="hub-task-count-important"></span></button>
+<button type="button" data-task-filter="applications" aria-pressed="false">Заявки</button>
+<button type="button" data-task-filter="contributions" aria-pressed="false">Вклады</button>
+<button type="button" data-task-filter="events" aria-pressed="false">Мероприятия</button>
+<button type="button" data-task-filter="access" aria-pressed="false">Паспорта</button>
+<button type="button" data-task-filter="data" aria-pressed="false">Данные</button>
+</div>
+<p id="hub-task-result" class="subnote" role="status" aria-live="polite"></p>
+<div id="hub-task-list" class="hub-task-list"></div>
+<button id="hub-task-more" class="action secondary" type="button" hidden>Показать остальные задачи</button>
+</div>
+<h2 class="hub-overview-subtitle">Показатели Eco Club</h2>
 <div id="hub-kpis" class="hub-kpis"></div>
 <div class="hub-columns">
 <article class="hub-box"><h3>Рейтинг классов</h3><div id="hub-classes"></div></article>
@@ -369,6 +421,7 @@ load();
 const get=id=>document.getElementById(id);
 const tabs=['overview','members','applications','contributions','events','passports','quality','site'];
 let current='overview',hub=null,people=[],busy=false,appFilter='pending',conFilter='pending',eventFilter='pending';
+let taskFilter='all',taskShowAll=false;
 const format=(n,d=0)=>Number.isFinite(Number(n))?new Intl.NumberFormat('ru-RU',{maximumFractionDigits:d}).format(Number(n)):'—';
 function element(tag,cls,content){
  const e=document.createElement(tag);
@@ -432,6 +485,7 @@ function refresh(){
  apiCall('dashboard',[],response=>{
   if(!response||!response.ok){feedback('Показатели не загрузились.',true);return;}
   hub=response;
+  taskShowAll=false;
   try{render();}
   catch(err){
    feedback('Ошибка отображения: '+String(err&&err.message||err)+'. Обновите страницу или свяжитесь с администратором.',true);
@@ -448,6 +502,7 @@ function refresh(){
 function render(){
  if(!hub)return;
  const s=hub.summary;
+ renderTaskCenter();
  const kp=get('hub-kpis');kp.replaceChildren();
  [
   [format(s.participants),'Участников с ID'],
@@ -501,6 +556,111 @@ function render(){
   c.append(line('Дата',a.date),line('Статус',a.status),line('Класс',a.className));
   log.append(c);
  });
+}
+
+function taskGroupMatch(task,filter){
+ if(filter==='all')return true;
+ if(filter==='important')return task.severity==='critical'||task.severity==='high';
+ return filter==='access'?task.kind==='access':
+  task.kind===filter;
+}
+function renderTaskCenter(){
+ if(!hub)return;
+ const center=hub.taskCenter;
+ const metrics=get('hub-task-kpis'),list=get('hub-task-list');
+ metrics.replaceChildren();list.replaceChildren();
+ if(!center||!Array.isArray(center.items)){
+  get('hub-task-result').textContent='Задачи недоступны. Проверьте, что Код.gs обновлён до версии 6.5.';
+  get('hub-task-updated').textContent='';
+  get('hub-task-more').hidden=true;
+  return;
+ }
+ const counts=center.counts||{},stat=[
+  [counts.applications||0,'Новых заявок','applications'],
+  [counts.contributions||0,'Вкладов на проверке','contributions'],
+  [counts.events||0,'Публикаций на модерации','events'],
+  [(counts.access||0)+(counts.data||0),'Паспорта и данные','access']
+ ];
+ stat.forEach(([n,label,target])=>{
+  const e=element('div','hub-task-metric');
+  const value=element('b','',format(n)),name=element('span','',label);
+  e.append(value,name);
+  metrics.append(e);
+ });
+ get('hub-task-updated').textContent='Проверено: '+(center.generatedAt||'—');
+ get('hub-task-count-all').textContent=String(center.total||0);
+ get('hub-task-count-important').textContent=String((center.urgency?.critical||0)+(center.urgency?.high||0));
+ document.querySelectorAll('[data-task-filter]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.taskFilter===taskFilter)));
+ const selected=center.items.filter(item=>taskGroupMatch(item,taskFilter));
+ const shown=taskShowAll?selected:selected.slice(0,8);
+ const more=get('hub-task-more');
+ more.hidden=selected.length<=8;
+ more.textContent=taskShowAll?'Свернуть очередь':'Показать ещё ('+(selected.length-8)+')';
+ get('hub-task-result').textContent='Задач: '+selected.length+
+   (center.truncated?' · показываются первые '+center.shown+' из '+center.total+' по приоритету':'')+
+   ' · действия выполняются только в исходном разделе';
+ if(!shown.length){
+  list.append(element('p','hub-task-empty',
+    taskFilter==='all'?'Новых задач нет. Все требующие рассмотрения вопросы обработаны.':'В этой категории нет задач.'));
+  return;
+ }
+ const priorityLabel={critical:'Требует внимания',high:'На рассмотрении',normal:'Плановая задача',routine:'Без срочности'};
+ shown.forEach(task=>{
+  const article=element('article','hub-task-item');
+  article.dataset.urgency=task.severity||'routine';
+  const head=element('div','hub-task-item-head');
+  head.append(element('span','hub-task-pill',priorityLabel[task.severity]||'Задача'));
+  if(task.date)head.append(element('span','subnote',task.date));
+  article.append(head,element('div','hub-task-item-title',task.title),
+   element('p','',task.detail));
+  const button=element('button','action secondary',task.target==='passports'?
+    (task.kind==='data'?'Перейти к привязке':'Управлять кодом'):'Открыть запись');
+  button.type='button';
+  button.addEventListener('click',()=>openTaskSource(task));
+  article.append(button);list.append(article);
+ });
+}
+function openTaskSource(task){
+ if(!task||!task.target)return;
+ const target=task.target;
+ if(target==='applications'){
+  appFilter=task.kind==='data'?'history':'pending';
+  get('hub-app-search').value='';
+  switchTo('applications');renderItems('application');
+ }else if(target==='contributions'){
+  conFilter='pending';
+  get('hub-con-search').value='';
+  get('hub-con-class').value='';
+  switchTo('contributions');renderItems('contribution');
+ }else if(target==='events'){
+  eventFilter='pending';
+  get('hub-ev-search').value='';
+  switchTo('events');renderEventItems();
+ }else if(target==='passports'){
+  switchTo('passports');
+  const search=get('search');
+  if(task.kind==='access'&&task.name){
+   search.value=task.name;
+   search.dispatchEvent(new Event('input',{bubbles:true}));
+   search.focus();
+  }else{
+   search.value='';
+   search.dispatchEvent(new Event('input',{bubbles:true}));
+   const sync=get('sync');
+   if(sync&&sync.style.display!=='none')sync.focus();
+  }
+  return;
+ }else return;
+ if(task.row){
+  const parent=get('hub-'+target);
+  const record=Array.from(parent.querySelectorAll('[data-hub-row]'))
+   .find(node=>node.dataset.hubRow===String(task.row));
+  if(record){
+   record.tabIndex=-1;
+   record.focus({preventScroll:true});
+   record.scrollIntoView({block:'center',behavior:'smooth'});
+  }
+ }
 }
 function memberFiltered(people,search,className){
  const needle=String(search||'').trim().toLocaleLowerCase('ru-RU');
@@ -698,6 +858,7 @@ function renderItems(type){
  }
  filtered.forEach(x=>{
   const c=card(x.name||'Без имени');
+  c.dataset.hubRow=String(x.row);
   c.append(line('Дата',x.date),line('Класс',x.className));
   if(app){
    c.append(line('Направление',x.direction),line('Мотивация',x.notes));
@@ -774,6 +935,7 @@ function renderEventItems(){
  if(!shown.length){list.append(element('p','empty',eventFilter==='pending'?'Новых мероприятий для проверки нет.':'По выбранному фильтру публикаций нет.'));return;}
  shown.forEach(x=>{
   const c=card(x.nameRu||x.nameKk||'Без названия');
+  c.dataset.hubRow=String(x.row);
   if(x.nameKk)c.append(line('Название ҚАЗ',x.nameKk));
   if(x.descRu)c.append(element('p','hub-ev-desc',x.descRu));
   if(x.descKk)c.append(line('Описание ҚАЗ',x.descKk));
@@ -884,6 +1046,14 @@ get('hub-member-close').addEventListener('click',()=>get('hub-member-dialog').cl
 get('hub-member-dialog').addEventListener('close',()=>{
  get('hub-member-details').replaceChildren();
 });
+document.querySelectorAll('[data-task-filter]').forEach(button=>
+ button.addEventListener('click',()=>{
+   taskFilter=button.dataset.taskFilter;
+   taskShowAll=false;
+   renderTaskCenter();
+ }));
+get('hub-task-more').addEventListener('click',()=>{taskShowAll=!taskShowAll;renderTaskCenter();});
+get('hub-task-refresh').addEventListener('click',refresh);
 get('hub-app-search').addEventListener('input',()=>renderItems('application'));
 document.querySelectorAll('[data-con-filter]').forEach(button=>
  button.addEventListener('click',()=>{
