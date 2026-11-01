@@ -494,6 +494,7 @@ function admin60Dashboard(){
     instagram:passportAdmin60Text_(r[10]),photoUrls:passportAdmin64EventImages_(r[11]),
     status,canDecide:pending,canPublish:pending&&passportAdmin64EventValid_(r),
     canUnpublish:passportAdmin64EventPublished_(status),
+    canDeleteTest:/^(?:тест|test)(?:\s|[—-]|$)/i.test(String(r[3]||'').trim()),
     decisionReason:passportAdmin60Text_(r[15])
   });
  }
@@ -791,6 +792,47 @@ function admin64DecideEvent(rowNumber,expectedStamp,decision,reason){
    publicationPendingVerification:decision==='approve'};
  }finally{lock.releaseLock();}
 }
+/**
+ * Limited clean-up for explicitly marked TEST teacher submissions only.
+ * This never touches a real event or a non-test photo. Destructive action
+ * requires owner account, current row stamp and an explicit UI confirmation.
+ */
+function admin65DeleteTestEvent(rowNumber,expectedStamp,eventId){
+ requirePassportAdmin_();
+ if(!Number.isSafeInteger(rowNumber)||rowNumber<2||rowNumber>10000)throw new Error('INVALID_ROW');
+ if(!/^[a-f0-9]{64}$/.test(String(expectedStamp||'')))throw new Error('INVALID_STAMP');
+ if(!/^EV-[A-Za-z0-9-]{1,80}$/.test(String(eventId||'')))throw new Error('INVALID_EVENT_ID');
+ const lock=LockService.getScriptLock();lock.waitLock(30000);
+ try{
+  const book=passportAdmin65EventsBook_(),sheet=passportAdminSheet_(book,ECO_HUB60.events);
+  if(rowNumber>sheet.getLastRow())throw new Error('ROW_NOT_FOUND');
+  const r=sheet.getRange(rowNumber,1,1,16).getValues()[0];
+  if(String(r[0]||'')!==eventId||passportAdmin60Stamp_('event',r)!==expectedStamp)
+   throw new Error('ROW_CHANGED_REFRESH');
+  if(!/^(?:тест|test)(?:\s|[—-]|$)/i.test(String(r[3]||'').trim()))
+   throw new Error('NOT_A_TEST_EVENT');
+  const photos=passportAdmin65PhotoFiles_(r);
+  // Verify we can access every photo before altering any record.
+  photos.forEach(file=>{if(!/^eco-/i.test(String(file.getName())))throw new Error('PHOTO_NOT_OWNED_BY_EVENT');});
+  const email=Session.getActiveUser().getEmail();
+  const auditSheet=passportAdminSheet_(book,'Мероприятия — журнал');
+  auditSheet.appendRow([new Date(),email,'DELETE_TEST',String(r[0]),'Удаление тестовой записи с закрытием фото']);
+  // Permanently remove public visibility in source before trashing test uploads.
+  sheet.deleteRow(rowNumber);
+  let failed=0;
+  photos.forEach(file=>{
+   try{
+    file.setSharing(DriveApp.Access.PRIVATE,DriveApp.Permission.NONE);
+    file.setTrashed(true);
+   }catch(e){failed++;console.error('Cleanup test photo failed',e);}
+  });
+  try{passportAdmin64AuditEvent_(passportAdminBook_(),r,'Тест удалён',email,'DELETE_TEST')}
+  catch(e){console.error('Admin audit cleanup failed',e)}
+  SpreadsheetApp.flush();
+  return {ok:true,deletedEventId:eventId,photoCleanupFailures:failed};
+ }finally{lock.releaseLock();}
+}
+
 /** Explicitly register an already-accepted applicant from earlier submissions. */
 function admin64EnrollAccepted(rowNumber,expectedStamp){
  requirePassportAdmin_();
