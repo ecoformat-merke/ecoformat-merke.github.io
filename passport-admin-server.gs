@@ -487,12 +487,15 @@ function admin60Dashboard(){
   eventList.push({
     row:i+1,stamp:passportAdmin60Stamp_('event',r),
     eventId:passportAdmin60Text_(r[0]),date:passportAdmin60Text_(r[9]),
+    dateISO:passportAdmin66IsoDate_(r[9]),
     submittedAt:passportAdmin60Text_(r[1]),
     nameRu:passportAdmin60Text_(r[3]),nameKk:passportAdmin60Text_(r[4]),
     descRu:passportAdmin60Text_(r[5]),descKk:passportAdmin60Text_(r[6]),
     className:passportAdmin60Text_(r[8]),category:passportAdmin60Text_(r[7]),
     instagram:passportAdmin60Text_(r[10]),photoUrls:passportAdmin64EventImages_(r[11]),
     status,canDecide:pending,canPublish:pending&&passportAdmin64EventValid_(r),
+    canEdit:pending||passportAdmin64EventRejected_(status)||String(status).trim()==='Снято с публикации',
+    canUploadPhoto:pending||passportAdmin64EventRejected_(status)||String(status).trim()==='Снято с публикации',
     canUnpublish:passportAdmin64EventPublished_(status),
     canDeleteTest:/^(?:тест|test)(?:\s|[—-]|$)/i.test(String(r[3]||'').trim()),
     decisionReason:passportAdmin60Text_(r[15])
@@ -728,7 +731,7 @@ function passportAdmin65EventsBook_(){
 }
 function passportAdmin65PhotoIds_(row){
  const parts=String(row[11]||'').split(',').map(x=>x.trim()).filter(Boolean);
- if(parts.length<1||parts.length>3||parts.some(x=>!/^[A-Za-z0-9_-]{15,150}$/.test(x)))
+ if(parts.length>3||parts.some(x=>!/^[A-Za-z0-9_-]{15,150}$/.test(x)))
    throw new Error('INVALID_EVENT_PHOTOS');
  return parts;
 }
@@ -1039,4 +1042,179 @@ function passportAdmin65BuildTasks_(book,apps,gifts,events,rosterSheet,now){
  return {total:tasks.length,shown:Math.min(limit,tasks.length),truncated:tasks.length>limit,
   counts:amounts,urgency,items:tasks.slice(0,limit),
   generatedAt:Utilities.formatDate(new Date(current),Session.getScriptTimeZone(),'dd.MM.yyyy HH:mm')};
+}
+
+
+
+/** HUB 6.6 — owner-only event editor and calendar. Drafts never auto-publish.
+ * Existing 6.4.3 moderation and public-feed mirroring remain authoritative. */
+function passportAdmin66IsoDate_(value){
+ if(value instanceof Date&&!isNaN(value.getTime()))
+  return Utilities.formatDate(value,Session.getScriptTimeZone(),'yyyy-MM-dd');
+ const s=String(value||'').trim();
+ if(/^\d{4}-\d{2}-\d{2}/.test(s))return s.slice(0,10);
+ const d=s.match(/^(\d{2})\.(\d{2})\.(\d{4})/);
+ return d?d[3]+'-'+d[2]+'-'+d[1]:'';
+}
+function passportAdmin66EventDate_(raw){
+ const value=String(raw||'').trim(),match=/^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
+ if(!match)throw new Error('EVENT_DATE_REQUIRED');
+ const y=Number(match[1]),m=Number(match[2]),d=Number(match[3]);
+ if(y<2020||y>2100)throw new Error('EVENT_DATE_OUT_OF_RANGE');
+ const date=new Date(y,m-1,d,12,0,0);
+ if(date.getFullYear()!==y||date.getMonth()!==m-1||date.getDate()!==d)
+  throw new Error('EVENT_DATE_INVALID');
+ return date;
+}
+function passportAdmin66EventPayload_(payload){
+ if(!payload||typeof payload!=='object'||Array.isArray(payload))throw new Error('INVALID_EVENT_DATA');
+ const get=(key,max,min)=>{const v=String(payload[key]||'').trim();
+  if(v.length<min||v.length>max)throw new Error('INVALID_EVENT_'+key.toUpperCase());
+  return v;};
+ const titleRu=get('titleRu',200,3),titleKk=get('titleKk',200,3);
+ const descRu=get('descRu',3000,10),descKk=get('descKk',3000,10);
+ const className=get('className',80,1),category=get('category',32,3);
+ if(!['education','upbringing','activity'].includes(category))
+  throw new Error('UNKNOWN_EVENT_CATEGORY');
+ const date=passportAdmin66EventDate_(payload.dateISO);
+ let instagram=String(payload.instagram||'').trim();
+ if(instagram){
+  if(instagram.length>250||!/^https:\/\/(?:www\.)?instagram\.com\/[a-zA-Z0-9_./?=&%-]+$/i.test(instagram))
+   throw new Error('INVALID_INSTAGRAM_URL');
+ }
+ return {titleRu,titleKk,descRu,descKk,className,category,date,instagram};
+}
+function passportAdmin66Editable_(status){
+ return passportAdmin64EventPending_(status)||passportAdmin64EventRejected_(status)||
+  String(status||'').trim()==='Снято с публикации';
+}
+function passportAdmin66Audit_(book,row,action,reason){
+ try{passportAdmin65ExternalAudit_(book,row,action,Session.getActiveUser().getEmail(),reason)}
+ catch(err){console.error('HUB 6.6 audit failed',err)}
+}
+function passportAdmin66EventSheet_(){
+ const book=passportAdmin65EventsBook_();
+ return {book,sheet:passportAdminSheet_(book,ECO_HUB60.events)};
+}
+function passportAdmin66CheckRow_(sheet,rowNumber,expectedStamp){
+ if(!Number.isSafeInteger(rowNumber)||rowNumber<2||rowNumber>10000)throw new Error('INVALID_ROW');
+ if(!/^[0-9a-f]{64}$/.test(String(expectedStamp||'')))throw new Error('INVALID_STAMP');
+ if(rowNumber>sheet.getLastRow())throw new Error('ROW_NOT_FOUND');
+ const row=sheet.getRange(rowNumber,1,1,16).getValues()[0];
+ if(passportAdmin60Stamp_('event',row)!==expectedStamp)throw new Error('ROW_CHANGED_REFRESH');
+ if(!passportAdmin66Editable_(row[12]))throw new Error('EVENT_MUST_BE_UNPUBLISHED_TO_EDIT');
+ return row;
+}
+/** Create pending event, or update unpublished one. No applicant/teacher fields overwritten. */
+function admin66SaveEvent(payload,rowNumber,expectedStamp){
+ requirePassportAdmin_();
+ const clean=passportAdmin66EventPayload_(payload);
+ const create=rowNumber===null||rowNumber===undefined||rowNumber===0;
+ const lock=LockService.getScriptLock();lock.waitLock(30000);
+ try{
+  const store=passportAdmin66EventSheet_(),sh=store.sheet;
+  let row,id,action;
+  if(create){
+   id='EV-HUB66-'+Utilities.getUuid();
+   row=[id,new Date(),'',
+    clean.titleRu,clean.titleKk,clean.descRu,clean.descKk,clean.category,
+    clean.className,clean.date,clean.instagram,'','Ожидает','','',''];
+   // Append is the only mutation; no automatic site publication.
+   sh.appendRow(row);
+   action='CREATE_DRAFT';
+  }else{
+   const old=passportAdmin66CheckRow_(sh,rowNumber,expectedStamp);
+   id=String(old[0]||'');
+   row=old.slice();
+   row[3]=clean.titleRu;row[4]=clean.titleKk;row[5]=clean.descRu;
+   row[6]=clean.descKk;row[7]=clean.category;row[8]=clean.className;
+   row[9]=clean.date;row[10]=clean.instagram;
+   row[12]='Ожидает';row[13]='';row[14]='';row[15]='';
+   // Update only content fields and review status, preserve source ID, author, photos.
+   sh.getRange(rowNumber,4,1,8).setValues([row.slice(3,11)]);
+   sh.getRange(rowNumber,13,1,4).setValues([row.slice(12,16)]);
+   action='UPDATE_DRAFT';
+  }
+  passportAdmin66Audit_(store.book,row,action,'HUB 6.6 · draft, not published');
+  SpreadsheetApp.flush();
+  return {ok:true,eventId:id,row:create?sh.getLastRow():rowNumber,
+   status:'Ожидает',needsReview:true};
+ }finally{lock.releaseLock();}
+}
+/** Private upload for pending/unpublished events. Maximum 3 files, 3 MiB each.
+ * The image is attached to the event only after creation succeeds. */
+function admin66UploadEventPhoto(rowNumber,expectedStamp,payload){
+ requirePassportAdmin_();
+ if(!payload||typeof payload!=='object')throw new Error('INVALID_PHOTO');
+ const name=String(payload.name||'').trim().slice(0,100);
+ const mime=String(payload.mime||'').trim().toLowerCase();
+ const base64=String(payload.base64||'');
+ if(!/^[\w .()-]{1,100}$/u.test(name)||!/\.(?:jpg|jpeg|png|webp)$/i.test(name))
+  throw new Error('INVALID_IMAGE_NAME');
+ if(!['image/jpeg','image/png','image/webp'].includes(mime))
+  throw new Error('INVALID_IMAGE_TYPE');
+ if(base64.length<20||base64.length>4300000||!/^[A-Za-z0-9+/]+={0,2}$/.test(base64))
+  throw new Error('INVALID_IMAGE_SIZE');
+ const bytes=Utilities.base64Decode(base64);
+ if(bytes.length<30||bytes.length>3*1024*1024)throw new Error('IMAGE_TOO_LARGE');
+ const b=i=>bytes[i]&255;
+ const valid=mime==='image/jpeg'?(b(0)===255&&b(1)===216&&b(2)===255):
+  mime==='image/png'?(b(0)===137&&b(1)===80&&b(2)===78&&b(3)===71):
+  (b(0)===82&&b(1)===73&&b(2)===70&&b(3)===70&&
+   String.fromCharCode(b(8),b(9),b(10),b(11))==='WEBP');
+ if(!valid)throw new Error('IMAGE_HEADER_MISMATCH');
+ const lock=LockService.getScriptLock();lock.waitLock(30000);
+ let file;
+ try{
+  const store=passportAdmin66EventSheet_(),sh=store.sheet;
+  const row=passportAdmin66CheckRow_(sh,rowNumber,expectedStamp);
+  const ids=passportAdmin65PhotoIds_(row);
+  if(ids.length>=3)throw new Error('MAX_THREE_IMAGES');
+  const props=PropertiesService.getScriptProperties();
+  let folderId=String(props.getProperty('ECO_HUB66_PHOTO_FOLDER_ID')||'').trim();
+  let folder;
+  if(folderId)folder=DriveApp.getFolderById(folderId);
+  else{
+   folder=DriveApp.createFolder('Eco Club — Фото мероприятий HUB');
+   props.setProperty('ECO_HUB66_PHOTO_FOLDER_ID',folder.getId());
+  }
+  const ext=mime==='image/jpeg'?'jpg':mime==='image/png'?'png':'webp';
+  const storedName='eco-hub66-'+String(row[0]).slice(0,80)+'-'+Utilities.getUuid()+'.'+ext;
+  file=folder.createFile(Utilities.newBlob(bytes,mime,storedName));
+  file.setSharing(DriveApp.Access.PRIVATE,DriveApp.Permission.NONE);
+  ids.push(file.getId());
+  sh.getRange(rowNumber,12).setValue(ids.join(','));
+  passportAdmin66Audit_(store.book,row,'ADD_PHOTO','Image uploaded privately');
+  SpreadsheetApp.flush();
+  return {ok:true,eventId:String(row[0]),fileId:file.getId(),count:ids.length};
+ }catch(err){
+  if(file){try{file.setTrashed(true)}catch(e){console.error('Failed to trash unused upload',e)}}
+  throw err;
+ }finally{lock.releaseLock();}
+}
+/** Detach one image from unpublished event. Never trash a teacher's image. */
+function admin66RemoveEventPhoto(rowNumber,expectedStamp,fileId){
+ requirePassportAdmin_();
+ const id=String(fileId||'').trim();
+ if(!/^[A-Za-z0-9_-]{15,150}$/.test(id))throw new Error('INVALID_FILE_ID');
+ const lock=LockService.getScriptLock();lock.waitLock(30000);
+ try{
+  const store=passportAdmin66EventSheet_(),sh=store.sheet;
+  const row=passportAdmin66CheckRow_(sh,rowNumber,expectedStamp);
+  const ids=passportAdmin65PhotoIds_(row);
+  if(!ids.includes(id))throw new Error('FILE_NOT_ATTACHED');
+  const file=DriveApp.getFileById(id);
+  // Do not silently revoke access if this asset is used by another event.
+  const rows=sh.getDataRange().getValues().slice(1);
+  const shared=rows.some((r,i)=>i+2!==rowNumber&&
+    String(r[11]||'').split(',').map(x=>x.trim()).includes(id));
+  if(shared)throw new Error('IMAGE_SHARED_WITH_ANOTHER_EVENT');
+  file.setSharing(DriveApp.Access.PRIVATE,DriveApp.Permission.NONE);
+  sh.getRange(rowNumber,12).setValue(ids.filter(x=>x!==id).join(','));
+  if(/^eco-hub66-/i.test(String(file.getName()||'')))
+   try{file.setTrashed(true)}catch(err){console.error('Failed to trash detached HUB photo',err)}
+  passportAdmin66Audit_(store.book,row,'REMOVE_PHOTO','Detached photo');
+  SpreadsheetApp.flush();
+  return {ok:true,eventId:String(row[0]),count:ids.length-1};
+ }finally{lock.releaseLock();}
 }
