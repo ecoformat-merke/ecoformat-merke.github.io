@@ -1087,9 +1087,10 @@ function openEventEditor(x){
  eventEditor={row:value.row||null,stamp:value.stamp||'',eventId:value.eventId||'',
   photoIds:Array.isArray(value.photoIds)?value.photoIds.slice():[]};
  eventEditorDirty=false;
- const fields={titleRu:value.nameRu||'',titleKk:value.nameKk||'',
-  descRu:value.descRu||'',descKk:value.descKk||'',category:value.category||'education',
-  class:value.className||'',date:value.dateISO||'',instagram:value.instagram||''};
+ const fields={'title-ru':value.nameRu||'','title-kk':value.nameKk||'',
+  'desc-ru':value.descRu||'','desc-kk':value.descKk||'',
+  category:value.category||'education',class:value.className||'',
+  date:value.dateISO||(x?'':new Date().toLocaleDateString('en-CA')),instagram:value.instagram||''};
  Object.entries(fields).forEach(([key,val])=>{const field=editorField(key);if(field)field.value=val;});
  get('hub-ev-f-photos').value='';
  get('hub-ev-editor-title').textContent=x?'Изменить: '+value.nameRu:'Новое мероприятие';
@@ -1116,7 +1117,6 @@ function uploadEventEditorPhotos(files,index){
  if(index>=files.length){
   eventEditorStatus('Мероприятие сохранено. Публикация доступна только после проверки.');
   closeEventEditor();
-  if(!eventEditorDirty)refresh();
   return;
  }
  const file=files[index];
