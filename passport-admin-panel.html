@@ -102,10 +102,42 @@ footer{border-top:1px solid #ffffff21;color:#93b7a0;font-size:12px;padding:25px;
 #hub-iframe{width:100%;height:min(80vh,850px);border:1px solid #aad6ae7c;border-radius:13px;background:white}
 .hub-site-tools{display:flex;gap:9px;flex-wrap:wrap;margin:12px 0}.hub-site-tools .action{min-width:110px}
 @media(max-width:760px){.hub-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.hub-columns,.hub-list{grid-template-columns:1fr}}
+
+/* HUB 6.6: owner-only event editor and calendar */
+.hub-ev-toolbar{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin:18px 0}
+.hub-ev-view-switch{display:flex;gap:6px}
+.hub-ev-view-switch button{padding:10px 15px;border:1px solid #b4dca76b;background:#154231;color:#dff2dc;border-radius:11px;min-height:43px;font-size:13px;font-weight:800}
+.hub-ev-view-switch button[aria-pressed="true"]{background:var(--green);color:#0d3926}
+.hub-ev-calendar-top{display:flex;align-items:center;justify-content:flex-start;flex-wrap:wrap;gap:10px;margin:16px 0}
+.hub-ev-calendar-top h3{font-size:18px;margin:0 auto 0 0;text-transform:capitalize}
+.hub-ev-calendar{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));border:1px solid #b9e4b955;border-radius:13px;overflow:hidden;background:#0b2e23;margin-top:12px}
+.hub-ev-day-name{padding:11px 4px;text-align:center;font-size:11px;font-weight:800;color:#bdf1af;background:#1b4a37}
+.hub-ev-day{min-height:114px;border-top:1px solid #bbdab844;border-right:1px solid #bbdab844;padding:8px;overflow:hidden}
+.hub-ev-day.outside{opacity:.4;background:#071a16}
+.hub-ev-day.today{box-shadow:inset 0 0 0 2px #caffaa}
+.hub-ev-day-number{font-size:12px;font-weight:800;color:#c3f3af}
+.hub-ev-calendar-event{display:block;width:100%;text-align:left;background:#22513f;border:1px solid #acdaba60;border-radius:6px;padding:5px;margin:5px 0 0;color:#f2fff1;font-size:10px;line-height:1.4;overflow-wrap:anywhere}
+.hub-ev-calendar-event:hover{border-color:#caffaa}
+.hub-ev-calendar-event[data-status="published"]{border-left:3px solid #caffaa}
+.hub-ev-calendar-event[data-status="pending"]{border-left:3px solid #e9c677}
+.hub-ev-calendar-event[data-status="rejected"],.hub-ev-calendar-event[data-status="unpublished"]{opacity:.72}
+.hub-ev-editor{width:min(850px,calc(100vw - 24px));max-height:min(92vh,1200px);overflow:auto}
+.hub-ev-editor-head{display:flex;gap:12px;justify-content:space-between;align-items:start}
+.hub-ev-form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px;margin-top:18px}
+.hub-ev-form-grid label{font-size:12px;font-weight:800;color:#d8f4d0;display:flex;flex-direction:column;gap:6px}
+.hub-ev-form-grid .hub-ev-field-full{grid-column:1/-1}
+.hub-ev-form-grid input,.hub-ev-form-grid select,.hub-ev-form-grid textarea{width:100%;background:#08291f;border:1px solid #b6e6ad70;border-radius:10px;color:#efffec;padding:12px;font-size:13px;min-height:43px;font-family:inherit}
+.hub-ev-form-grid textarea{resize:vertical}
+.hub-ev-existing-photos{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.hub-ev-existing-photos>div{width:130px;border:1px solid #b7dfaa55;border-radius:10px;padding:7px;display:flex;flex-direction:column;gap:7px}
+.hub-ev-existing-photos img{height:95px;width:100%;object-fit:cover;border-radius:6px}
+.hub-ev-existing-photos button{font-size:11px;padding:6px;border:1px solid #e0b0aa;background:#4b2928;color:white;border-radius:7px}
+@media(max-width:740px){.hub-ev-form-grid{grid-template-columns:1fr}.hub-ev-day{min-height:80px;padding:3px}.hub-ev-calendar-event{font-size:9px;padding:3px}.hub-ev-day-name{font-size:9px}}
+
 </style></head>
 <body>
 <main>
-<header class="top"><strong class="logo">🌿 ECO CLUB / ADMIN</strong><span class="tag">ECO CLUB HUB 6.5 · PRIVATE</span></header>
+<header class="top"><strong class="logo">🌿 ECO CLUB / ADMIN</strong><span class="tag">ECO CLUB HUB 6.6 · PRIVATE</span></header>
 <h1>Eco Club | Цифровой кабинет</h1>
 <p class="intro">Единое рабочее пространство руководителя Eco Club: показатели, учащиеся, заявки, вклады, паспорта и сайт.</p>
 
@@ -190,8 +222,16 @@ footer{border-top:1px solid #ffffff21;color:#93b7a0;font-size:12px;padding:25px;
 <div id="hub-con-list" class="hub-list"></div>
 </section>
 <section id="hub-events" class="hub-view" hidden>
-<h2>Мероприятия · модерация публикаций</h2>
+<h2>Мероприятия · календарь и публикации</h2>
 <p class="subnote">Педагоги отправляют события с основного сайта. Перед публикацией проверьте тексты, фотографии и разрешения на их размещение.</p>
+<div class="hub-ev-toolbar">
+<button id="hub-ev-create" class="action" type="button">+ Создать мероприятие</button>
+<div class="hub-ev-view-switch" role="group" aria-label="Вид мероприятий">
+<button type="button" data-ev-view="list" aria-pressed="true">Список</button>
+<button type="button" data-ev-view="calendar" aria-pressed="false">Календарь</button>
+</div>
+</div>
+<div id="hub-ev-list-view">
 <div class="hub-filterbar" aria-label="Фильтр публикаций">
 <button data-event-filter="pending" aria-pressed="true" type="button">На проверке <span id="hub-ev-pending"></span></button>
 <button data-event-filter="published" aria-pressed="false" type="button">Опубликованные <span id="hub-ev-published"></span></button>
@@ -202,6 +242,17 @@ footer{border-top:1px solid #ffffff21;color:#93b7a0;font-size:12px;padding:25px;
 <div class="hub-app-searchbar"><input id="hub-ev-search" class="search" type="search" placeholder="Поиск по названию, классу и категории"><button id="hub-ev-clear" class="action secondary" type="button">Очистить</button></div>
 <p class="subnote" id="hub-ev-context" aria-live="polite"></p>
 <div id="hub-event-list" class="hub-list"></div>
+</div>
+<div id="hub-ev-calendar-view" hidden>
+<div class="hub-ev-calendar-top">
+<button id="hub-ev-prev" type="button" class="action secondary" aria-label="Предыдущий месяц">‹</button>
+<h3 id="hub-ev-month">Календарь</h3>
+<button id="hub-ev-next" type="button" class="action secondary" aria-label="Следующий месяц">›</button>
+<button id="hub-ev-today" type="button" class="action secondary">Сегодня</button>
+</div>
+<p id="hub-ev-calendar-info" class="subnote"></p>
+<div class="hub-ev-calendar" id="hub-ev-calendar" aria-label="Календарь мероприятий"></div>
+</div>
 </section>
 <section id="hub-quality" class="hub-view" hidden><h2>Контроль качества данных</h2><div id="hub-quality-kpis" class="hub-kpis"></div><h3>Последние решения</h3><div id="hub-audit-list" class="hub-list"></div></section>
 <section id="hub-site" class="hub-view" hidden><h2>Публичный сайт</h2><p class="subnote">Предпросмотр опубликованного Eco Club в этом же кабинете. Изменения дизайна сайта по-прежнему выполняются через GitHub.</p><div class="hub-site-tools" role="group" aria-label="Просмотр разделов публичного сайта"><button type="button" class="action" data-preview="home">Главная</button><button type="button" class="action secondary" data-preview="world">ECO WORLD</button><button type="button" class="action secondary" data-preview="passport">Паспорт · демо</button></div>
@@ -246,6 +297,31 @@ footer{border-top:1px solid #ffffff21;color:#93b7a0;font-size:12px;padding:25px;
 <div id="audit" class="audit-list"></div>
 </section>
 </section>
+<dialog id="hub-ev-editor" class="hub-ev-editor" aria-labelledby="hub-ev-editor-title">
+<div class="hub-ev-editor-head"><h2 id="hub-ev-editor-title">Новое мероприятие</h2><button id="hub-ev-editor-close" class="action secondary" type="button">Закрыть</button></div>
+<p class="subnote">Сохранение создаёт запись «Ожидает». На основной сайт она попадёт только после отдельной проверки и публикации.</p>
+<form id="hub-ev-form">
+<div class="hub-ev-form-grid">
+<label>Название на русском <input id="hub-ev-f-title-ru" type="text" required minlength="3" maxlength="200" autocomplete="off"></label>
+<label>Қазақша атауы <input id="hub-ev-f-title-kk" type="text" required minlength="3" maxlength="200" autocomplete="off"></label>
+<label class="hub-ev-field-full">Описание на русском <textarea id="hub-ev-f-desc-ru" required minlength="10" maxlength="3000" rows="3"></textarea></label>
+<label class="hub-ev-field-full">Қазақша сипаттамасы <textarea id="hub-ev-f-desc-kk" required minlength="10" maxlength="3000" rows="3"></textarea></label>
+<label>Направление <select id="hub-ev-f-category" required>
+<option value="education">Экологическое образование</option>
+<option value="upbringing">Экологическое воспитание</option>
+<option value="activity">Экологическая деятельность</option></select></label>
+<label>Класс / участники <input id="hub-ev-f-class" type="text" required maxlength="80" autocomplete="off" placeholder="Например, 6Е"></label>
+<label>Дата мероприятия <input id="hub-ev-f-date" type="date" required></label>
+<label>Instagram (необязательно) <input id="hub-ev-f-instagram" type="url" maxlength="250" placeholder="https://www.instagram.com/reel/..."></label>
+<label class="hub-ev-field-full">Фотографии: до 3 JPG, PNG или WebP, до 3 МБ каждая
+<input id="hub-ev-f-photos" type="file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" multiple></label>
+</div>
+<div class="hub-ev-existing-photos" id="hub-ev-existing-photos"></div>
+<p id="hub-ev-editor-msg" class="subnote" aria-live="polite"></p>
+<div class="dialog-actions">
+<button id="hub-ev-save" class="action" type="submit">Сохранить на модерацию</button>
+</div>
+</form></dialog>
 <dialog id="hub-member-dialog" class="hub-member-dialog" aria-labelledby="hub-member-title">
 <div class="hub-member-dialog-head"><h2 id="hub-member-title">Профиль участника</h2><button class="action secondary" id="hub-member-close" type="button">Закрыть</button></div>
 <p id="hub-member-loading" class="feedback" role="status" aria-live="polite"></p>
@@ -422,6 +498,7 @@ const get=id=>document.getElementById(id);
 const tabs=['overview','members','applications','contributions','events','passports','quality','site'];
 let current='overview',hub=null,people=[],busy=false,appFilter='pending',conFilter='pending',eventFilter='pending';
 let taskFilter='all',taskShowAll=false;
+let eventView='list',eventEditor=null,eventEditorDirty=false,calMonth=new Date(new Date().getFullYear(),new Date().getMonth(),1);
 const format=(n,d=0)=>Number.isFinite(Number(n))?new Intl.NumberFormat('ru-RU',{maximumFractionDigits:d}).format(Number(n)):'—';
 function element(tag,cls,content){
  const e=document.createElement(tag);
@@ -459,13 +536,14 @@ function switchTo(target){
  }
  window.scrollTo({top:0,behavior:'auto'});
 }
-function apiCall(method,args,onSuccess){
+function apiCall(method,args,onSuccess,onFailure){
  if(busy)return;
  busy=true;
  const runner=google.script.run
    .withFailureHandler(err=>{
     busy=false;
     feedback('Ошибка: '+(err&&err.message?err.message:'Проверьте данные или права доступа.'),true);
+    if(typeof onFailure==='function')onFailure(err);
    })
    .withSuccessHandler(res=>{
     busy=false;
@@ -478,6 +556,9 @@ function apiCall(method,args,onSuccess){
  if(method==='enroll')runner.admin64EnrollAccepted(...args);
  if(method==='eventDecide')runner.admin64DecideEvent(...args);
  if(method==='deleteTestEvent')runner.admin65DeleteTestEvent(...args);
+ if(method==='eventSave')runner.admin66SaveEvent(...args);
+ if(method==='eventUploadPhoto')runner.admin66UploadEventPhoto(...args);
+ if(method==='eventRemovePhoto')runner.admin66RemoveEventPhoto(...args);
 }
 function refresh(){
  if(busy)return;
@@ -908,6 +989,174 @@ function decide(kind,record,action){
   refresh();
  });
 }
+
+function changeEventView(next){
+ if(next!=='list'&&next!=='calendar')return;
+ eventView=next;
+ get('hub-ev-list-view').hidden=eventView!=='list';
+ get('hub-ev-calendar-view').hidden=eventView!=='calendar';
+ document.querySelectorAll('[data-ev-view]').forEach(b=>
+  b.setAttribute('aria-pressed',String(b.dataset.evView===eventView)));
+ if(eventView==='calendar')renderEventsCalendar();
+}
+function eventDateISO(date){
+ const s=String(date||'').trim();
+ return /^\d{4}-\d{2}-\d{2}$/.test(s)?s:'';
+}
+function renderEventsCalendar(){
+ if(!hub||!hub.events)return;
+ const wrap=get('hub-ev-calendar');wrap.replaceChildren();
+ const year=calMonth.getFullYear(),month=calMonth.getMonth();
+ get('hub-ev-month').textContent=calMonth.toLocaleDateString('ru-RU',{month:'long',year:'numeric'});
+ const names=['Пн','Вт','Ср','Чт','Пт','Сб','Вс'];
+ names.forEach(x=>wrap.append(element('div','hub-ev-day-name',x)));
+ const start=(new Date(year,month,1).getDay()+6)%7;
+ const maxDay=new Date(year,month+1,0).getDate();
+ const days=35+7*(start+maxDay>35);
+ const events=(hub.events||[]).filter(x=>eventDateISO(x.dateISO));
+ const byDate=new Map();
+ events.forEach(x=>{
+  const group=byDate.get(x.dateISO)||[];
+  group.push(x);byDate.set(x.dateISO,group);
+ });
+ const current=new Date(),today=[current.getFullYear(),String(current.getMonth()+1).padStart(2,'0'),String(current.getDate()).padStart(2,'0')].join('-');
+ for(let i=0;i<days;i++){
+  const day=new Date(year,month,1-start+i);
+  const iso=[day.getFullYear(),String(day.getMonth()+1).padStart(2,'0'),String(day.getDate()).padStart(2,'0')].join('-');
+  const outside=day.getMonth()!==month;
+  const cell=element('div','hub-ev-day'+(outside?' outside':'')+(iso===today?' today':''));
+  cell.append(element('span','hub-ev-day-number',day.getDate()));
+  (byDate.get(iso)||[]).forEach(x=>{
+   const btn=element('button','hub-ev-calendar-event',x.nameRu||x.nameKk||'Мероприятие');
+   btn.type='button';btn.dataset.status=eventStatus(x);
+   btn.title=(x.nameRu||'Мероприятие')+' — '+x.status;
+   btn.addEventListener('click',()=>{
+    eventFilter='all';get('hub-ev-search').value=x.eventId;
+    changeEventView('list');renderEventItems();
+    const target=Array.from(get('hub-event-list').querySelectorAll('[data-hub-row]'))
+      .find(el=>el.dataset.hubRow===String(x.row));
+    if(target){target.tabIndex=-1;target.focus();target.scrollIntoView({block:'center',behavior:'smooth'});}
+   });
+   cell.append(btn);
+  });
+  wrap.append(cell);
+ }
+ const monthItems=events.filter(x=>x.dateISO.slice(0,7)===
+  year+'-'+String(month+1).padStart(2,'0'));
+ get('hub-ev-calendar-info').textContent='Мероприятий в выбранном месяце: '+monthItems.length+
+  '. Нажмите событие в календаре, чтобы открыть его карточку.';
+}
+function editorField(name){return get('hub-ev-f-'+name);}
+function closeEventEditor(){
+ const dlg=get('hub-ev-editor');
+ if(dlg.open)dlg.close();
+ if(eventEditorDirty){eventEditorDirty=false;refresh();}
+}
+function eventEditorStatus(text,isError=false){
+ const el=get('hub-ev-editor-msg');
+ el.textContent=text;el.style.color=isError?'#ffb5a8':'#d5f9c5';
+}
+function renderEventEditorPhotos(){
+ const wrap=get('hub-ev-existing-photos');wrap.replaceChildren();
+ const x=eventEditor;
+ if(!x||!Array.isArray(x.photoIds))return;
+ x.photoIds.forEach((id,i)=>{
+  const photo=element('div','');
+  const img=element('img');img.alt='Изображение мероприятия '+(i+1);
+  img.src='https://drive.google.com/thumbnail?id='+encodeURIComponent(id)+'&sz=w500';
+  img.loading='lazy';photo.append(img);
+  const b=element('button','','Убрать фото');
+  b.type='button';b.disabled=!x.row;
+  b.addEventListener('click',()=>{
+   if(busy||!confirm('Убрать фотографию из записи мероприятия? Файл будет закрыт от публичного просмотра.'))return;
+   eventEditorStatus('Убираем фотографию…');
+   apiCall('eventRemovePhoto',[x.row,x.stamp,id],result=>{
+    if(!result?.ok){eventEditorStatus('Не удалось убрать фотографию.',true);return;}
+    x.stamp=result.stamp;x.photoIds=x.photoIds.filter(v=>v!==id);
+    eventEditorDirty=true;
+    renderEventEditorPhotos();
+    eventEditorStatus('Фотография убрана. Остальные данные не изменены.');
+   },err=>eventEditorStatus('Ошибка: '+(err?.message||'Неизвестная ошибка'),true));
+  });
+  photo.append(b);wrap.append(photo);
+ });
+}
+function openEventEditor(x){
+ if(busy)return;
+ const value=x||{};
+ eventEditor={row:value.row||null,stamp:value.stamp||'',eventId:value.eventId||'',
+  photoIds:Array.isArray(value.photoIds)?value.photoIds.slice():[]};
+ eventEditorDirty=false;
+ const fields={titleRu:value.nameRu||'',titleKk:value.nameKk||'',
+  descRu:value.descRu||'',descKk:value.descKk||'',category:value.category||'education',
+  class:value.className||'',date:value.dateISO||'',instagram:value.instagram||''};
+ Object.entries(fields).forEach(([key,val])=>{const field=editorField(key);if(field)field.value=val;});
+ get('hub-ev-f-photos').value='';
+ get('hub-ev-editor-title').textContent=x?'Изменить: '+value.nameRu:'Новое мероприятие';
+ get('hub-ev-save').disabled=false;
+ eventEditorStatus(x?
+  'Изменения сохраняются в очереди модерации. Для публикации требуется отдельное подтверждение.':
+  'Заполните данные и сохраните. Фото необязательны.');
+ renderEventEditorPhotos();
+ get('hub-ev-editor').showModal();
+}
+function fileToBase64(file,done,fail){
+ const reader=new FileReader();
+ reader.onerror=()=>fail(new Error('READ_PHOTO_FAILED'));
+ reader.onload=()=>{
+  const result=String(reader.result||'');
+  const pos=result.indexOf(',');
+  if(pos<0)fail(new Error('INVALID_IMAGE_DATA'));
+  else done(result.slice(pos+1));
+ };
+ reader.readAsDataURL(file);
+}
+function uploadEventEditorPhotos(files,index){
+ if(!eventEditor)return;
+ if(index>=files.length){
+  eventEditorStatus('Мероприятие сохранено. Публикация доступна только после проверки.');
+  closeEventEditor();
+  if(!eventEditorDirty)refresh();
+  return;
+ }
+ const file=files[index];
+ eventEditorStatus('Загрузка фото '+(index+1)+' из '+files.length+'…');
+ fileToBase64(file,base64=>{
+  apiCall('eventUploadPhoto',[eventEditor.row,eventEditor.stamp,
+   {name:file.name,mime:file.type||'image/jpeg',base64}],res=>{
+    if(!res?.ok){eventEditorStatus('Не удалось загрузить фотографию.',true);return;}
+    eventEditor.stamp=res.stamp;
+    eventEditor.photoIds.push(res.fileId);
+    eventEditorDirty=true;
+    renderEventEditorPhotos();
+    uploadEventEditorPhotos(files,index+1);
+   },err=>eventEditorStatus('Ошибка загрузки: '+(err?.message||'Повторите попытку'),true));
+ },err=>eventEditorStatus('Ошибка чтения файла: '+err.message,true));
+}
+function submitEventEditor(e){
+ e.preventDefault();
+ if(busy||!eventEditor)return;
+ const data={titleRu:editorField('title-ru').value.trim(),
+  titleKk:editorField('title-kk').value.trim(),descRu:editorField('desc-ru').value.trim(),
+  descKk:editorField('desc-kk').value.trim(),category:editorField('category').value,
+  className:editorField('class').value.trim(),dateISO:editorField('date').value,
+  instagram:editorField('instagram').value.trim()};
+ const photos=Array.from(get('hub-ev-f-photos').files||[]);
+ if(eventEditor.photoIds.length+photos.length>3){
+  eventEditorStatus('Не более трёх фотографий на мероприятие.',true);return;
+ }
+ if(photos.some(f=>f.size>3*1024*1024||
+    !['image/jpeg','image/png','image/webp'].includes(f.type))){
+  eventEditorStatus('Допустимы только JPG, PNG или WebP размером до 3 МБ.',true);return;
+ }
+ eventEditorStatus('Сохраняем мероприятие…');
+ apiCall('eventSave',[data,eventEditor.row,eventEditor.stamp],r=>{
+  if(!r?.ok){eventEditorStatus('Не удалось сохранить запись.',true);return;}
+  eventEditor.row=r.row;eventEditor.eventId=r.eventId;eventEditor.stamp=r.stamp;
+  eventEditorDirty=true;
+  uploadEventEditorPhotos(photos,0);
+ },err=>eventEditorStatus('Ошибка сохранения: '+(err?.message||'Проверьте данные'),true));
+}
 function eventStatus(x){
  const s=String(x.status||'').normalize('NFKC').trim().toLowerCase().replace(/^[✅❌⏳]\s*/,'');
  if(x.canDecide||['на проверке','на модерации','ожидает','ожидает проверки','ожидает подтверждения','на рассмотрении','отправлено','новая публикация','новое мероприятие','pending','submitted'].includes(s))return 'pending';
@@ -919,11 +1168,12 @@ function eventStatus(x){
 function eventFiltered(all,filter,q){
  const search=String(q||'').trim().toLowerCase();
  return all.filter(x=>(filter==='all'||eventStatus(x)===filter)&&
-  [x.nameRu,x.nameKk,x.category,x.className,x.descRu].join(' ').toLowerCase().includes(search))
+  [x.eventId,x.dateISO,x.nameRu,x.nameKk,x.category,x.className,x.descRu].join(' ').toLowerCase().includes(search))
   .sort((a,b)=>filter==='all'&&(eventStatus(a)==='pending')!==(eventStatus(b)==='pending')?(eventStatus(a)==='pending'?-1:1):b.row-a.row);
 }
 function renderEventItems(){
  if(!hub)return;
+ renderEventsCalendar();
  const all=hub.events||[],counts={pending:0,published:0,rejected:0,unpublished:0,other:0};
  all.forEach(x=>counts[eventStatus(x)]++);
  ['pending','published','rejected','unpublished'].forEach(x=>get('hub-ev-'+x).textContent=counts[x]);
@@ -947,6 +1197,12 @@ function renderEventItems(){
      const img=element('img');img.src=u;img.loading='lazy';img.alt='Фотография '+(i+1);link.append(img);strip.append(link);
    });c.append(strip);
   }
+  if(x.canEdit){
+   const edit=element('button','action secondary','Редактировать / Фото');
+   edit.type='button';edit.addEventListener('click',()=>openEventEditor(x));
+   const tools=element('div','hub-actions');tools.append(edit);c.append(tools);
+  }
+  if(x.canUnpublish)c.append(element('p','subnote','Для редактирования опубликованного мероприятия сначала снимите его с сайта.'));
   if(x.canDecide){
    if(!x.canPublish)c.append(element('p','hub-ev-hint','Для публикации необходимы правильные ID, заголовок, категория и дата. Отклонение доступно с причиной.'));
    const actions=element('div','hub-actions');
@@ -1073,6 +1329,14 @@ document.querySelectorAll('[data-event-filter]').forEach(b=>b.addEventListener('
 }));
 get('hub-ev-search').addEventListener('input',renderEventItems);
 get('hub-ev-clear').addEventListener('click',()=>{get('hub-ev-search').value='';renderEventItems();});
+get('hub-ev-create').addEventListener('click',()=>openEventEditor(null));
+get('hub-ev-editor-close').addEventListener('click',closeEventEditor);
+get('hub-ev-editor').addEventListener('close',()=>{if(eventEditorDirty){eventEditorDirty=false;refresh();}});
+get('hub-ev-form').addEventListener('submit',submitEventEditor);
+document.querySelectorAll('[data-ev-view]').forEach(b=>b.addEventListener('click',()=>changeEventView(b.dataset.evView)));
+get('hub-ev-prev').addEventListener('click',()=>{calMonth=new Date(calMonth.getFullYear(),calMonth.getMonth()-1,1);renderEventsCalendar();});
+get('hub-ev-next').addEventListener('click',()=>{calMonth=new Date(calMonth.getFullYear(),calMonth.getMonth()+1,1);renderEventsCalendar();});
+get('hub-ev-today').addEventListener('click',()=>{const d=new Date();calMonth=new Date(d.getFullYear(),d.getMonth(),1);renderEventsCalendar();});
 get('hub-con-search').addEventListener('input',()=>renderItems('contribution'));
 refresh();
 })();
