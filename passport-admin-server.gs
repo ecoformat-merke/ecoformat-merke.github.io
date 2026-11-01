@@ -502,6 +502,7 @@ function admin60Dashboard(){
  .map(r=>({date:passportAdmin60Text_(r[0]),action:passportAdmin60Text_(r[2]),
   status:passportAdmin60Text_(r[3]),className:passportAdmin60Text_(r[7])}));
  const rosterSize=people?people.getDataRange().getValues().slice(1).filter(r=>r[0]&&r[4]!==false).length:0;
+ const taskCenter=passportAdmin65BuildTasks_(book,apps,gifts,events,people);
  return {
   ok:true,
   summary:{
@@ -516,7 +517,7 @@ function admin60Dashboard(){
   applications:applications.slice().reverse().slice(0,ECO_HUB60.limit),
   contributions:contributions.slice().reverse().slice(0,ECO_HUB60.limit),
   events:eventList.slice().reverse().slice(0,ECO_HUB60.limit),
-  audit:auditTrail,
+  audit:auditTrail,taskCenter,
   truncated:applications.length>ECO_HUB60.limit||contributions.length>ECO_HUB60.limit
  };
 }
@@ -943,4 +944,99 @@ function admin64EnrollAccepted(rowNumber,expectedStamp){
   if(result.created)passportAdminLog_('HUB_ENROLL',result.id,'OK','accepted applicant registration');
   return {ok:true,participantRef:'ECO-'+result.id.slice(0,8).toUpperCase(),created:result.created};
  }finally{lock.releaseLock();}
+}
+
+
+// === ECO CLUB HUB 6.5: private, read-only daily task queue. ===
+// Not an automation: no code issue, approval, revocation, or row mutation.
+// All tasks originate from real spreadsheet values and retain stable row/ID targets.
+function passportAdmin65BuildTasks_(book,apps,gifts,events,rosterSheet,now){
+ const current=typeof now==='number'?now:Date.now();
+ const tasks=[],amounts={applications:0,contributions:0,events:0,access:0,data:0},
+   urgency={critical:0,high:0,normal:0,routine:0};
+ const add=(kind,severity,title,detail,target,row,personId,name,className,date)=>{
+  tasks.push({kind,severity,title:String(title).slice(0,180),detail:String(detail).slice(0,260),
+   target,row:Number(row)||0,participantId:String(personId||''),
+   name:String(name||'').slice(0,120),className:String(className||'').slice(0,40),
+   date:passportAdmin60Text_(date).slice(0,50)});
+  amounts[kind]++;urgency[severity]++;
+ };
+ for(let i=1;i<apps.length;i++){
+  const r=apps[i],status=String(r[7]||'').trim();
+  if(!r.some(v=>v!==''&&v!=null))continue;
+  const name=String(r[1]||'').trim(),cl=String(r[2]||'').trim();
+  if(passportAdmin60IsPendingApplication_(status))
+   add('applications','high','Проверить заявку',name+' · '+cl,'applications',i+1,'',name,cl,r[0]);
+ }
+ for(let i=1;i<gifts.length;i++){
+  const r=gifts[i],status=String(r[7]||'').trim();
+  if(!r.some(v=>v!==''&&v!=null))continue;
+  const name=String(r[1]||'').trim(),cl=String(r[2]||'').trim();
+  const test=/тест/i.test(name);
+  if(passportAdmin60IsPendingContribution_(status))
+   add('contributions','high','Проверить экологический вклад',
+    name+' · '+cl+' · '+passportAdminNumber_(r[3])+' кг / '+passportAdminNumber_(r[4])+' крышек',
+    'contributions',i+1,'',name,cl,r[0]);
+  else if(!test&&passportAdminConfirmed_(status)&&!String(r[12]||'').trim())
+   add('data','normal','Привязать подтверждённый вклад',name+' · '+cl+
+    ' · запись не связана с ID участника','passports',i+1,'',name,cl,r[0]);
+ }
+ for(let i=1;i<events.length;i++){
+  const r=events[i],status=String(r[12]||'').trim();
+  if(!r.some(v=>v!==''&&v!=null))continue;
+  if(passportAdmin64EventPending_(status))
+   add('events','high','Проверить публикацию',String(r[3]||'Без названия')+
+    ' · '+String(r[8]||''),'events',i+1,'','',String(r[8]||''),r[1]);
+ }
+ const roster=rosterSheet?rosterSheet.getDataRange().getValues().slice(1)
+  .filter(r=>r[0]&&r[4]!==false):[];
+ const activeKeys=new Set(roster.map(r=>passportAdminIdentity_(r[1],r[2])));
+ for(let i=1;i<apps.length;i++){
+  const r=apps[i];if(!/^принят$/i.test(String(r[7]||'').trim()))continue;
+  const key=passportAdminIdentity_(r[1],r[2]);
+  if(!key||activeKeys.has(key)||/тест/i.test(String(r[1]||'')))continue;
+  add('data','normal','Создать EcoPassport принятому ученику',
+   String(r[1]||'')+' · '+String(r[2]||'')+' · принят, но ещё без ID',
+   'applications',i+1,'',r[1],r[2],r[0]);
+ }
+ const access=passportAdminSheet_(book,PASSPORT_ADMIN54.access).getDataRange().getValues().slice(1);
+ roster.forEach(p=>{
+  const id=String(p[0]||'').trim(),name=String(p[1]||'').trim(),cl=String(p[2]||'').trim();
+  const key=passportAdminIdentity_(name,cl);
+  const matches=access.filter(r=>String(r[7]||'').trim()===id||
+   (!String(r[7]||'').trim()&&passportAdminIdentity_(r[0],r[1])===key));
+  const valid=matches.filter(r=>r[3]===true&&passportAdminNotExpired_(r));
+  if(!valid.length){
+   const expired=matches.some(r=>r[3]===true&&
+     passportAdmin56Classify_(r,current).status==='expired');
+   const invalid=matches.some(r=>r[3]===true&&
+     passportAdmin56Classify_(r,current).status==='invalid');
+   const important=expired||invalid;
+   add('access',important?'critical':'routine',
+    important?'Восстановить доступ к EcoPassport':'Код EcoPassport не выдан',
+    name+' · '+cl+(expired?' · срок кода истёк':invalid?' · некорректная дата':' · нет действующего кода'),
+    'passports',0,id,name,cl,p[3]);
+  }else{
+   // At most one alert per participant, even when old and newer codes co-exist.
+   const statuses=valid.map(r=>passportAdmin56Classify_(r,current));
+   const urgent=statuses.find(x=>x.status==='within7');
+   const soon=statuses.find(x=>x.status==='within30');
+   const legacy=statuses.find(x=>x.status==='legacy');
+   const selected=urgent||soon||legacy;
+   if(selected){
+    const level=urgent?'critical':soon?'normal':'routine';
+    const label=urgent?'Код истекает в ближайшие 7 дней':
+      soon?'Код истекает в ближайшие 30 дней':'Старый код без срока действия';
+    const d=selected.expiryDate?' · до '+selected.expiryDate:' · рекомендуем плановую замену';
+    add('access',level,label,name+' · '+cl+d,'passports',0,id,name,cl,p[3]);
+   }
+  }
+ });
+ const rank={critical:0,high:1,normal:2,routine:3};
+ tasks.sort((a,b)=>rank[a.severity]-rank[b.severity]||
+  (b.row||0)-(a.row||0)||a.title.localeCompare(b.title,'ru'));
+ const limit=120;
+ return {total:tasks.length,shown:Math.min(limit,tasks.length),truncated:tasks.length>limit,
+  counts:amounts,urgency,items:tasks.slice(0,limit),
+  generatedAt:Utilities.formatDate(new Date(current),Session.getScriptTimeZone(),'dd.MM.yyyy HH:mm')};
 }
