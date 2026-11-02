@@ -1631,52 +1631,115 @@ function hub68PdfFolder_(){
  props.setProperty(HUB68.folderProperty,folder.getId());
  return folder;
 }
-function hub68DocLine_(body,txt,size,bold,color,space){
- const p=body.appendParagraph(String(txt));
+
+/** HUB 6.8.1 print-ready A4 certificate. All fields are stored award facts. */
+function hub681ValueLabel_(value,unit){
+ const n=Number(value),number=Number.isFinite(n)?String(Math.round(n*1000)/1000):String(value);
+ if(unit!=='вклад'||!Number.isInteger(n))return number+' '+unit;
+ const a=Math.abs(n)%100,b=Math.abs(n)%10;
+ return number+' '+(a>=11&&a<=14?'вкладов':b===1?'вклад':b>=2&&b<=4?'вклада':'вкладов');
+}
+function hub68DocLine_(container,txt,size,bold,color,before,after){
+ const p=container.appendParagraph(String(txt));
  p.setAlignment(DocumentApp.HorizontalAlignment.CENTER);
- if(space)p.setSpacingBefore(space);
- const t=p.editAsText();t.setFontFamily('Arial');t.setFontSize(size);
+ p.setSpacingBefore(before||0);p.setSpacingAfter(after||0);
+ const t=p.editAsText();
+ t.setFontFamily('Arial');t.setFontSize(size);
  t.setBold(!!bold);t.setForegroundColor(color||'#184938');
  return p;
 }
-function hub68GeneratePdf_(person,t,awardId){
+function hub681Logo_(container){
+ try{
+  const url='https://gulyantsdanil-oss.github.io/eco-club-m.auezov/eco-club-logo.png';
+  const res=UrlFetchApp.fetch(url,{muteHttpExceptions:true,followRedirects:true});
+  if(res.getResponseCode()!==200)throw new Error('Logo unavailable');
+  const pic=container.appendParagraph('');
+  pic.setAlignment(DocumentApp.HorizontalAlignment.CENTER);
+  pic.setSpacingAfter(4);
+  const img=pic.appendInlineImage(res.getBlob());
+  img.setWidth(68);img.setHeight(68);
+  return;
+ }catch(e){
+  // Logo is optional; failures must never block issuance or leave award half-issued.
+  console.warn('Logo not available, using typography: '+String(e));
+  hub68DocLine_(container,'ECO CLUB',26,true,'#14513B',8,6);
+ }
+}
+function hub68GeneratePdf_(person,t,awardId,issueDate){
  let tempDoc=null,createdFile=null;
  try{
   const doc=DocumentApp.create('Eco Club — Черновик '+awardId);
   tempDoc=DriveApp.getFileById(doc.getId());
   const body=doc.getBody();
-  body.setMarginTop(48);body.setMarginBottom(50);
-  body.setMarginLeft(49);body.setMarginRight(49);
+  body.setMarginTop(27);body.setMarginBottom(25);
+  body.setMarginLeft(27);body.setMarginRight(27);
   if(typeof body.setPageWidth==='function')body.setPageWidth(595);
   if(typeof body.setPageHeight==='function')body.setPageHeight(842);
-  hub68DocLine_(body,'ECO CLUB',25,true,'#18523A',40);
-  hub68DocLine_(body,'ШКОЛА-ЛИЦЕЙ ИМЕНИ М. АУЭЗОВА',10,false,'#466957',5);
-  hub68DocLine_(body,'ECOLOGY · RESPONSIBILITY · FUTURE',10,true,'#26925D',13);
-  hub68DocLine_(body,t.titleRu.toUpperCase(),23,true,'#18523A',22);
-  hub68DocLine_(body,t.titleKz,15,true,'#365F46',6);
-  hub68DocLine_(body,'НАГРАЖДАЕТСЯ / МАРАПАТТАЛАДЫ',11,true,'#64826A',30);
-  hub68DocLine_(body,person.name,21,true,'#153E2A',14);
-  hub68DocLine_(body,person.className+' класс / сынып',12,false,'#45624C',4);
-  hub68DocLine_(body,t.reasonRu,14,false,'#184938',25);
-  hub68DocLine_(body,t.reasonKz,13,false,'#315B43',10);
-  hub68DocLine_(body,'Подтверждённый результат / Расталған нәтиже:',11,false,'#64826A',25);
-  hub68DocLine_(body,String(hub68Metric_(person,t))+' '+t.unit,17,true,'#18523A',6);
-  hub68DocLine_(body,'Руководитель Eco Club / Eco Club жетекшісі',11,false,'#184938',40);
-  hub68DocLine_(body,'______________________________',11,false,'#6D8172',7);
-  hub68DocLine_(body,'Дата / Күні: '+Utilities.formatDate(new Date(),
-   Session.getScriptTimeZone(),'dd.MM.yyyy'),10,false,'#5B7361',24);
-  hub68DocLine_(body,'№ '+awardId,9,false,'#789080',8);
+  const frame=body.appendTable([['']]);
+  frame.setBorderWidth(2);
+  frame.setBorderColor('#287451');
+  const area=frame.getCell(0,0);
+  area.clear();area.setBackgroundColor('#FFFFFF');
+  area.setPaddingTop(17);area.setPaddingBottom(18);
+  area.setPaddingLeft(21);area.setPaddingRight(21);
+  hub681Logo_(area);
+  hub68DocLine_(area,'ECO CLUB  •  ШКОЛА-ЛИЦЕЙ ИМЕНИ М. АУЭЗОВА',
+   10,true,'#36664C',5,3);
+  hub68DocLine_(area,'ЭКОЛОГИЯ  ·  ОТВЕТСТВЕННОСТЬ  ·  БУДУЩЕЕ',
+   8,false,'#7C936F',4,11);
+  // A solid gold band draws attention without graphics or external dependencies.
+  const accent=area.appendTable([['']]);
+  accent.setBorderWidth(0);
+  const stripe=accent.getCell(0,0);
+  stripe.setBackgroundColor('#CBA55A');
+  stripe.setPaddingTop(1);stripe.setPaddingBottom(1);
+  stripe.setPaddingLeft(0);stripe.setPaddingRight(0);
+  hub68DocLine_(area,'НАГРАДА ECO CLUB  /  ECO CLUB МАРАПАТЫ',
+   10,true,'#9B783C',16,8);
+  const longTitle=String(t.titleRu||'').length>34;
+  hub68DocLine_(area,String(t.titleRu||'СЕРТИФИКАТ').toUpperCase(),
+   longTitle?19:23,true,'#134D36',4,5);
+  hub68DocLine_(area,String(t.titleKz||''),
+   String(t.titleKz||'').length>38?12:14,true,'#3C7354',1,20);
+  hub68DocLine_(area,'НАГРАЖДАЕТСЯ  /  МАРАПАТТАЛАДЫ',
+   10,true,'#8B774C',10,10);
+  hub68DocLine_(area,person.name,
+   String(person.name||'').length>34?20:25,true,'#123E2E',2,5);
+  hub68DocLine_(area,person.className+' класс  /  '+person.className+' сынып',
+   11,false,'#5B6B60',1,17);
+  hub68DocLine_(area,t.reasonRu,13,false,'#214E3B',1,8);
+  hub68DocLine_(area,t.reasonKz,12,false,'#3A6B50',1,21);
+  const achievement=t.metricValue!==undefined?t.metricValue:hub68Metric_(person,t);
+  hub68DocLine_(area,'ПОДТВЕРЖДЁННЫЙ РЕЗУЛЬТАТ  /  РАСТАЛҒАН НӘТИЖЕ',
+   9,true,'#7D8159',8,7);
+  hub68DocLine_(area,hub681ValueLabel_(achievement,t.unit),
+   21,true,'#17543D',1,15);
+  // Balanced signature and seal area for physical issuance; no forged signatures.
+  hub68DocLine_(area,'Руководитель Eco Club  /  Eco Club жетекшісі',
+   10,false,'#3F604A',13,13);
+  hub68DocLine_(area,'________________________________',
+   12,false,'#809080',0,2);
+  hub68DocLine_(area,'Подпись / Қолы                         Место печати / Мөр орны',
+   9,false,'#7A8A77',0,19);
+  const issued=issueDate instanceof Date&&!isNaN(issueDate.getTime())
+   ?issueDate:new Date();
+  hub68DocLine_(area,'Дата выдачи / Берілген күні: '+
+   Utilities.formatDate(issued,Session.getScriptTimeZone(),'dd.MM.yyyy'),
+   10,false,'#4C6D55',5,7);
+  hub68DocLine_(area,'Регистрационный № '+awardId,
+   8,false,'#7C8B7D',0,2);
   doc.saveAndClose();
-  const blob=tempDoc.getAs(MimeType.PDF);
-  blob.setName(awardId+'.pdf');
-  createdFile=hub68PdfFolder_().createFile(blob);
+  const pdf=tempDoc.getAs(MimeType.PDF);
+  pdf.setName(awardId+'.pdf');
+  createdFile=hub68PdfFolder_().createFile(pdf);
   createdFile.setSharing(DriveApp.Access.PRIVATE,DriveApp.Permission.NONE);
   return createdFile;
  }catch(e){
   if(createdFile)try{createdFile.setTrashed(true)}catch(ignore){}
   throw e;
  }finally{
-  if(tempDoc)try{tempDoc.setTrashed(true)}catch(e){console.error('Award temporary document cleanup failed',e)}
+  if(tempDoc)try{tempDoc.setTrashed(true)}
+  catch(e){console.error('Award temporary document cleanup failed',e)}
  }
 }
 function admin68IssueAward(participantId,templateId){
@@ -1751,5 +1814,41 @@ function admin68RevokeAward(awardId){
    'template='+hub68TemplateNote_(located.row[17])+';revoked_by='+Session.getActiveUser().getEmail());
   SpreadsheetApp.flush();
   return {ok:true,status:'revoked'};
+ }finally{lock.releaseLock();}
+}
+
+
+/** Re-render the *same* award with the A4 6.8.1 layout.
+ * No duplicate award record is created. Original issue date/ID are preserved.
+ * On errors the old PDF and registry link remain unchanged.
+ */
+function admin681RefreshCertificate(awardId){
+ requirePassportAdmin_();
+ const lock=LockService.getScriptLock();lock.waitLock(30000);
+ let generated=null,committed=false;
+ try{
+  const located=hub68LocateAward_(awardId),r=located.row;
+  if(String(r[13]||'').trim()!=='issued')throw new Error('HUB68_AWARD_NOT_ACTIVE');
+  const oldUrl=String(r[12]||'').trim();
+  const idFromUrl=/\/d\/([A-Za-z0-9_-]{15,})\//.exec(oldUrl);
+  if(!idFromUrl)throw new Error('HUB68_OLD_PDF_URL_INVALID');
+  const person={name:String(r[3]||'').trim(),className:String(r[4]||'').trim()};
+  const t={
+   titleRu:String(r[6]||'').trim(),titleKz:String(r[7]||'').trim(),
+   reasonRu:String(r[8]||'').trim(),reasonKz:String(r[9]||'').trim(),
+   metricValue:r[10],unit:String(r[11]||'').trim()
+  };
+  if(!person.name||!person.className||!t.titleRu||!t.titleKz)
+   throw new Error('HUB68_AWARD_DATA_INCOMPLETE');
+  generated=hub68GeneratePdf_(person,t,String(r[0]),r[15]);
+  located.sheet.getRange(located.rowNumber,13).setValue(generated.getUrl());
+  SpreadsheetApp.flush();
+  committed=true;
+  try{DriveApp.getFileById(idFromUrl[1]).setTrashed(true)}
+  catch(err){console.error('Old award PDF could not be moved to trash',err)}
+  return {ok:true,awardId:String(r[0]),filename:String(r[0])+'.pdf'};
+ }catch(err){
+  if(generated&&!committed)try{generated.setTrashed(true)}catch(ignore){}
+  throw err;
  }finally{lock.releaseLock();}
 }
