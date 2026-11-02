@@ -204,7 +204,7 @@ footer{border-top:1px solid #ffffff21;color:#93b7a0;font-size:12px;padding:25px;
 </style></head>
 <body>
 <main>
-<header class="top"><strong class="logo">🌿 ECO CLUB / ADMIN</strong><span class="tag">ECO CLUB HUB 6.8 · PRIVATE</span></header>
+<header class="top"><strong class="logo">🌿 ECO CLUB / ADMIN</strong><span class="tag">ECO CLUB HUB 6.8.1 · PRIVATE</span></header>
 <h1>Eco Club | Цифровой кабинет</h1>
 <p class="intro">Единое рабочее пространство руководителя Eco Club: показатели, учащиеся, заявки, вклады, паспорта и сайт.</p>
 
@@ -739,6 +739,7 @@ function apiCall(method,args,onSuccess,onFailure){
  if(method==='awardIssue')runner.admin68IssueAward(...args);
  if(method==='awardDownload')runner.admin68DownloadAward(...args);
  if(method==='awardRevoke')runner.admin68RevokeAward(...args);
+ if(method==='awardRefreshPDF')runner.admin681RefreshCertificate(...args);
  if(method==='profile')runner.admin63MemberProfile(args[0]);
  if(method==='decide')runner.admin60Decide(...args);
  if(method==='enroll')runner.admin64EnrollAccepted(...args);
@@ -1005,9 +1006,11 @@ function renderAwards(){
    const a=element('div','hub-actions');
    const btn=element('button','action secondary','Скачать PDF');
    btn.type='button';btn.onclick=()=>downloadAward(x.id);
+   const regen=element('button','action secondary','Обновить оформление PDF');
+   regen.type='button';regen.onclick=()=>refreshAwardPDF(x);
    const revoke=element('button','action danger','Отозвать награду');
    revoke.type='button';revoke.onclick=()=>revokeAward(x);
-   a.append(btn,revoke);c.append(a);
+   a.append(btn,regen,revoke);c.append(a);
   }
   history.append(c);
  });
@@ -1051,6 +1054,18 @@ function downloadAward(id){
    awardMessage('Файл готов. Нажмите ссылку для сохранения PDF.');
   }catch(e){awardMessage('Ошибка создания файла: '+String(e.message||e),true);}
  },err=>awardMessage('Ошибка скачивания: '+String(err?.message||err),true));
+}
+function refreshAwardPDF(item){
+ if(busy)return;
+ if(!confirm('Обновить оформление уже выданного сертификата № '+item.id+
+  '? Дата выдачи и номер останутся прежними. Старый PDF будет перенесён в корзину, а ранее скачанные копии не изменятся.'))return;
+ awardMessage('Создаём обновлённый сертификат на А4…');
+ apiCall('awardRefreshPDF',[item.id],r=>{
+  if(!r?.ok){awardMessage('Не удалось обновить PDF.',true);return;}
+  if(awardPDFUrl){URL.revokeObjectURL(awardPDFUrl);awardPDFUrl=null;}
+  get('hub-award-download').replaceChildren();
+  loadAwardData();
+ },err=>awardMessage('Ошибка перевыпуска PDF: '+String(err?.message||err),true));
 }
 function revokeAward(item){
  if(busy)return;
