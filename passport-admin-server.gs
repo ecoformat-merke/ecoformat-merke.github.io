@@ -1665,69 +1665,109 @@ function hub681Logo_(container){
   hub68DocLine_(container,'ECO CLUB',26,true,'#14513B',8,6);
  }
 }
+/**
+ * Eco Club HUB 6.8.2 — premium A4 landscape certificate.
+ * Green-and-gold layered border and decorative panels made with native Docs
+ * elements; real student and award data are live, not burned into an image.
+ * No fabricated signatures or seals. Uses one centered main title.
+ */
+function hub682CertCell_(table,row,col,bg,padding){
+ const cell=table.getCell(row,col);
+ cell.clear();
+ cell.setBackgroundColor(bg);
+ cell.setPaddingTop(padding);cell.setPaddingBottom(padding);
+ cell.setPaddingLeft(padding);cell.setPaddingRight(padding);
+ return cell;
+}
+function hub682StyledBand_(parent,ru,kz){
+ const band=parent.appendTable([['']]);
+ band.setBorderWidth(1.4);band.setBorderColor('#B99645');
+ const c=hub682CertCell_(band,0,0,'#0E4935',3);
+ hub68DocLine_(c,ru,12,true,'#FFF2C7',1,1);
+ hub68DocLine_(c,kz,10,false,'#E3EDDC',0,1);
+ return band;
+}
+function hub682ShortName_(name){
+ const s=String(name||'').trim();
+ return s.length>38?17:s.length>26?21:27;
+}
 function hub68GeneratePdf_(person,t,awardId,issueDate){
  let tempDoc=null,createdFile=null;
  try{
-  const doc=DocumentApp.create('Eco Club — Черновик '+awardId);
+  const doc=DocumentApp.create('Eco Club — Premium A4 '+awardId);
   tempDoc=DriveApp.getFileById(doc.getId());
   const body=doc.getBody();
-  body.setMarginTop(27);body.setMarginBottom(25);
-  body.setMarginLeft(27);body.setMarginRight(27);
-  if(typeof body.setPageWidth==='function')body.setPageWidth(595);
-  if(typeof body.setPageHeight==='function')body.setPageHeight(842);
+  // A4, horizontal orientation: 297 × 210 mm = 841.89 × 595.28 pt.
+  body.setPageWidth(841.89);body.setPageHeight(595.28);
+  body.setMarginTop(16);body.setMarginBottom(16);
+  body.setMarginLeft(20);body.setMarginRight(20);
+  // Preserve actual owner-issued record; never create a simulated seal/signature.
   const frame=body.appendTable([['']]);
-  frame.setBorderWidth(2);
-  frame.setBorderColor('#287451');
-  const area=frame.getCell(0,0);
-  area.clear();area.setBackgroundColor('#FFFFFF');
-  area.setPaddingTop(17);area.setPaddingBottom(18);
-  area.setPaddingLeft(21);area.setPaddingRight(21);
+  frame.setBorderWidth(3.0);
+  frame.setBorderColor('#125139');
+  const outer=hub682CertCell_(frame,0,0,'#F0F5E9',6);
+  const gilded=outer.appendTable([['']]);
+  gilded.setBorderWidth(1.5);
+  gilded.setBorderColor('#BE9849');
+  const area=hub682CertCell_(gilded,0,0,'#FFFEF7',10);
+
   hub681Logo_(area);
   hub68DocLine_(area,'ECO CLUB  •  ШКОЛА-ЛИЦЕЙ ИМЕНИ М. АУЭЗОВА',
-   10,true,'#36664C',5,3);
+   10,true,'#154D35',1,0);
   hub68DocLine_(area,'ЭКОЛОГИЯ  ·  ОТВЕТСТВЕННОСТЬ  ·  БУДУЩЕЕ',
-   8,false,'#7C936F',4,11);
-  // A solid gold band draws attention without graphics or external dependencies.
-  const accent=area.appendTable([['']]);
-  accent.setBorderWidth(0);
-  const stripe=accent.getCell(0,0);
-  stripe.setBackgroundColor('#CBA55A');
-  stripe.setPaddingTop(1);stripe.setPaddingBottom(1);
-  stripe.setPaddingLeft(0);stripe.setPaddingRight(0);
-  hub68DocLine_(area,'НАГРАДА ECO CLUB  /  ECO CLUB МАРАПАТЫ',
-   10,true,'#9B783C',16,8);
-  const longTitle=String(t.titleRu||'').length>34;
-  hub68DocLine_(area,String(t.titleRu||'СЕРТИФИКАТ').toUpperCase(),
-   longTitle?19:23,true,'#134D36',4,5);
-  hub68DocLine_(area,String(t.titleKz||''),
-   String(t.titleKz||'').length>38?12:14,true,'#3C7354',1,20);
+   8,false,'#8B774C',0,5);
+
+  // One dominant word in the center, as approved.
+  hub68DocLine_(area,'СЕРТИФИКАТ',32,true,'#A4782C',4,5);
+  hub682StyledBand_(area,
+   'ECO CLUB  •  ЗА ВКЛАД В ЗЕЛЁНОЕ БУДУЩЕЕ',
+   'ECO CLUB  •  ЖАСЫЛ БОЛАШАҚҚА ҚОСҚАН ҮЛЕСІ ҮШІН');
+
   hub68DocLine_(area,'НАГРАЖДАЕТСЯ  /  МАРАПАТТАЛАДЫ',
-   10,true,'#8B774C',10,10);
-  hub68DocLine_(area,person.name,
-   String(person.name||'').length>34?20:25,true,'#123E2E',2,5);
-  hub68DocLine_(area,person.className+' класс  /  '+person.className+' сынып',
-   11,false,'#5B6B60',1,17);
-  hub68DocLine_(area,t.reasonRu,13,false,'#214E3B',1,8);
-  hub68DocLine_(area,t.reasonKz,12,false,'#3A6B50',1,21);
+   10,true,'#9B753C',9,2);
+  hub68DocLine_(area,String(person.name||'').trim(),
+   hub682ShortName_(person.name),true,'#123F2D',1,0);
+  hub68DocLine_(area,
+   String(person.className||'').trim()+' класс  /  '+String(person.className||'').trim()+' сынып',
+   11,false,'#4D6752',0,8);
+  const reasonRu=String(t.reasonRu||'').trim(),reasonKz=String(t.reasonKz||'').trim();
+  const compact=reasonRu.length>110||reasonKz.length>110;
+  hub68DocLine_(area,reasonRu,compact?10:12,false,'#224B37',0,2);
+  hub68DocLine_(area,reasonKz,compact?9:11,false,'#3B6548',0,5);
+
   const achievement=t.metricValue!==undefined?t.metricValue:hub68Metric_(person,t);
-  hub68DocLine_(area,'ПОДТВЕРЖДЁННЫЙ РЕЗУЛЬТАТ  /  РАСТАЛҒАН НӘТИЖЕ',
-   9,true,'#7D8159',8,7);
-  hub68DocLine_(area,hub681ValueLabel_(achievement,t.unit),
-   21,true,'#17543D',1,15);
-  // Balanced signature and seal area for physical issuance; no forged signatures.
-  hub68DocLine_(area,'Руководитель Eco Club  /  Eco Club жетекшісі',
-   10,false,'#3F604A',13,13);
-  hub68DocLine_(area,'________________________________',
-   12,false,'#809080',0,2);
-  hub68DocLine_(area,'Подпись / Қолы                         Место печати / Мөр орны',
-   9,false,'#7A8A77',0,19);
-  const issued=issueDate instanceof Date&&!isNaN(issueDate.getTime())
-   ?issueDate:new Date();
-  hub68DocLine_(area,'Дата выдачи / Берілген күні: '+
-   Utilities.formatDate(issued,Session.getScriptTimeZone(),'dd.MM.yyyy'),
-   10,false,'#4C6D55',5,7);
-  hub68DocLine_(area,'Регистрационный № '+awardId,
-   8,false,'#7C8B7D',0,2);
+  const result=hub681ValueLabel_(achievement,String(t.unit||'').trim());
+  const resultBand=area.appendTable([['']]);
+  resultBand.setBorderWidth(1.1);resultBand.setBorderColor('#C6A45B');
+  const metric=hub682CertCell_(resultBand,0,0,'#F4F4E7',3);
+  hub68DocLine_(metric,
+   'ПОДТВЕРЖДЁННЫЙ РЕЗУЛЬТАТ  /  РАСТАЛҒАН НӘТИЖЕ',
+   8,true,'#6B805A',0,0);
+  hub68DocLine_(metric,result,17,true,'#164B35',0,0);
+
+  const issued=issueDate instanceof Date&&!isNaN(issueDate.getTime())?
+   issueDate:new Date();
+  const issuedOn=Utilities.formatDate(issued,Session.getScriptTimeZone(),'dd.MM.yyyy');
+  hub68DocLine_(area,'Дата выдачи / Берілген күні: '+issuedOn+
+   '     ·     № '+awardId,8,false,'#596C58',7,5);
+
+  const attest=area.appendTable([['','']]);
+  attest.setBorderWidth(0);
+  const signed=hub682CertCell_(attest,0,0,'#FFFEF7',3);
+  const stamp=hub682CertCell_(attest,0,1,'#FFFEF7',3);
+  hub68DocLine_(signed,'Руководитель Eco Club / Eco Club жетекшісі',
+   9,true,'#305E42',0,8);
+  hub68DocLine_(signed,'____________________________',
+   10,false,'#738874',0,0);
+  hub68DocLine_(signed,'Подпись / Қолы',
+   8,false,'#82907D',0,0);
+  hub68DocLine_(stamp,'Место для печати / Мөр орны',
+   9,true,'#305E42',0,12);
+  hub68DocLine_(stamp,'________________________',
+   10,false,'#738874',0,0);
+  hub68DocLine_(stamp,'Только настоящая печать школы',
+   8,false,'#82907D',0,0);
+
   doc.saveAndClose();
   const pdf=tempDoc.getAs(MimeType.PDF);
   pdf.setName(awardId+'.pdf');
