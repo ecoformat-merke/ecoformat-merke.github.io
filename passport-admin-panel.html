@@ -204,7 +204,7 @@ footer{border-top:1px solid #ffffff21;color:#93b7a0;font-size:12px;padding:25px;
 </style></head>
 <body>
 <main>
-<header class="top"><strong class="logo">🌿 ECO CLUB / ADMIN</strong><span class="tag">ECO CLUB HUB 6.8.1 · PRIVATE</span></header>
+<header class="top"><strong class="logo">🌿 ECO CLUB / ADMIN</strong><span class="tag">ECO CLUB HUB 6.8.2 · PRIVATE</span></header>
 <h1>Eco Club | Цифровой кабинет</h1>
 <p class="intro">Единое рабочее пространство руководителя Eco Club: показатели, учащиеся, заявки, вклады, паспорта и сайт.</p>
 
@@ -1006,7 +1006,7 @@ function renderAwards(){
    const a=element('div','hub-actions');
    const btn=element('button','action secondary','Скачать PDF');
    btn.type='button';btn.onclick=()=>downloadAward(x.id);
-   const regen=element('button','action secondary','Обновить оформление PDF');
+   const regen=element('button','action secondary','Premium А4 · альбомный');
    regen.type='button';regen.onclick=()=>refreshAwardPDF(x);
    const revoke=element('button','action danger','Отозвать награду');
    revoke.type='button';revoke.onclick=()=>revokeAward(x);
@@ -1057,7 +1057,7 @@ function downloadAward(id){
 }
 function refreshAwardPDF(item){
  if(busy)return;
- if(!confirm('Обновить оформление уже выданного сертификата № '+item.id+
+ if(!confirm('Создать премиальный альбомный А4 для сертификата № '+item.id+
   '? Дата выдачи и номер останутся прежними. Старый PDF будет перенесён в корзину, а ранее скачанные копии не изменятся.'))return;
  awardMessage('Создаём обновлённый сертификат на А4…');
  apiCall('awardRefreshPDF',[item.id],r=>{
