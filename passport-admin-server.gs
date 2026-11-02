@@ -1651,7 +1651,7 @@ function hub68GeneratePdf_(person,t,awardId){
   if(typeof body.setPageHeight==='function')body.setPageHeight(842);
   hub68DocLine_(body,'ECO CLUB',25,true,'#18523A',40);
   hub68DocLine_(body,'ШКОЛА-ЛИЦЕЙ ИМЕНИ М. АУЭЗОВА',10,false,'#466957',5);
-  hub68DocLine_(body,'🌿',29,false,'#26925D',13);
+  hub68DocLine_(body,'ECOLOGY · RESPONSIBILITY · FUTURE',10,true,'#26925D',13);
   hub68DocLine_(body,t.titleRu.toUpperCase(),23,true,'#18523A',22);
   hub68DocLine_(body,t.titleKz,15,true,'#365F46',6);
   hub68DocLine_(body,'НАГРАЖДАЕТСЯ / МАРАПАТТАЛАДЫ',11,true,'#64826A',30);
