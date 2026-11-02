@@ -1491,3 +1491,265 @@ function admin67ExportReport(filters,format){
   }
  }
 }
+
+
+// === ECO CLUB HUB 6.8 — awards & bilingual PDF certificates ===
+// Private owner-only endpoints. No automatic award issuance or public sharing.
+const HUB68=Object.freeze({
+ awards:'Награды',templates:'Шаблоны наград',
+ folderProperty:'ECO_HUB68_AWARDS_FOLDER_ID',
+ awardsHeader:['award_id','created_at','participant_id','ФИО','Класс','type',
+ 'title_ru','title_kz','reason_ru','reason_kz','metric_value','metric_unit',
+ 'file_url','status','issued_by','issued_at','source','note'],
+ templatesHeader:['template_id','active','type','title_ru','title_kz','reason_ru',
+ 'reason_kz','rule_code','metric_threshold','metric_unit','design','note'],
+ rules:['first_contribution','paper_5kg','caps_100'],maxRows:400
+});
+function hub68Sheet_(name,expected){
+ const s=passportAdminSheet_(passportAdminBook_(),name);
+ const header=s.getRange(1,1,1,expected.length).getValues()[0]
+  .map(x=>String(x||'').trim().toLowerCase());
+ if(header.join('|')!==expected.map(x=>x.toLowerCase()).join('|'))
+  throw new Error('HUB68_INVALID_HEADER_'+name);
+ return s;
+}
+function hub68Roster_(){
+ const s=passportAdminSheet_(passportAdminBook_(),PASSPORT_ADMIN54.roster);
+ const rows=s.getDataRange().getValues().slice(1);
+ const ids=new Set(),identities=new Map(),students=[];
+ rows.forEach(r=>{
+  const id=String(r[0]||'').trim().toLowerCase();
+  if(!/^[a-f0-9]{32}$/.test(id)||r[4]===false)return;
+  if(ids.has(id))throw new Error('HUB68_DUPLICATE_ROSTER_ID');
+  ids.add(id);
+  const person={id,name:String(r[1]||'').trim(),className:String(r[2]||'').trim(),
+   contributions:0,paperKg:0,capsCount:0};
+  students.push(person);
+  const key=passportAdminIdentity_(person.name,person.className);
+  if(!identities.has(key))identities.set(key,[]);
+  identities.get(key).push(person);
+ });
+ const byId=new Map(students.map(x=>[x.id,x]));
+ const rowsOfContributions=passportAdminSheet_(passportAdminBook_(),PASSPORT_ADMIN54.contributions)
+  .getDataRange().getValues().slice(1);
+ rowsOfContributions.forEach(r=>{
+  if(!passportAdminConfirmed_(r[7])||/тест/i.test(String(r[1]||'')))return;
+  const kg=passportAdminNumber_(r[3]),caps=passportAdminNumber_(r[4]);
+  if(kg===null||caps===null)return;
+  const ref=String(r[12]||'').trim().toLowerCase();
+  let p;
+  if(ref){p=byId.get(ref);if(!p)return;} // Never re-attribute another ID's contribution.
+  else{
+   const found=identities.get(passportAdminIdentity_(r[1],r[2]))||[];
+   if(found.length!==1)return; // Ambiguous names require manual resolution first.
+   p=found[0];
+  }
+  p.contributions++;p.paperKg+=kg;p.capsCount+=caps;
+ });
+ students.forEach(p=>{
+  p.paperKg=Math.round(p.paperKg*1000)/1000;
+  p.capsCount=Math.round(p.capsCount*1000)/1000;
+ });
+ return students;
+}
+function hub68Templates_(){
+ const s=hub68Sheet_(HUB68.templates,HUB68.templatesHeader);
+ const arr=s.getDataRange().getValues().slice(1),seen=new Set();
+ return arr.filter(r=>String(r[0]||'').trim()).map(r=>{
+  const template={
+   id:String(r[0]||'').trim(),active:r[1]===true||String(r[1]).trim().toLowerCase()==='true',
+   type:String(r[2]||'').trim(),
+   titleRu:String(r[3]||'').trim(),titleKz:String(r[4]||'').trim(),
+   reasonRu:String(r[5]||'').trim(),reasonKz:String(r[6]||'').trim(),
+   rule:String(r[7]||'').trim(),threshold:passportAdminNumber_(r[8]),
+   unit:String(r[9]||'').trim(),design:String(r[10]||'').trim()
+  };
+  if(seen.has(template.id))throw new Error('HUB68_DUPLICATE_TEMPLATE');
+  seen.add(template.id);
+  if(template.id.length>64||!HUB68.rules.includes(template.rule)||template.threshold===null||
+    !['certificate','achievement','diploma'].includes(template.type)||
+    !template.titleRu||!template.titleKz||!template.reasonRu||!template.reasonKz)
+   throw new Error('HUB68_INVALID_TEMPLATE_'+template.id);
+  return template;
+ });
+}
+function hub68Metric_(person,t){
+ if(t.rule==='first_contribution')return person.contributions;
+ if(t.rule==='paper_5kg')return person.paperKg;
+ if(t.rule==='caps_100')return person.capsCount;
+ throw new Error('HUB68_UNSUPPORTED_RULE');
+}
+function hub68AwardRows_(){
+ const rows=hub68Sheet_(HUB68.awards,HUB68.awardsHeader).getDataRange().getValues().slice(1);
+ return rows.filter(r=>String(r[0]||'').trim()).map(r=>({
+  id:String(r[0]).trim(),createdAt:hub68Date_(r[1]),participantId:String(r[2]||'').trim().toLowerCase(),
+  name:String(r[3]||''),className:String(r[4]||''),type:String(r[5]||''),
+  titleRu:String(r[6]||''),titleKz:String(r[7]||''),reasonRu:String(r[8]||''),
+  reasonKz:String(r[9]||''),value:r[10],unit:String(r[11]||''),
+  hasFile:!!String(r[12]||'').trim(),status:String(r[13]||'').trim(),
+  issuedAt:hub68Date_(r[15]),templateId:hub68TemplateNote_(r[17])
+ }));
+}
+function hub68Date_(raw){
+ if(raw instanceof Date&&!isNaN(raw.getTime()))
+  return Utilities.formatDate(raw,Session.getScriptTimeZone(),'dd.MM.yyyy HH:mm');
+ return String(raw||'').slice(0,32);
+}
+function hub68TemplateNote_(note){
+ const s=String(note||'');
+ const m=/(?:^|;)template=([A-Za-z0-9_-]{1,64})(?:;|$)/.exec(s);
+ return m?m[1]:'';
+}
+function hub68Overview_(){
+ const students=hub68Roster_(),templates=hub68Templates_(),awards=hub68AwardRows_();
+ const issued=new Set(awards.filter(x=>x.status==='issued'&&x.templateId)
+  .map(x=>x.participantId+'|'+x.templateId));
+ const candidates=[];
+ students.forEach(p=>templates.filter(t=>t.active).forEach(t=>{
+  const measured=hub68Metric_(p,t);
+  if(measured+1e-9<t.threshold||issued.has(p.id+'|'+t.id))return;
+  candidates.push({participantId:p.id,name:p.name,className:p.className,
+   templateId:t.id,templateTitle:t.titleRu,rule:t.rule,
+   currentValue:measured,threshold:t.threshold,unit:t.unit});
+ }));
+ const overview=awards.slice().reverse().slice(0,HUB68.maxRows);
+ return {ok:true,templates,students,candidates,awards:overview,
+  totals:{students:students.length,templates:templates.filter(t=>t.active).length,
+   candidates:candidates.length,issued:awards.filter(x=>x.status==='issued').length,
+   revoked:awards.filter(x=>x.status==='revoked').length},
+  truncated:awards.length>HUB68.maxRows};
+}
+function admin68Overview(){
+ requirePassportAdmin_();
+ return hub68Overview_();
+}
+function hub68PdfFolder_(){
+ const props=PropertiesService.getScriptProperties();
+ const id=String(props.getProperty(HUB68.folderProperty)||'').trim();
+ if(id)return DriveApp.getFolderById(id);
+ const folder=DriveApp.createFolder('Eco Club — Закрытые сертификаты');
+ props.setProperty(HUB68.folderProperty,folder.getId());
+ return folder;
+}
+function hub68DocLine_(body,txt,size,bold,color,space){
+ const p=body.appendParagraph(String(txt));
+ p.setAlignment(DocumentApp.HorizontalAlignment.CENTER);
+ if(space)p.setSpacingBefore(space);
+ const t=p.editAsText();t.setFontFamily('Arial');t.setFontSize(size);
+ t.setBold(!!bold);t.setForegroundColor(color||'#184938');
+ return p;
+}
+function hub68GeneratePdf_(person,t,awardId){
+ let tempDoc=null,createdFile=null;
+ try{
+  const doc=DocumentApp.create('Eco Club — Черновик '+awardId);
+  tempDoc=DriveApp.getFileById(doc.getId());
+  const body=doc.getBody();
+  body.setMarginTop(48);body.setMarginBottom(50);
+  body.setMarginLeft(49);body.setMarginRight(49);
+  if(typeof body.setPageWidth==='function')body.setPageWidth(595);
+  if(typeof body.setPageHeight==='function')body.setPageHeight(842);
+  hub68DocLine_(body,'ECO CLUB',25,true,'#18523A',40);
+  hub68DocLine_(body,'ШКОЛА-ЛИЦЕЙ ИМЕНИ М. АУЭЗОВА',10,false,'#466957',5);
+  hub68DocLine_(body,'🌿',29,false,'#26925D',13);
+  hub68DocLine_(body,t.titleRu.toUpperCase(),23,true,'#18523A',22);
+  hub68DocLine_(body,t.titleKz,15,true,'#365F46',6);
+  hub68DocLine_(body,'НАГРАЖДАЕТСЯ / МАРАПАТТАЛАДЫ',11,true,'#64826A',30);
+  hub68DocLine_(body,person.name,21,true,'#153E2A',14);
+  hub68DocLine_(body,person.className+' класс / сынып',12,false,'#45624C',4);
+  hub68DocLine_(body,t.reasonRu,14,false,'#184938',25);
+  hub68DocLine_(body,t.reasonKz,13,false,'#315B43',10);
+  hub68DocLine_(body,'Подтверждённый результат / Расталған нәтиже:',11,false,'#64826A',25);
+  hub68DocLine_(body,String(hub68Metric_(person,t))+' '+t.unit,17,true,'#18523A',6);
+  hub68DocLine_(body,'Руководитель Eco Club / Eco Club жетекшісі',11,false,'#184938',40);
+  hub68DocLine_(body,'______________________________',11,false,'#6D8172',7);
+  hub68DocLine_(body,'Дата / Күні: '+Utilities.formatDate(new Date(),
+   Session.getScriptTimeZone(),'dd.MM.yyyy'),10,false,'#5B7361',24);
+  hub68DocLine_(body,'№ '+awardId,9,false,'#789080',8);
+  doc.saveAndClose();
+  const blob=tempDoc.getAs(MimeType.PDF);
+  blob.setName(awardId+'.pdf');
+  createdFile=hub68PdfFolder_().createFile(blob);
+  createdFile.setSharing(DriveApp.Access.PRIVATE,DriveApp.Permission.NONE);
+  return createdFile;
+ }catch(e){
+  if(createdFile)try{createdFile.setTrashed(true)}catch(ignore){}
+  throw e;
+ }finally{
+  if(tempDoc)try{tempDoc.setTrashed(true)}catch(e){console.error('Award temporary document cleanup failed',e)}
+ }
+}
+function admin68IssueAward(participantId,templateId){
+ requirePassportAdmin_();
+ const id=String(participantId||'').trim().toLowerCase();
+ const tpl=String(templateId||'').trim();
+ if(!/^[a-f0-9]{32}$/.test(id)||!/^[A-Za-z0-9_-]{1,64}$/.test(tpl))
+  throw new Error('HUB68_INVALID_SELECTION');
+ const lock=LockService.getScriptLock();lock.waitLock(30000);
+ let pdf=null;
+ try{
+  const p=hub68Roster_().find(x=>x.id===id);
+  const t=hub68Templates_().find(x=>x.id===tpl&&x.active);
+  if(!p||!t)throw new Error('HUB68_PARTICIPANT_OR_TEMPLATE_NOT_FOUND');
+  const metric=hub68Metric_(p,t);
+  if(metric+1e-9<t.threshold)throw new Error('HUB68_REQUIREMENT_NOT_MET');
+  const sheet=hub68Sheet_(HUB68.awards,HUB68.awardsHeader);
+  const current=hub68AwardRows_();
+  if(current.some(x=>x.participantId===id&&x.templateId===tpl&&x.status==='issued'))
+   throw new Error('HUB68_AWARD_ALREADY_ISSUED');
+  const awardId='AWD-'+Utilities.getUuid();
+  pdf=hub68GeneratePdf_(p,t,awardId);
+  const now=new Date();
+  sheet.appendRow([
+   awardId,now,id,p.name,p.className,t.type,t.titleRu,t.titleKz,
+   t.reasonRu,t.reasonKz,metric,t.unit,pdf.getUrl(),'issued',
+   Session.getActiveUser().getEmail(),now,'manual','template='+tpl
+  ]);
+  SpreadsheetApp.flush();
+  return {ok:true,awardId,status:'issued',name:p.name,filename:awardId+'.pdf'};
+ }catch(e){
+  if(pdf)try{pdf.setTrashed(true)}catch(ignore){}
+  throw e;
+ }finally{lock.releaseLock();}
+}
+function hub68LocateAward_(id){
+ const awardId=String(id||'').trim();
+ if(!/^AWD-[a-f0-9-]{36}$/i.test(awardId))throw new Error('HUB68_INVALID_AWARD_ID');
+ const sheet=hub68Sheet_(HUB68.awards,HUB68.awardsHeader);
+ const data=sheet.getDataRange().getValues();
+ let idx=-1,row;
+ for(let i=1;i<data.length;i++){
+  if(String(data[i][0]||'').trim()!==awardId)continue;
+  if(idx>=0)throw new Error('HUB68_DUPLICATE_AWARD_ID');
+  idx=i+1;row=data[i];
+ }
+ if(idx<0)throw new Error('HUB68_AWARD_NOT_FOUND');
+ return {sheet,rowNumber:idx,row};
+}
+function admin68DownloadAward(awardId){
+ requirePassportAdmin_();
+ const located=hub68LocateAward_(awardId),row=located.row;
+ if(String(row[13]||'').trim()!=='issued')throw new Error('HUB68_AWARD_NOT_ACTIVE');
+ const url=String(row[12]||'');
+ const match=/\/d\/([A-Za-z0-9_-]{15,})\//.exec(url);
+ if(!match)throw new Error('HUB68_PDF_URL_INVALID');
+ const file=DriveApp.getFileById(match[1]),blob=file.getBlob();
+ if(blob.getContentType()!=='application/pdf')throw new Error('HUB68_NOT_PDF');
+ const bytes=blob.getBytes();
+ if(bytes.length>6*1024*1024)throw new Error('HUB68_PDF_TOO_LARGE');
+ return {ok:true,filename:awardId+'.pdf',mime:'application/pdf',
+  base64:Utilities.base64Encode(bytes)};
+}
+function admin68RevokeAward(awardId){
+ requirePassportAdmin_();
+ const lock=LockService.getScriptLock();lock.waitLock(30000);
+ try{
+  const located=hub68LocateAward_(awardId);
+  if(String(located.row[13]||'').trim()!=='issued')throw new Error('HUB68_NOT_ISSUED');
+  located.sheet.getRange(located.rowNumber,14).setValue('revoked');
+  located.sheet.getRange(located.rowNumber,18).setValue(
+   'template='+hub68TemplateNote_(located.row[17])+';revoked_by='+Session.getActiveUser().getEmail());
+  SpreadsheetApp.flush();
+  return {ok:true,status:'revoked'};
+ }finally{lock.releaseLock();}
+}
