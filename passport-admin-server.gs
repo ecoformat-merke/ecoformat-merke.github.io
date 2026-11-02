@@ -1691,7 +1691,50 @@ function hub682ShortName_(name){
  const s=String(name||'').trim();
  return s.length>38?17:s.length>26?21:27;
 }
+
+/** HUB 6.8.3: pixel-accurate approved backdrop, editable data labels.
+ * The source is a private Google Slides converted from supplied PPTX.
+ * If no template ID is configured, the previously working generator remains active.
+ */
+function hub683PremiumPdf_(person,t,awardId,issueDate){
+ const id=String(PropertiesService.getScriptProperties().getProperty('ECO_HUB683_TEMPLATE_ID')||'').trim();
+ if(!/^[A-Za-z0-9_-]{20,150}$/.test(id))return null;
+ let temp=null,pdf=null;
+ try{
+  const source=DriveApp.getFileById(id);
+  temp=source.makeCopy('Eco Club — private award rendering '+awardId);
+  const slides=SlidesApp.openById(temp.getId());
+  const value=t.metricValue!==undefined?t.metricValue:hub68Metric_(person,t);
+  const issued=issueDate instanceof Date&&!isNaN(issueDate.getTime())?issueDate:new Date();
+  const cls=String(person.className||'').trim();
+  const replacements={
+   '{{TITLE_RU}}':String(t.titleRu||''),
+   '{{TITLE_KZ}}':String(t.titleKz||''),
+   '{{STUDENT_NAME}}':String(person.name||''),
+   '{{CLASS_BILINGUAL}}':cls+' класс / '+cls+' сынып',
+   '{{REASON_RU}}':String(t.reasonRu||''),
+   '{{REASON_KZ}}':String(t.reasonKz||''),
+   '{{METRIC}}':hub681ValueLabel_(value,String(t.unit||'')),
+   '{{AWARD_ID}}':String(awardId),
+   '{{AWARD_DATE}}':Utilities.formatDate(issued,Session.getScriptTimeZone(),'dd.MM.yyyy')
+  };
+  Object.keys(replacements).forEach(k=>slides.replaceAllText(k,replacements[k]));
+  slides.saveAndClose();
+  // Export a private Slides copy only; never update the master template itself.
+  const binary=temp.getAs(MimeType.PDF).setName(awardId+'.pdf');
+  pdf=hub68PdfFolder_().createFile(binary);
+  pdf.setSharing(DriveApp.Access.PRIVATE,DriveApp.Permission.NONE);
+  return pdf;
+ }catch(e){
+  if(pdf)try{pdf.setTrashed(true)}catch(ignore){}
+  throw e;
+ }finally{
+  if(temp)try{temp.setTrashed(true)}catch(e){console.warn('Temporary Slides copy cleanup failed',e)}
+ }
+}
 function hub68GeneratePdf_(person,t,awardId,issueDate){
+ const exact=hub683PremiumPdf_(person,t,awardId,issueDate);
+ if(exact)return exact;
  let tempDoc=null,createdFile=null;
  try{
   const doc=DocumentApp.create('Eco Club — Premium A4 '+awardId);
