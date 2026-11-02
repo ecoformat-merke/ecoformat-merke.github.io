@@ -1222,3 +1222,272 @@ function admin66RemoveEventPhoto(rowNumber,expectedStamp,fileId){
    stamp:passportAdmin60Stamp_('event',sh.getRange(rowNumber,1,1,16).getValues()[0])};
  }finally{lock.releaseLock();}
 }
+
+
+// ===== ECO CLUB HUB 6.7 | Private analytics and on-demand reporting =====
+// All endpoints require administrator identity. No modification of source data.
+function passportAdmin67DateParts_(iso){
+ const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(String(iso||''));
+ if(!m)throw new Error('INVALID_REPORT_DATE');
+ const y=+m[1],mon=+m[2],d=+m[3],check=new Date(Date.UTC(y,mon-1,d));
+ if(y<2020||y>2100||check.getUTCFullYear()!==y||
+    check.getUTCMonth()!==mon-1||check.getUTCDate()!==d)
+  throw new Error('INVALID_REPORT_DATE');
+ return {y,mon,d,iso:m[0]};
+}
+function passportAdmin67Iso_(date){
+ if(date instanceof Date){
+  if(isNaN(date.getTime()))return '';
+  return Utilities.formatDate(date,Session.getScriptTimeZone(),'yyyy-MM-dd');
+ }
+ const s=String(date==null?'':date).trim();
+ if(/^\d{4}-\d{2}-\d{2}(?:[T ]|$)/.test(s)){
+  const iso=s.slice(0,10);
+  try{passportAdmin67DateParts_(iso);return iso}catch(e){return ''}
+ }
+ const m=/^(\d{1,2})\.(\d{1,2})\.(\d{4})(?:\s|$)/.exec(s);
+ if(m){
+  const iso=m[3]+'-'+m[2].padStart(2,'0')+'-'+m[1].padStart(2,'0');
+  try{passportAdmin67DateParts_(iso);return iso}catch(e){return ''}
+ }
+ return '';
+}
+function passportAdmin67Range_(filters,now){
+ const p=filters&&typeof filters==='object'&&!Array.isArray(filters)?filters:{};
+ const preset=String(p.preset||'month');
+ if(!['month','quarter','schoolYear','custom'].includes(preset))
+  throw new Error('INVALID_REPORT_PERIOD');
+ const current=now instanceof Date?now:new Date();
+ const today=Utilities.formatDate(current,Session.getScriptTimeZone(),'yyyy-MM-dd');
+ const anchor=passportAdmin67DateParts_(p.referenceDate||today);
+ let from,to,caption;
+ const pad=n=>String(n).padStart(2,'0');
+ if(preset==='custom'){
+  from=passportAdmin67DateParts_(p.from).iso;
+  to=passportAdmin67DateParts_(p.to).iso;
+  caption='Выбранный период';
+ }else if(preset==='month'){
+  from=anchor.y+'-'+pad(anchor.mon)+'-01';
+  const end=new Date(Date.UTC(anchor.y,anchor.mon,0));
+  to=anchor.y+'-'+pad(anchor.mon)+'-'+pad(end.getUTCDate());
+  caption='Месяц';
+ }else if(preset==='schoolYear'){
+  const y=anchor.mon>=9?anchor.y:anchor.y-1;
+  from=y+'-09-01';to=(y+1)+'-08-31';
+  caption='Учебный год '+y+'–'+(y+1);
+ }else{
+  const y=anchor.mon>=9?anchor.y:anchor.y-1;
+  if(anchor.mon===9||anchor.mon===10){
+   from=y+'-09-01';to=y+'-10-31';caption='I четверть';
+  }else if(anchor.mon===11||anchor.mon===12){
+   from=y+'-11-01';to=y+'-12-31';caption='II четверть';
+  }else if(anchor.mon>=1&&anchor.mon<=3){
+   from=(y+1)+'-01-01';to=(y+1)+'-03-31';caption='III четверть';
+  }else{
+   from=(y+1)+'-04-01';to=(y+1)+'-05-31';caption='IV четверть';
+  }
+ }
+ const a=passportAdmin67DateParts_(from),b=passportAdmin67DateParts_(to);
+ const diff=(Date.UTC(b.y,b.mon-1,b.d)-Date.UTC(a.y,a.mon-1,a.d))/86400000;
+ if(diff<0||diff>730)throw new Error('REPORT_PERIOD_OUT_OF_RANGE');
+ return {preset,from,to,caption};
+}
+function passportAdmin67Round_(v){return Math.round((v+Number.EPSILON)*1000)/1000;}
+function passportAdmin67Build_(filters,now){
+ const period=passportAdmin67Range_(filters,now),book=passportAdminBook_();
+ const contrib=passportAdminSheet_(book,PASSPORT_ADMIN54.contributions).getDataRange().getValues();
+ const apps=passportAdminSheet_(book,ECO_HUB60.applications).getDataRange().getValues();
+ const teacherEvents=passportAdminSheet_(passportAdmin65EventsBook_(),ECO_HUB60.events).getDataRange().getValues();
+ const rosterSheet=book.getSheetByName(PASSPORT_ADMIN54.roster);
+ const roster=rosterSheet?rosterSheet.getDataRange().getValues().slice(1):[];
+ const byId=new Map(),byKey=new Map();
+ roster.forEach(r=>{
+  if(!r[0]||r[4]===false)return;
+  const person={id:String(r[0]).trim(),name:String(r[1]||'').trim(),className:String(r[2]||'').trim()};
+  byId.set(person.id.toLowerCase(),person);
+  byKey.set(passportAdminIdentity_(person.name,person.className),person);
+ });
+ const months=new Map(),classes=new Map(),students=new Map();
+ const ensureMonth=iso=>{
+  const key=iso.slice(0,7);
+  if(!months.has(key))months.set(key,{month:key,paperKg:0,capsCount:0,contributions:0});
+  return months.get(key);
+ };
+ const start=period.from.slice(0,7),finish=period.to.slice(0,7);
+ let [yr,mo]=start.split('-').map(Number);
+ for(let guard=0;guard<25;guard++){
+  const key=yr+'-'+String(mo).padStart(2,'0');
+  ensureMonth(key);
+  if(key===finish)break;
+  mo++;if(mo>12){mo=1;yr++;}
+ }
+ const stats={
+  approvedContributions:0,paperKg:0,capsCount:0,activeStudents:0,activeClasses:0,
+  acceptedApplications:0,publishedEvents:0,unlinkedContributions:0,
+  undatedConfirmed:0,invalidConfirmedAmounts:0,
+  undatedAcceptedApplications:0,undatedPublishedEvents:0
+ };
+ const getAggregate=(map,key,base)=>{
+  if(!map.has(key))map.set(key,{...base,contributions:0,paperKg:0,capsCount:0,score:0});
+  return map.get(key);
+ };
+ const included=(iso)=>!!iso&&iso>=period.from&&iso<=period.to;
+ for(let i=1;i<contrib.length;i++){
+  const r=contrib[i];
+  if(!passportAdminConfirmed_(r[7])||/тест/i.test(String(r[1]||'')))continue;
+  const iso=passportAdmin67Iso_(r[0]);
+  if(!iso){stats.undatedConfirmed++;continue;}
+  if(!included(iso))continue;
+  const kg=passportAdminNumber_(r[3]),caps=passportAdminNumber_(r[4]);
+  if(kg===null||caps===null){stats.invalidConfirmedAmounts++;continue;}
+  const name=String(r[1]||'').trim(),cl=String(r[2]||'').trim();
+  const entry=ensureMonth(iso);
+  entry.contributions++;entry.paperKg+=kg;entry.capsCount+=caps;
+  stats.approvedContributions++;stats.paperKg+=kg;stats.capsCount+=caps;
+  if(!String(r[12]||'').trim())stats.unlinkedContributions++;
+  const classEntry=getAggregate(classes,cl||'Без класса',{className:cl||'Без класса'});
+  classEntry.contributions++;classEntry.paperKg+=kg;classEntry.capsCount+=caps;
+  const personId=String(r[12]||'').trim().toLowerCase();
+  const registered=byId.get(personId)||byKey.get(passportAdminIdentity_(name,cl));
+  const studentName=registered?registered.name:name||'Без ФИО';
+  const studentClass=registered?registered.className:cl||'Без класса';
+  const key=registered?'id:'+registered.id:'name:'+passportAdminIdentity_(name,cl);
+  const person=getAggregate(students,key,{name:studentName,className:studentClass,
+   participantRef:registered?'ECO-'+registered.id.slice(0,8).toUpperCase():'Без ID'});
+  person.contributions++;person.paperKg+=kg;person.capsCount+=caps;
+ }
+ for(let i=1;i<apps.length;i++){
+  const r=apps[i];
+  if(!/^принят$/i.test(String(r[7]||'').trim())||/тест/i.test(String(r[1]||'')))continue;
+  const iso=passportAdmin67Iso_(r[0]);
+  if(!iso){stats.undatedAcceptedApplications++;continue;}
+  if(included(iso))stats.acceptedApplications++;
+ }
+ for(let i=1;i<teacherEvents.length;i++){
+  const r=teacherEvents[i];
+  if(!passportAdmin64EventPublished_(r[12])||/^(?:тест|test)(?:\s|[—-]|$)/i.test(String(r[3]||'')))continue;
+  const iso=passportAdmin67Iso_(r[9]);
+  if(!iso){stats.undatedPublishedEvents++;continue;}
+  if(included(iso))stats.publishedEvents++;
+ }
+ const finishGroup=values=>values.map(x=>({
+  ...x,paperKg:passportAdmin67Round_(x.paperKg),
+  capsCount:passportAdmin67Round_(x.capsCount),
+  score:passportAdmin67Round_(x.paperKg*10+x.capsCount/10)
+ }));
+ const sort=(a,b)=>b.score-a.score||b.contributions-a.contributions||
+  String(a.name||a.className).localeCompare(String(b.name||b.className),'ru');
+ const classRows=finishGroup([...classes.values()]).sort(sort);
+ const studentRows=finishGroup([...students.values()]).sort(sort);
+ const monthly=finishGroup([...months.values()]).sort((a,b)=>a.month.localeCompare(b.month));
+ stats.paperKg=passportAdmin67Round_(stats.paperKg);
+ stats.capsCount=passportAdmin67Round_(stats.capsCount);
+ stats.activeStudents=studentRows.length;
+ stats.activeClasses=classRows.length;
+ return {ok:true,period,summary:stats,monthly,
+  classes:classRows,students:studentRows,rankingLimit:200,
+  generatedAt:Utilities.formatDate(now instanceof Date?now:new Date(),
+   Session.getScriptTimeZone(),'dd.MM.yyyy HH:mm'),
+  note:'Учтены подтверждённые нетестовые вклады с датой в выбранном периоде. Баллы: 10 × кг макулатуры + 0,1 × количество крышек. Персональные результаты — только для руководителя.'};
+}
+function admin67Analytics(filters){
+ requirePassportAdmin_();
+ return passportAdmin67Build_(filters);
+}
+// Escape spreadsheet formula injection in names, class labels, and titles.
+function passportAdmin67Cell_(value){
+ if(typeof value==='string'&&/^\s*[=+\-@]/.test(value))return "'"+value;
+ return value===null||value===undefined?'':value;
+}
+function passportAdmin67Write_(sheet,rows,widths){
+ if(!rows.length)return;
+ const w=Math.max(...rows.map(r=>r.length));
+ const values=rows.map(r=>Array.from({length:w},(_,i)=>passportAdmin67Cell_(r[i])));
+ sheet.getRange(1,1,values.length,w).setValues(values);
+ sheet.setFrozenRows(1);
+ sheet.getRange(1,1,1,w).setFontWeight('bold').setBackground('#194b38')
+  .setFontColor('#ffffff');
+ sheet.getRange(1,1,values.length,w).setVerticalAlignment('middle');
+ sheet.setRowHeight(1,34);
+ (widths||[]).forEach((size,i)=>sheet.setColumnWidth(i+1,size));
+ if(values.length>1)sheet.getRange(2,1,values.length-1,w).setWrap(true);
+}
+function passportAdmin67Book_(analytics){
+ const ss=SpreadsheetApp.create('Eco Club — Временный отчёт '+analytics.period.from);
+ const info=ss.getSheets()[0];info.setName('Итоги');
+ const stat=analytics.summary,period=analytics.period;
+ const note='Для служебного использования. Персональные данные учащихся не публиковать.';
+ const summary=[
+  ['Eco Club — аналитический отчёт','Значение'],
+  ['Период',period.caption+' · '+period.from+' — '+period.to],
+  ['Подготовлен',analytics.generatedAt],
+  ['Подтверждённые вклады',stat.approvedContributions],
+  ['Макулатура, кг',stat.paperKg],
+  ['Крышки, шт.',stat.capsCount],
+  ['Активные ученики',stat.activeStudents],
+  ['Активные классы',stat.activeClasses],
+  ['Принятые заявки',stat.acceptedApplications],
+  ['Опубликованные мероприятия',stat.publishedEvents],
+  ['Вклады без ID',stat.unlinkedContributions],
+  ['Подтверждённые записи без даты (не включены)',stat.undatedConfirmed],
+  ['Некорректные объёмы вкладов в периоде (не включены)',stat.invalidConfirmedAmounts],
+  ['Заявки без даты (не включены)',stat.undatedAcceptedApplications],
+  ['Публикации без даты (не включены)',stat.undatedPublishedEvents],
+  ['Методика','Баллы = кг × 10 + крышки × 0,1'],
+  ['Конфиденциальность',note]
+ ];
+ passportAdmin67Write_(info,summary,[405,460]);
+ const dynamic=ss.insertSheet('Динамика');
+ passportAdmin67Write_(dynamic,[
+  ['Месяц','Вкладов','Макулатура, кг','Крышки, шт.','Баллы'],
+  ...analytics.monthly.map(x=>[x.month,x.contributions,x.paperKg,x.capsCount,x.score])
+ ],[160,130,170,150,140]);
+ const groups=ss.insertSheet('Рейтинг классов');
+ passportAdmin67Write_(groups,[
+  ['Место','Класс','Вкладов','Макулатура, кг','Крышки, шт.','Баллы'],
+  ...analytics.classes.slice(0,analytics.rankingLimit).map((x,i)=>[
+   i+1,x.className,x.contributions,x.paperKg,x.capsCount,x.score])
+ ],[90,170,130,160,145,125]);
+ const pupils=ss.insertSheet('Рейтинг учеников');
+ passportAdmin67Write_(pupils,[
+  ['Место','Ученик','Класс','Номер EcoPassport','Вкладов','Макулатура, кг','Крышки, шт.','Баллы'],
+  ...analytics.students.slice(0,analytics.rankingLimit).map((x,i)=>[
+   i+1,x.name,x.className,x.participantRef,x.contributions,x.paperKg,x.capsCount,x.score])
+ ],[75,260,115,175,95,155,120,105]);
+ return ss;
+}
+function admin67ExportReport(filters,format){
+ requirePassportAdmin_();
+ if(format!=='xlsx'&&format!=='pdf')throw new Error('INVALID_EXPORT_FORMAT');
+ const a=passportAdmin67Build_(filters);
+ if(a.classes.length>200||a.students.length>200)
+  throw new Error('REPORT_TOO_LARGE_FOR_EXPORT');
+ let book;
+ try{
+  book=passportAdmin67Book_(a);
+  SpreadsheetApp.flush();
+  const id=book.getId();
+  const ext=format==='pdf'?'pdf':'xlsx';
+  const mime=format==='pdf'?'application/pdf':
+   'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+  const parameters=format==='pdf'?
+   '?format=pdf&size=A4&portrait=false&fitw=true&sheetnames=true&printtitle=false&gridlines=false&fzr=true':
+   '?format=xlsx';
+  const url='https://docs.google.com/spreadsheets/d/'+encodeURIComponent(id)+'/export'+parameters;
+  const response=UrlFetchApp.fetch(url,{
+   method:'get',headers:{Authorization:'Bearer '+ScriptApp.getOAuthToken()},
+   muteHttpExceptions:true,followRedirects:true
+  });
+  if(response.getResponseCode()!==200)
+   throw new Error('REPORT_EXPORT_FAILED_HTTP_'+response.getResponseCode());
+  const bytes=response.getContent();
+  if(bytes.length>6*1024*1024)throw new Error('REPORT_EXPORT_TOO_LARGE');
+  return {ok:true,mime,filename:'Eco-Club-'+a.period.from+'-'+a.period.to+'.'+ext,
+   base64:Utilities.base64Encode(bytes),size:bytes.length};
+ }finally{
+  if(book){
+   try{DriveApp.getFileById(book.getId()).setTrashed(true)}
+   catch(err){console.error('Temporary report clean-up failed',err)}
+  }
+ }
+}
