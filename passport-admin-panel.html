@@ -177,10 +177,34 @@ footer{border-top:1px solid #ffffff21;color:#93b7a0;font-size:12px;padding:25px;
 @media(max-width:840px){.hub-report-grid{grid-template-columns:1fr}.hub-report-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:440px){.hub-report-chart-row{grid-template-columns:64px 1fr 55px;gap:5px}.hub-report-kpi{padding:10px}.hub-report-toolbar label{flex:1 1 140px}.hub-report-quality{grid-template-columns:1fr}}
 
+
+/* Eco Club HUB 6.8: private certificates and award register */
+.hub-award-head{display:flex;align-items:start;justify-content:space-between;gap:15px;flex-wrap:wrap;margin:18px 0}
+.hub-award-head h2{margin:5px 0 8px}
+.hub-award-head .subnote{max-width:760px}
+.hub-award-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:17px 0}
+.hub-award-metric{background:linear-gradient(145deg,#20503c,#0f3326);border:1px solid #c1e4b35a;border-radius:15px;padding:14px}
+.hub-award-metric strong{font-size:28px;display:block;color:var(--green)}
+.hub-award-metric span{font-size:12px;display:block;color:#c6e5cb;margin-top:6px}
+.hub-award-panel{background:#0c3329ba;border:1px solid #b2deb050;border-radius:17px;padding:17px;margin-top:15px}
+.hub-award-title-row{display:flex;align-items:center;justify-content:space-between;gap:15px;flex-wrap:wrap;margin-bottom:12px}
+.hub-award-title-row h3{font-size:19px;margin:0}
+.hub-award-title-row input,.hub-award-toolbar select{background:#0b2c23;border:1px solid #b9dfad66;border-radius:9px;color:#e6f8e4;min-height:43px;padding:10px;font-size:13px}
+.hub-award-title-row input{width:min(100%,375px)}
+.hub-award-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}
+.hub-award-card{background:linear-gradient(140deg,#20503d,#12382b);border:1px solid #b2dfa84c;border-radius:14px;padding:15px;min-width:0}
+.hub-award-card h4{font-size:15px;margin:0 0 8px;overflow-wrap:anywhere}
+.hub-award-card p{font-size:12px;margin:5px 0;color:#cee7d4;line-height:1.45;overflow-wrap:anywhere}
+.hub-award-card .hub-actions{margin-top:12px;display:flex;flex-wrap:wrap;gap:7px}
+.hub-award-chip{font-size:10px;font-weight:800;background:#b6eba928;color:#daf1ce;border-radius:18px;padding:5px 8px;display:inline-block;margin-bottom:7px}
+.hub-award-empty{grid-column:1/-1;padding:15px;border:1px dashed #bedfa666;border-radius:12px;color:#d3e9cf;font-size:13px}
+#hub-award-download a{color:#d1ffa5;font-size:13px;display:inline-block;margin-top:15px}
+@media(max-width:800px){.hub-award-grid{grid-template-columns:1fr}.hub-award-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
 </style></head>
 <body>
 <main>
-<header class="top"><strong class="logo">🌿 ECO CLUB / ADMIN</strong><span class="tag">ECO CLUB HUB 6.7 · PRIVATE</span></header>
+<header class="top"><strong class="logo">🌿 ECO CLUB / ADMIN</strong><span class="tag">ECO CLUB HUB 6.8 · PRIVATE</span></header>
 <h1>Eco Club | Цифровой кабинет</h1>
 <p class="intro">Единое рабочее пространство руководителя Eco Club: показатели, учащиеся, заявки, вклады, паспорта и сайт.</p>
 
@@ -191,6 +215,7 @@ footer{border-top:1px solid #ffffff21;color:#93b7a0;font-size:12px;padding:25px;
 <button type="button" data-target="contributions">♻ Вклады</button>
 <button type="button" data-target="events">▦ Мероприятия</button>
 <button type="button" data-target="analytics">▥ Аналитика</button>
+<button type="button" data-target="awards">✦ Награды</button>
 <button type="button" data-target="passports">▣ Паспорта</button>
 <button type="button" data-target="quality">◇ Контроль</button>
 <button type="button" data-target="site">↗ Сайт</button>
@@ -366,6 +391,46 @@ footer{border-top:1px solid #ffffff21;color:#93b7a0;font-size:12px;padding:25px;
 <p id="hub-report-status" class="subnote" role="status" aria-live="polite">Укажите период и нажмите «Показать результаты».</p>
 <div id="hub-report-download"></div>
 <p class="subnote">Баллы активности: <strong>10 × кг макулатуры + 0,1 × число крышек</strong>. Для учебной четверти используются периоды: сентябрь–октябрь, ноябрь–декабрь, январь–март и апрель–май.</p>
+</section>
+
+<section id="hub-awards" class="hub-view" hidden>
+ <div class="hub-award-head">
+  <div>
+   <div class="hub-eyebrow">ECO CLUB / НАГРАДЫ</div>
+   <h2>Награды и сертификаты</h2>
+   <p class="subnote">Только подтверждённые экологические достижения. Выдача наград выполняется вручную после проверки руководителем.</p>
+  </div>
+  <button class="action secondary" id="hub-award-refresh" type="button">↻ Обновить</button>
+ </div>
+ <div id="hub-award-kpis" class="hub-award-kpis"></div>
+ <div class="hub-award-panel">
+  <div class="hub-award-title-row">
+   <h3>Кандидаты на награждение</h3>
+   <input id="hub-award-search" class="search" placeholder="Поиск ученика, класса или награды" type="search">
+  </div>
+  <p class="subnote">Подтверждённые результаты сравниваются с активными шаблонами. Нажатие «Выдать PDF-награду» создаёт реальный сертификат и запись в реестре.</p>
+  <div id="hub-award-candidates" class="hub-award-grid"></div>
+ </div>
+ <div class="hub-award-panel">
+  <div class="hub-award-title-row">
+   <h3>Реестр выданных наград</h3>
+   <div class="hub-award-toolbar">
+    <select id="hub-award-status" aria-label="Фильтр наград">
+     <option value="all">Все статусы</option>
+     <option value="issued">Действующие</option>
+     <option value="revoked">Отозванные</option>
+    </select>
+   </div>
+  </div>
+  <div id="hub-award-history" class="hub-award-grid"></div>
+ </div>
+ <div class="hub-award-panel">
+  <h3>Шаблоны наград</h3>
+  <div id="hub-award-templates" class="hub-award-grid"></div>
+  <p class="subnote">Шаблоны редактируются в закрытом листе Google Таблицы «Шаблоны наград». Новые правила требуют проверки серверного кода перед включением.</p>
+ </div>
+ <p id="hub-award-feedback" class="subnote" role="status" aria-live="polite"></p>
+ <div id="hub-award-download"></div>
 </section>
 <section id="hub-quality" class="hub-view" hidden><h2>Контроль качества данных</h2><div id="hub-quality-kpis" class="hub-kpis"></div><h3>Последние решения</h3><div id="hub-audit-list" class="hub-list"></div></section>
 <section id="hub-site" class="hub-view" hidden><h2>Публичный сайт</h2><p class="subnote">Предпросмотр опубликованного Eco Club в этом же кабинете. Изменения дизайна сайта по-прежнему выполняются через GitHub.</p><div class="hub-site-tools" role="group" aria-label="Просмотр разделов публичного сайта"><button type="button" class="action" data-preview="home">Главная</button><button type="button" class="action secondary" data-preview="world">ECO WORLD</button><button type="button" class="action secondary" data-preview="passport">Паспорт · демо</button></div>
@@ -608,10 +673,11 @@ load();
 (function(){
 'use strict';
 const get=id=>document.getElementById(id);
-const tabs=['overview','members','applications','contributions','events','analytics','passports','quality','site'];
+const tabs=['overview','members','applications','contributions','events','analytics','awards','passports','quality','site'];
 let current='overview',hub=null,people=[],busy=false,appFilter='pending',conFilter='pending',eventFilter='pending';
 let taskFilter='all',taskShowAll=false;
 let reportData=null,reportParams=null,reportChartMetric='paperKg',reportDownloadURL=null;
+let awardData=null,awardPDFUrl=null;
 let eventView='list',eventEditor=null,eventEditorDirty=false,calMonth=new Date(new Date().getFullYear(),new Date().getMonth(),1);
 const format=(n,d=0)=>Number.isFinite(Number(n))?new Intl.NumberFormat('ru-RU',{maximumFractionDigits:d}).format(Number(n)):'—';
 function element(tag,cls,content){
@@ -649,6 +715,7 @@ function switchTo(target){
   // Embedded preview is read-only. External link is always available.
  }
  if(target==='analytics'&&!reportData)loadAnalytics();
+ if(target==='awards'&&!awardData)loadAwardData();
  window.scrollTo({top:0,behavior:'auto'});
 }
 function apiCall(method,args,onSuccess,onFailure){
@@ -668,6 +735,10 @@ function apiCall(method,args,onSuccess,onFailure){
  if(method==='members')runner.admin54Overview();
  if(method==='analytics')runner.admin67Analytics(args[0]);
  if(method==='reportExport')runner.admin67ExportReport(...args);
+ if(method==='awardOverview')runner.admin68Overview();
+ if(method==='awardIssue')runner.admin68IssueAward(...args);
+ if(method==='awardDownload')runner.admin68DownloadAward(...args);
+ if(method==='awardRevoke')runner.admin68RevokeAward(...args);
  if(method==='profile')runner.admin63MemberProfile(args[0]);
  if(method==='decide')runner.admin60Decide(...args);
  if(method==='enroll')runner.admin64EnrollAccepted(...args);
@@ -877,6 +948,122 @@ function reportExport(fmt){
   }catch(e){reportStatus('Ошибка подготовки скачивания: '+e.message,true);}
  },err=>reportStatus('Не удалось создать '+fmt.toUpperCase()+': '+String(err?.message||err),true));
 }
+
+function awardMessage(message,isError){
+ const box=get('hub-award-feedback');
+ box.textContent=message;
+ box.style.color=isError?'#ffb1a1':'#dbf7ce';
+}
+function loadAwardData(){
+ if(busy)return;
+ awardMessage('Загружаем результаты и награды…');
+ apiCall('awardOverview',[],result=>{
+  if(!result?.ok){awardMessage('Невозможно загрузить реестр наград.',true);return;}
+  awardData=result;renderAwards();
+  awardMessage('Данные обновлены. Выдача сертификатов — только по отдельному подтверждению.');
+ },err=>awardMessage('Ошибка: '+String(err?.message||err),true));
+}
+function renderAwards(){
+ if(!awardData)return;
+ const k=get('hub-award-kpis');k.replaceChildren();
+ const stats=awardData.totals||{};
+ [[stats.students||0,'Участников с ID'],[stats.templates||0,'Активных шаблонов'],
+ [stats.candidates||0,'Готовы к награждению'],[stats.issued||0,'Действующих наград']].forEach(([number,label])=>{
+  const card=element('div','hub-award-metric');
+  card.append(element('strong','',String(number)),element('span','',label));
+  k.append(card);
+ });
+ const search=String(get('hub-award-search').value||'').trim().toLocaleLowerCase('ru-RU');
+ const list=get('hub-award-candidates');list.replaceChildren();
+ const candidates=(awardData.candidates||[]).filter(x=>
+  [x.name,x.className,x.templateTitle].join(' ').toLocaleLowerCase('ru-RU').includes(search));
+ if(!candidates.length)list.append(element('p','hub-award-empty',
+  search?'Совпадений нет.':'Новых достижений для выдачи наград пока нет.'));
+ candidates.slice(0,120).forEach(x=>{
+  const c=element('article','hub-award-card');
+  c.append(element('span','hub-award-chip','Достижение подтверждено'),
+   element('h4','',x.name+' · '+x.className),
+   element('p','',x.templateTitle),
+   element('p','',format(x.currentValue,2)+' '+x.unit+
+    ' / порог: '+format(x.threshold,2)+' '+x.unit));
+  const actions=element('div','hub-actions');
+  const btn=element('button','action','Выдать PDF-награду');
+  btn.type='button';btn.addEventListener('click',()=>issueAward(x));
+  actions.append(btn);c.append(actions);list.append(c);
+ });
+ const history=get('hub-award-history');history.replaceChildren();
+ const status=get('hub-award-status').value;
+ const awards=(awardData.awards||[]).filter(x=>status==='all'||x.status===status);
+ if(!awards.length)history.append(element('p','hub-award-empty','Выданных наград пока нет.'));
+ awards.forEach(x=>{
+  const c=element('article','hub-award-card');
+  c.append(element('span','hub-award-chip',x.status==='issued'?'Действует':'Отозвана'),
+   element('h4','',x.name+' · '+x.className),
+   element('p','',x.titleRu+' · '+x.titleKz),
+   element('p','',x.issuedAt+' · № '+x.id));
+  if(x.status==='issued'){
+   const a=element('div','hub-actions');
+   const btn=element('button','action secondary','Скачать PDF');
+   btn.type='button';btn.onclick=()=>downloadAward(x.id);
+   const revoke=element('button','action danger','Отозвать награду');
+   revoke.type='button';revoke.onclick=()=>revokeAward(x);
+   a.append(btn,revoke);c.append(a);
+  }
+  history.append(c);
+ });
+ const tbox=get('hub-award-templates');tbox.replaceChildren();
+ (awardData.templates||[]).forEach(t=>{
+  const c=element('article','hub-award-card');
+  c.append(element('span','hub-award-chip',t.active?'Активный шаблон':'Отключён'),
+   element('h4','',t.titleRu),element('p','',t.titleKz),
+   element('p','',t.reasonRu),
+   element('p','',t.threshold+' '+t.unit+' · правило: '+t.rule));
+  tbox.append(c);
+ });
+}
+function issueAward(candidate){
+ if(busy)return;
+ const text='Выдать награду «'+candidate.templateTitle+'» ученику '+candidate.name+
+  ' ('+candidate.className+')? Будет создан PDF и постоянная запись в реестре.';
+ if(!confirm(text))return;
+ awardMessage('Формируем сертификат и проверяем достижения…');
+ apiCall('awardIssue',[candidate.participantId,candidate.templateId],r=>{
+  if(!r?.ok){awardMessage('Награда не выдана.',true);return;}
+  awardMessage('Награда № '+r.awardId+' оформлена. Для скачивания откройте реестр ниже.');
+  loadAwardData();
+ },err=>awardMessage('Выдача не выполнена: '+String(err?.message||err),true));
+}
+function downloadAward(id){
+ if(busy)return;
+ awardMessage('Готовим PDF для скачивания…');
+ apiCall('awardDownload',[id],r=>{
+  if(!r?.ok||!r.base64){awardMessage('PDF не получен.',true);return;}
+  try{
+   const raw=atob(r.base64),data=new Uint8Array(raw.length);
+   for(let i=0;i<raw.length;i++)data[i]=raw.charCodeAt(i);
+   const blob=new Blob([data],{type:'application/pdf'});
+   if(awardPDFUrl)URL.revokeObjectURL(awardPDFUrl);
+   awardPDFUrl=URL.createObjectURL(blob);
+   const wrap=get('hub-award-download');wrap.replaceChildren();
+   const link=element('a','','Скачать готовый сертификат '+r.filename);
+   link.href=awardPDFUrl;link.download=r.filename;
+   wrap.append(link);
+   awardMessage('Файл готов. Нажмите ссылку для сохранения PDF.');
+  }catch(e){awardMessage('Ошибка создания файла: '+String(e.message||e),true);}
+ },err=>awardMessage('Ошибка скачивания: '+String(err?.message||err),true));
+}
+function revokeAward(item){
+ if(busy)return;
+ if(!confirm('Отозвать награду № '+item.id+'? Сведения останутся в истории. Уже скачанные копии PDF не могут быть удалены автоматически.'))return;
+ const answer=prompt('Чтобы подтвердить отзыв, введите: ОТОЗВАТЬ','');
+ if(answer!=='ОТОЗВАТЬ')return;
+ awardMessage('Отзываем награду…');
+ apiCall('awardRevoke',[item.id],r=>{
+  if(!r?.ok){awardMessage('Невозможно отозвать награду.',true);return;}
+  loadAwardData();
+ },err=>awardMessage('Отзыв не выполнен: '+String(err?.message||err),true));
+}
+
 function taskGroupMatch(task,filter){
  if(filter==='all')return true;
  if(filter==='important')return task.severity==='critical'||task.severity==='high';
@@ -1571,6 +1758,9 @@ document.querySelectorAll('[data-event-filter]').forEach(b=>b.addEventListener('
 }));
 get('hub-ev-search').addEventListener('input',renderEventItems);
 get('hub-ev-clear').addEventListener('click',()=>{get('hub-ev-search').value='';renderEventItems();});
+get('hub-award-refresh').addEventListener('click',loadAwardData);
+get('hub-award-search').addEventListener('input',renderAwards);
+get('hub-award-status').addEventListener('change',renderAwards);
 get('hub-report-preset').addEventListener('change',reportControls);
 get('hub-report-apply').addEventListener('click',loadAnalytics);
 get('hub-report-metric').addEventListener('change',()=>{
