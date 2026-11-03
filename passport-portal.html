@@ -6,8 +6,20 @@
 <style>
 :root{--deep:#071f18;--panel:#103b2e;--line:#b4eba84f;--green:#c9f7aa;--text:#e9f8ed;--muted:#b9d8c4;font-family:system-ui,-apple-system,"Segoe UI",Arial,sans-serif}
 *{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 45% -15%,#215941,#071f18 62%);color:var(--text);line-height:1.5}main{width:min(850px,100% - 24px);margin:0 auto;padding:30px 0 60px}.top{display:flex;justify-content:space-between;align-items:center;gap:14px}.brand{font-weight:850;color:var(--green);font-size:14px;letter-spacing:.04em}.languages{display:flex;gap:4px;border-radius:30px;background:#ffffff13;padding:4px}.languages button{border:0;background:none;border-radius:30px;color:#cce9d8;padding:7px 12px;font-size:12px;font-weight:800;cursor:pointer}.languages button.active{background:var(--green);color:#123b27}
-h1{font:normal clamp(35px,6vw,57px)/1.1 Georgia,serif;letter-spacing:-.045em;margin:28px 0 14px}.intro{color:var(--muted);font-size:14px;max-width:700px}.panel,.stat,.medal,.event{border:1px solid var(--line);border-radius:17px;background:linear-gradient(145deg,#194c39,#0d3025)}.panel{padding:22px;margin:24px 0}.warn{font-size:12px;color:#c1e4c7;margin:12px 0}label{display:block;font-size:13px;margin-bottom:9px;font-weight:800}input{width:100%;font:inherit;color:#193c28;border:2px solid #b6edb0;border-radius:12px;padding:14px;background:#f0fff0}input:focus-visible,button:focus-visible{outline:3px solid #d4ffb9;outline-offset:3px}button{font:inherit;cursor:pointer}.primary{border:0;color:#113a27;background:var(--green);padding:13px 17px;border-radius:12px;font-size:14px;font-weight:850;min-height:46px;margin-top:13px}.secondary{border:1px solid #c6eab7;color:#e4ffe2;background:transparent;padding:11px 15px;border-radius:12px;font-size:13px;font-weight:750;min-height:44px;margin-top:12px}.state{min-height:24px;font-size:13px;margin:13px 0;color:#c6f3c4}.state.error{color:#ffcec6}.hide{display:none!important}.profile-head{display:flex;gap:14px;flex-wrap:wrap;align-items:center;justify-content:space-between}.profile-head h2{font-size:27px;margin:0}.profile-head p{color:var(--muted);font-size:13px;margin:4px 0}.level{background:#bdfca620;border:1px solid #d4faab88;padding:8px 13px;border-radius:22px;font-size:12px;font-weight:800}.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:17px 0}.stat{padding:15px}.stat strong{display:block;color:var(--green);font-size:clamp(22px,4vw,32px)}.stat span{font-size:12px;color:var(--muted)}.bar{height:10px;border-radius:30px;background:#ffffff1e;overflow:hidden;margin-top:11px}.bar i{display:block;height:100%;background:linear-gradient(90deg,#71dca3,#c8faaa);border-radius:30px}h3{font-size:19px;margin:27px 0 14px}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.medal,.event{padding:14px;display:flex;gap:10px;align-items:center}.medal.no{opacity:.6}.ico{font-size:25px}.medal strong,.event strong{font-size:13px;display:block}.medal small,.event small{font-size:11px;color:var(--muted);display:block}.subnote{color:var(--muted);font-size:12px;margin-top:12px}
-@media(max-width:540px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.grid{grid-template-columns:1fr}.panel{padding:15px}.stat{padding:12px}.profile-head h2{font-size:22px}}
+h1{font:normal clamp(35px,6vw,57px)/1.1 Georgia,serif;letter-spacing:-.045em;margin:28px 0 14px}.intro{color:var(--muted);font-size:14px;max-width:700px}.panel,.stat,.medal,.event{border:1px solid var(--line);border-radius:17px;background:linear-gradient(145deg,#194c39,#0d3025)}.panel{padding:22px;margin:24px 0}.warn{font-size:12px;color:#c1e4c7;margin:12px 0}label{display:block;font-size:13px;margin-bottom:9px;font-weight:800}input{width:100%;font:inherit;color:#193c28;border:2px solid #b6edb0;border-radius:12px;padding:14px;background:#f0fff0}input:focus-visible,button:focus-visible{outline:3px solid #d4ffb9;outline-offset:3px}button{font:inherit;cursor:pointer}.primary{border:0;color:#113a27;background:var(--green);padding:13px 17px;border-radius:12px;font-size:14px;font-weight:850;min-height:46px;margin-top:13px}.secondary{border:1px solid #c6eab7;color:#e4ffe2;background:transparent;padding:11px 15px;border-radius:12px;font-size:13px;font-weight:750;min-height:44px;margin-top:12px}.state{min-height:24px;font-size:13px;margin:13px 0;color:#c6f3c4}.state.error{color:#ffcec6}.hide{display:none!important}.profile-head{display:flex;gap:14px;flex-wrap:wrap;align-items:center;justify-content:space-between}.profile-head h2{font-size:27px;margin:0}.profile-head p{color:var(--muted);font-size:13px;margin:4px 0}.level{background:#bdfca620;border:1px solid #d4faab88;padding:8px 13px;border-radius:22px;font-size:12px;font-weight:800}.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:17px 0}.stat{padding:15px}.stat strong{display:block;color:var(--green);font-size:clamp(22px,4vw,32px)}.stat span{font-size:12px;color:var(--muted)}.bar{height:10px;border-radius:30px;background:#ffffff1e;overflow:hidden;margin-top:11px}.bar i{display:block;height:100%;background:linear-gradient(90deg,#71dca3,#c8faaa);border-radius:30px}h3{font-size:19px;margin:27px 0 14px}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.medal,.event{padding:14px;display:flex;gap:10px;align-items:center}.medal.no{opacity:.6}.ico{font-size:25px}
+.certificates{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.certificate{display:flex;flex-direction:column;gap:7px;padding:17px;border:1px solid #d3df9a77;border-radius:17px;background:linear-gradient(145deg,#29543c,#103127)}
+.certificate .seal{font-size:23px;line-height:1}
+.certificate h4{margin:0;color:#d6f5b5;font-size:16px}
+.certificate .subtitle{font-size:13px;color:#e3eecb;margin:0}
+.certificate .reason{color:#e1efdc;font-size:12px;margin:0;line-height:1.4}
+.certificate .meta{color:#bed6c4;font-size:11px;margin:0;overflow-wrap:anywhere}
+.certificate .secondary{align-self:start;margin-top:auto}
+.download-state{margin:9px 0 0;color:#c7f0c7;font-size:12px;min-height:19px}
+.download-state.error{color:#ffcbc2}
+.certificate-download a{display:inline-block;margin-top:9px;color:#d7ffb4;font-weight:700;font-size:13px;overflow-wrap:anywhere}
+.ico{font-size:25px}.medal strong,.event strong{font-size:13px;display:block}.medal small,.event small{font-size:11px;color:var(--muted);display:block}.subnote{color:var(--muted);font-size:12px;margin-top:12px}
+@media(max-width:540px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.grid,.certificates{grid-template-columns:1fr}.panel{padding:15px}.stat{padding:12px}.profile-head h2{font-size:22px}}
 </style></head>
 <body>
 <main>
@@ -29,6 +41,10 @@ h1{font:normal clamp(35px,6vw,57px)/1.1 Georgia,serif;letter-spacing:-.045em;mar
 <button class="secondary" type="button" id="logout"></button>
 </div>
 <h3 id="badges-title"></h3><div class="grid" id="badges"></div>
+<h3 id="certificates-title"></h3><div id="certificates" class="certificates"></div>
+<p id="certificates-hint" class="subnote"></p>
+<div id="certificate-status" class="download-state" role="status" aria-live="polite"></div>
+<div id="certificate-download" class="certificate-download"></div>
 <h3 id="history-title"></h3><div class="grid" id="history"></div>
 <p class="subnote" id="privacy"></p>
 </section>
@@ -38,10 +54,10 @@ h1{font:normal clamp(35px,6vw,57px)/1.1 Georgia,serif;letter-spacing:-.045em;mar
 'use strict';
 var d=function(id){return document.getElementById(id);};
 var dictionaries={
-ru:{heading:'Личный экологический паспорт',intro:'Доступ только по индивидуальному коду, выданному руководителем Eco Club. Сведения загружаются с закрытого сервера после проверки кода.',label:'Личный код доступа',enter:'Открыть мой паспорт',waiting:'Проверяем код…',denied:'Код неверный или отозван. Обратитесь к руководителю Eco Club.',security:'Не пересылайте код другим людям. Он не сохраняется на сайте и не добавляется в адрес страницы.',student:'Участник',class:'Класс',idLabel:'Экопаспорт №',level:'Уровень',levels:['Новичок','Экоактивист','Экогерой','Эколидер'],unranked:'Начальный этап',count:'Подтверждённые вклады',paper:'Макулатура, кг',caps:'Крышки, шт.',next:'До следующего уровня осталось',contributions:'вкладов',max:'Достигнут высший уровень',logout:'Закрыть паспорт',awards:'Мои экологические награды',history:'История подтверждённых вкладов',yes:'Получено',no:'Ещё не получено',empty:'Подтверждённых записей пока нет',date:'Дата',privacy:'В этом кабинете показаны только ваши результаты. Не публикуйте снимки экрана с личными данными.'},
-kk:{heading:'Жеке экологиялық паспорт',intro:'Кіру тек Eco Club жетекшісі берген жеке код арқылы жүзеге асады. Код тексерілгеннен кейін мәліметтер жабық серверден алынады.',label:'Жеке кіру коды',enter:'Паспортымды ашу',waiting:'Код тексерілуде…',denied:'Код дұрыс емес немесе кері қайтарылған. Eco Club жетекшісіне хабарласыңыз.',security:'Кодты басқа адамдарға жібермеңіз. Ол сайтта сақталмайды және мекенжайға қосылмайды.',student:'Қатысушы',class:'Сынып',idLabel:'Экопаспорт №',level:'Деңгей',levels:['Бастаушы','Экоактивист','Экобатыр','Экокөшбасшы'],unranked:'Бастапқы кезең',count:'Расталған үлестер',paper:'Макулатура, кг',caps:'Қақпақтар, дана',next:'Келесі деңгейге дейін қалды',contributions:'үлес',max:'Жоғары деңгейге жетті',logout:'Паспортты жабу',awards:'Менің экологиялық марапаттарым',history:'Расталған үлестер тарихы',yes:'Алынды',no:'Әлі алынбаған',empty:'Әзірге расталған жазбалар жоқ',date:'Күні',privacy:'Бұл кабинетте тек сіздің нәтижелеріңіз көрсетіледі. Жеке деректері бар скриншоттарды жарияламаңыз.'}
+ru:{heading:'Личный экологический паспорт',intro:'Доступ только по индивидуальному коду, выданному руководителем Eco Club. Сведения загружаются с закрытого сервера после проверки кода.',label:'Личный код доступа',enter:'Открыть мой паспорт',waiting:'Проверяем код…',denied:'Код неверный или отозван. Обратитесь к руководителю Eco Club.',security:'Не пересылайте код другим людям. Он не сохраняется на сайте и не добавляется в адрес страницы.',student:'Участник',class:'Класс',idLabel:'Экопаспорт №',level:'Уровень',levels:['Новичок','Экоактивист','Экогерой','Эколидер'],unranked:'Начальный этап',count:'Подтверждённые вклады',paper:'Макулатура, кг',caps:'Крышки, шт.',next:'До следующего уровня осталось',contributions:'вкладов',max:'Достигнут высший уровень',logout:'Закрыть паспорт',awards:'Мои экодостижения',certificates:'Мои сертификаты',noCertificates:'Выданных сертификатов пока нет. Достижения выше начисляются автоматически и не заменяют официальных наград.',legacyCertificates:'Для просмотра именных сертификатов обратитесь к руководителю за новым кодом паспорта с постоянным ID.',download:'Скачать сертификат PDF',downloading:'Подготавливаем ваш PDF…',downloadReady:'Сертификат готов. Нажмите ссылку для сохранения.',downloadLink:'Сохранить PDF-сертификат',downloadError:'Не удалось скачать сертификат. Возможно, код истёк, награда отозвана или доступ закрыт. Откройте паспорт заново.',certificateDate:'Дата выдачи',history:'История подтверждённых вкладов',yes:'Получено',no:'Ещё не получено',empty:'Подтверждённых записей пока нет',date:'Дата',privacy:'В этом кабинете показаны только ваши результаты. Не публикуйте снимки экрана с личными данными.'},
+kk:{heading:'Жеке экологиялық паспорт',intro:'Кіру тек Eco Club жетекшісі берген жеке код арқылы жүзеге асады. Код тексерілгеннен кейін мәліметтер жабық серверден алынады.',label:'Жеке кіру коды',enter:'Паспортымды ашу',waiting:'Код тексерілуде…',denied:'Код дұрыс емес немесе кері қайтарылған. Eco Club жетекшісіне хабарласыңыз.',security:'Кодты басқа адамдарға жібермеңіз. Ол сайтта сақталмайды және мекенжайға қосылмайды.',student:'Қатысушы',class:'Сынып',idLabel:'Экопаспорт №',level:'Деңгей',levels:['Бастаушы','Экоактивист','Экобатыр','Экокөшбасшы'],unranked:'Бастапқы кезең',count:'Расталған үлестер',paper:'Макулатура, кг',caps:'Қақпақтар, дана',next:'Келесі деңгейге дейін қалды',contributions:'үлес',max:'Жоғары деңгейге жетті',logout:'Паспортты жабу',awards:'Менің эко жетістіктерім',certificates:'Менің сертификаттарым',noCertificates:'Әзірге берілген сертификаттар жоқ. Жоғарыдағы жетістіктер автоматты түрде есептеледі және ресми марапаттар емес.',legacyCertificates:'Сертификаттарды көру үшін жетекшіден тұрақты ID-і бар жаңа паспорт кодын алыңыз.',download:'PDF сертификатты жүктеу',downloading:'PDF дайындалуда…',downloadReady:'Сертификат дайын. Сақтау үшін сілтемені басыңыз.',downloadLink:'PDF сертификатты сақтау',downloadError:'Сертификатты жүктеу мүмкін болмады. Код мерзімі біткен, марапат кері қайтарылған немесе кіруге шектеу қойылған болуы мүмкін. Паспортқа қайта кіріңіз.',certificateDate:'Берілген күні',history:'Расталған үлестер тарихы',yes:'Алынды',no:'Әлі алынбаған',empty:'Әзірге расталған жазбалар жоқ',date:'Күні',privacy:'Бұл кабинетте тек сіздің нәтижелеріңіз көрсетіледі. Жеке деректері бар скриншоттарды жарияламаңыз.'}
 };
-var lang='ru', current=null;
+var lang='ru', current=null, certificateGrant=null, downloadUrl=null, downloadBusy=false;
 function t(){return dictionaries[lang];}
 function n(value,dp){return new Intl.NumberFormat(lang==='kk'?'kk-KZ':'ru-RU',{maximumFractionDigits:dp||0}).format(value);}
 function node(tag,klass,text){var el=document.createElement(tag);if(klass)el.className=klass;if(text!==undefined)el.textContent=text;return el;}
@@ -49,12 +65,12 @@ function set(id,value){d(id).textContent=value;}
 function paint(){
  document.documentElement.lang=lang;document.title=t().heading+' — Eco Club';
  ['ru','kk'].forEach(function(code){d(code).classList.toggle('active',code===lang);d(code).setAttribute('aria-pressed',String(code===lang));});
- var mapping={heading:'heading',intro:'intro',label:'code-label',enter:'submit',security:'security',count:'label-count',paper:'label-paper',caps:'label-caps',logout:'logout',awards:'badges-title',history:'history-title',privacy:'privacy'};
+ var mapping={heading:'heading',intro:'intro',label:'code-label',enter:'submit',security:'security',count:'label-count',paper:'label-paper',caps:'label-caps',logout:'logout',awards:'badges-title',certificates:'certificates-title',history:'history-title',privacy:'privacy'};
  Object.keys(mapping).forEach(function(key){set(mapping[key],t()[key]);});
- if(current)show(current);
+ if(current){show(current);if(downloadUrl){var links=d('certificate-download').querySelectorAll('a');links.forEach(function(a){a.textContent=t().downloadLink+' · '+a.download;});}}
 }
 function show(data){
- current=data;d('login').classList.add('hide');d('passport').classList.remove('hide');set('student',data.name||t().student);set('klass',t().class+': '+data.className);
+ current=data;certificateGrant=data.certificateGrant||null;d('login').classList.add('hide');d('passport').classList.remove('hide');set('student',data.name||t().student);set('klass',t().class+': '+data.className);
  d('participant-ref').hidden=!data.participantRef;set('participant-ref',data.participantRef?t().idLabel+': '+data.participantRef:'');
  set('count',n(data.confirmedCount));set('paper',n(data.paperKg,2));set('caps',n(data.capsCount));
  set('level',t().level+': '+(data.level>=0?t().levels[data.level]:t().unranked));
@@ -70,6 +86,7 @@ function show(data){
  el.append(node('span','ico',b.icon||'🏅'));
  var copy=node('div');copy.append(node('strong','',b[lang]||b.id),node('small','',b.earned?t().yes:t().no));el.append(copy);d('badges').append(el);
  });
+ renderCertificates(data);
  d('history').replaceChildren();
  var records=Array.isArray(data.history)?data.history:[];
  if(!records.length)d('history').append(node('p','subnote',t().empty));
@@ -79,7 +96,67 @@ function show(data){
  box.append(description);d('history').append(box);
  });
 }
-function reset(){current=null;d('passport').classList.add('hide');d('login').classList.remove('hide');d('access-code').value='';set('status','');d('access-code').focus();}
+
+function clearCertificateFile(){
+ if(downloadUrl){URL.revokeObjectURL(downloadUrl);downloadUrl=null;}
+ d('certificate-download').replaceChildren();
+}
+function renderCertificates(data){
+ var box=d('certificates');box.replaceChildren();
+ var items=Array.isArray(data.issuedCertificates)?data.issuedCertificates:[];
+ if(!items.length){
+  box.append(node('p','subnote',data.participantRef?t().noCertificates:t().legacyCertificates));
+  return;
+ }
+ items.forEach(function(a){
+  var card=node('article','certificate');
+  card.append(node('div','seal','🏅'));
+  card.append(node('h4','',a[lang==='ru'?'titleRu':'titleKz']||a.titleRu));
+  card.append(node('p','subtitle',a[lang==='ru'?'reasonRu':'reasonKz']||''));
+  var measurement=a.metricValue===null?'':n(a.metricValue,2)+' '+(a.metricUnit||'');
+  card.append(node('p','meta',measurement));
+  card.append(node('p','meta',t().certificateDate+': '+(a.issuedAt||'')+' · № '+a.id));
+  var action=node('button','secondary',t().download);
+  action.type='button';action.disabled=downloadBusy||!certificateGrant;
+  action.addEventListener('click',function(){downloadCertificate(a.id);});
+  card.append(action);box.append(card);
+ });
+}
+function downloadCertificate(id){
+ if(!certificateGrant||downloadBusy)return;
+ var grant=certificateGrant;
+ clearCertificateFile();downloadBusy=true;
+ d('certificate-status').className='download-state';
+ set('certificate-status',t().downloading);
+ renderCertificates(current);
+ google.script.run.withSuccessHandler(function(result){
+  if(grant!==certificateGrant||!current)return;
+  downloadBusy=false;renderCertificates(current);
+  if(!result||result.ok!==true||!result.base64){
+   d('certificate-status').className='download-state error';
+   set('certificate-status',t().downloadError);return;
+  }
+  try{
+   var raw=atob(result.base64),bytes=new Uint8Array(raw.length);
+   for(var i=0;i<raw.length;i++)bytes[i]=raw.charCodeAt(i);
+   var blob=new Blob([bytes],{type:'application/pdf'});
+   downloadUrl=URL.createObjectURL(blob);
+   var link=node('a','',t().downloadLink+' · '+result.filename);
+   link.href=downloadUrl;link.download=result.filename;
+   d('certificate-download').append(link);
+   set('certificate-status',t().downloadReady);
+  }catch(err){
+   d('certificate-status').className='download-state error';
+   set('certificate-status',t().downloadError);
+  }
+ }).withFailureHandler(function(){
+  if(grant!==certificateGrant||!current)return;
+  downloadBusy=false;renderCertificates(current);
+  d('certificate-status').className='download-state error';
+  set('certificate-status',t().downloadError);
+ }).downloadMyCertificate(grant,id);
+}
+function reset(){current=null;certificateGrant=null;downloadBusy=false;clearCertificateFile();set('certificate-status','');d('passport').classList.add('hide');d('login').classList.remove('hide');d('access-code').value='';set('status','');d('access-code').focus();}
 d('access-form').addEventListener('submit',function(event){event.preventDefault();var code=d('access-code').value.trim();
  if(!/^[0-9a-f]{64}$/i.test(code)){d('status').className='state error';set('status',t().denied);return;}
  d('submit').disabled=true;d('status').className='state';set('status',t().waiting);
