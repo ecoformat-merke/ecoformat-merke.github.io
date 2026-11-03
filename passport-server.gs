@@ -1,4 +1,4 @@
-/** EcoPassport 5.5 — pupil-facing read-only server.
+/** EcoPassport 6.9 — pupil-facing read-only server.
  * Hosted in EXISTING student Apps Script. Do not insert owner administration code.
  * HUB 6.9: owner-issued certificates visible only to the authenticated pupil.
  * Old legacy credentials (no expiry / no stable ID) continue working during migration.
@@ -25,7 +25,8 @@ function doGet() {
 }
 
 function getMyPassport(code) {
-  // This is the ONLY remotely callable data reader.
+  // This is the only remotely callable personal-data reader. The other
+  // public endpoint downloads a single PDF after verifying a temporary grant.
   // No name, class or participant ID is accepted from the browser.
   const submitted = String(code || '').trim();
   if (!/^[0-9a-f]{64}$/i.test(submitted)) throw new Error('ACCESS_DENIED');
