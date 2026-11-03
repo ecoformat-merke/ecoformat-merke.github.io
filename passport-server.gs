@@ -1,5 +1,6 @@
 /** EcoPassport 5.5 — pupil-facing read-only server.
  * Hosted in EXISTING student Apps Script. Do not insert owner administration code.
+ * HUB 6.9: owner-issued certificates visible only to the authenticated pupil.
  * Old legacy credentials (no expiry / no stable ID) continue working during migration.
  * New credentials require both participant ID and non-expired timestamp.
  * Real personal data never goes to GitHub Pages.
@@ -10,7 +11,11 @@ const ECO_PASSPORT = Object.freeze({
   accessTab: 'Паспорт — доступ',
   deliveryTab: 'Паспорт — выдача',
   maxHistory: 100,
-  participantTab: 'Паспорт — участники'
+  participantTab: 'Паспорт — участники',
+  issuedAwardTab: 'Награды',
+  awardSessionSeconds: 900,
+  maxIssuedAwards: 50,
+  maxPdfBytes: 4*1024*1024
 });
 
 function doGet() {
@@ -96,6 +101,13 @@ function getMyPassport(code) {
     {id:'paper10', icon:'🌳', ru:'10 кг добра', kk:'10 кг жақсылық', earned:paperKg>=10},
     {id:'caps100', icon:'♻️', ru:'100 крышек', kk:'100 қақпақ', earned:capsCount>=100}
   ];
+  // A short-lived, memory-only grant is generated only after a valid pupil
+  // access code and active permanent participant ID were verified.
+  // The grant contains no plaintext code and is rechecked on PDF download.
+  const certs=authorised.participantId
+    ?eco69MyAwards_(book,authorised.participantId):[];
+  const awardGrant=authorised.participantId
+    ?eco69IssueGrant_(fingerprint,authorised.participantId):null;
   return {
     success:true,
     name:authorised.name, className:authorised.className,
@@ -107,6 +119,8 @@ function getMyPassport(code) {
     participantRef: authorised.participantId ? 'ECO-'+authorised.participantId.slice(0,8).toUpperCase() : null,
     legacyAccess: authorised.legacy,
     awards,
+    issuedCertificates:certs,
+    certificateGrant:awardGrant,
     history:history.slice(-ECO_PASSPORT.maxHistory).reverse()
   };
 }
@@ -136,4 +150,125 @@ function nonNegative_(value) {
 function sha256_(text) {
   const bytes=Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256,text,Utilities.Charset.UTF_8);
   return bytes.map(x=>(x&255).toString(16).padStart(2,'0')).join('');
+}
+
+
+// ===== HUB 6.9 — issued certificates in a student's private EcoPassport =====
+//
+// Only getMyPassport(code) and downloadMyCertificate(grant, awardId) are public
+// RPC endpoints. Helper names end in "_" and are not callable via script.run.
+// PDF URLs, access hashes and other pupils' rows are never sent to the browser.
+function eco69MyAwards_(book,participantId){
+  const expected=String(participantId||'').trim().toLowerCase();
+  if(!/^[0-9a-f]{32}$/.test(expected))return [];
+  const sheet=book.getSheetByName(ECO_PASSPORT.issuedAwardTab);
+  if(!sheet)return []; // pre-6.8 installs remain compatible
+  const values=sheet.getDataRange().getValues();
+  const found=[],seen=new Set();
+  for(let i=1;i<values.length;i++){
+    const r=values[i];
+    const id=String(r[0]||'').trim();
+    if(!/^AWD-[0-9a-f-]{36}$/i.test(id)||seen.has(id))continue;
+    if(String(r[2]||'').trim().toLowerCase()!==expected)continue;
+    if(String(r[13]||'').trim()!=='issued')continue;
+    if(!String(r[12]||'').trim())continue; // no downloadable PDF
+    seen.add(id);
+    const d=r[15] instanceof Date && !isNaN(r[15].getTime())
+      ?Utilities.formatDate(r[15],Session.getScriptTimeZone(),'dd.MM.yyyy')
+      :String(r[15]||'').trim().slice(0,22);
+    const num=Number(String(r[10]??'').replace(',','.'));
+    found.push({
+      id:id,
+      titleRu:String(r[6]||'').trim().slice(0,130),
+      titleKz:String(r[7]||'').trim().slice(0,130),
+      reasonRu:String(r[8]||'').trim().slice(0,220),
+      reasonKz:String(r[9]||'').trim().slice(0,220),
+      metricValue:Number.isFinite(num)?num:null,
+      metricUnit:String(r[11]||'').trim().slice(0,25),
+      issuedAt:d
+    });
+  }
+  return found.slice(-ECO_PASSPORT.maxIssuedAwards).reverse();
+}
+
+function eco69IssueGrant_(fingerprint,participantId){
+  const token=(
+    Utilities.getUuid().replace(/-/g,'')+
+    Utilities.getUuid().replace(/-/g,'')
+  ).toLowerCase();
+  if(!/^[0-9a-f]{64}$/.test(token))throw new Error('CERTIFICATE_UNAVAILABLE');
+  const entry=JSON.stringify({fingerprint,participantId:participantId.toLowerCase()});
+  CacheService.getScriptCache().put(
+    'ecopassport-award:'+token,entry,ECO_PASSPORT.awardSessionSeconds
+  );
+  return token;
+}
+
+function eco69CheckGrant_(grant){
+  const token=String(grant||'').trim().toLowerCase();
+  if(!/^[0-9a-f]{64}$/.test(token))throw new Error('ACCESS_DENIED');
+  const raw=CacheService.getScriptCache().get('ecopassport-award:'+token);
+  if(!raw)throw new Error('ACCESS_DENIED');
+  let entry;
+  try{entry=JSON.parse(raw)}catch(e){throw new Error('ACCESS_DENIED')}
+  if(!entry||!/^[0-9a-f]{64}$/.test(String(entry.fingerprint||''))||
+     !/^[0-9a-f]{32}$/.test(String(entry.participantId||'')))
+    throw new Error('ACCESS_DENIED');
+
+  // Revocation, expiry and participant deactivation must take effect even
+  // when the pupil already has a 15-minute download grant.
+  const book=sourceWorkbook_();
+  const access=book.getSheetByName(ECO_PASSPORT.accessTab);
+  const roster=book.getSheetByName(ECO_PASSPORT.participantTab);
+  if(!access||!roster)throw new Error('ACCESS_DENIED');
+  const now=Date.now();
+  const registered=roster.getDataRange().getValues().slice(1)
+    .filter(r=>String(r[0]||'').trim().toLowerCase()===entry.participantId && r[4]!==false);
+  if(registered.length!==1)throw new Error('ACCESS_DENIED');
+  const active=access.getDataRange().getValues().slice(1).some(r=>{
+    if(String(r[2]||'').trim().toLowerCase()!==entry.fingerprint||
+       r[3]!==true||String(r[7]||'').trim().toLowerCase()!==entry.participantId)
+      return false;
+    const expiry=r[6];
+    if(expiry===''||expiry==null)return true; // grandfathered legacy
+    const end=expiry instanceof Date?expiry.getTime():new Date(expiry).getTime();
+    return Number.isFinite(end)&&now<end;
+  });
+  if(!active)throw new Error('ACCESS_DENIED');
+  return {book,participantId:entry.participantId};
+}
+
+function downloadMyCertificate(grant,awardId){
+  // Never accept participant ID, name, file URL, filename or class from client.
+  const tokenId=String(awardId||'').trim();
+  if(!/^AWD-[0-9a-f-]{36}$/i.test(tokenId))throw new Error('ACCESS_DENIED');
+  const verified=eco69CheckGrant_(grant);
+  const sheet=verified.book.getSheetByName(ECO_PASSPORT.issuedAwardTab);
+  if(!sheet)throw new Error('CERTIFICATE_UNAVAILABLE');
+  const rows=sheet.getDataRange().getValues();
+  let row=null;
+  for(let i=1;i<rows.length;i++){
+    if(String(rows[i][0]||'').trim()!==tokenId)continue;
+    if(row)throw new Error('CERTIFICATE_UNAVAILABLE'); // duplicate ID
+    row=rows[i];
+  }
+  if(!row||String(row[2]||'').trim().toLowerCase()!==verified.participantId||
+     String(row[13]||'').trim()!=='issued')
+    throw new Error('ACCESS_DENIED');
+
+  // The PDF stays private; never return its Drive URL to the pupil.
+  const fileUrl=String(row[12]||'').trim();
+  const m=/^https:\/\/drive\.google\.com\/file\/d\/([A-Za-z0-9_-]{15,})\/(?:view|edit)(?:[?#].*)?$/.exec(fileUrl);
+  if(!m)throw new Error('CERTIFICATE_UNAVAILABLE');
+  const blob=DriveApp.getFileById(m[1]).getBlob();
+  if(blob.getContentType()!=='application/pdf')throw new Error('CERTIFICATE_UNAVAILABLE');
+  const bytes=blob.getBytes();
+  if(bytes.length<10||bytes.length>ECO_PASSPORT.maxPdfBytes)
+    throw new Error('CERTIFICATE_UNAVAILABLE');
+  return {
+    ok:true,
+    filename:tokenId+'.pdf',
+    mime:'application/pdf',
+    base64:Utilities.base64Encode(bytes)
+  };
 }
