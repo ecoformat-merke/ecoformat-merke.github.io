@@ -20,6 +20,19 @@
  var current=-1,lastMobile=null,selectedCard=null,ticking=false,startedX=null,startedY=null,suppressClick=false;
 
  function kz(){return document.documentElement.lang==='kk'}
+ function updateAria(){
+  globe.setAttribute('aria-label',kz()
+   ?'Глобусты айналдыру және алты жобаны ауыстыру'
+   :'Вращать глобус и переходить между шестью проектами');
+  if(railUp){
+   railUp.setAttribute('aria-label',kz()?'Алдыңғы жоба':'Предыдущий проект');
+   railUp.title=kz()?'Артқа':'Назад';
+  }
+  if(railDown){
+   railDown.setAttribute('aria-label',kz()?'Келесі жоба':'Следующий проект');
+   railDown.title=kz()?'Келесі':'Далее';
+  }
+ }
  function clamp(v,a,b){return Math.max(a,Math.min(b,v))}
  function currentTitle(c){return c.querySelector('.project-copy h3')?.textContent?.trim()||''}
  function scrollRange(){
@@ -129,6 +142,7 @@
  }
  if(window.MutationObserver){
   new MutationObserver(function(){
+   updateAria();
    if(selectedCard&&dialog&&dialog.open)detail(selectedCard);
    if(live&&current>=0)live.textContent=(kz()?'Жоба ':'Проект ')+(current+1)+': '+currentTitle(cards[current]);
   }).observe(document.documentElement,{attributes:true,attributeFilter:['lang']});
@@ -167,6 +181,7 @@
  window.addEventListener('resize',requestUpdate,{passive:true});
  // Never hide the originals until listeners and the first active state exist.
  update(scrollIndex(),false);
+ updateAria();
  stage.classList.add('eco-orbit-ready');
  journey.classList.add('eco-orbit-enabled');
 })();
