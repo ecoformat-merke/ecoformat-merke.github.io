@@ -130,3 +130,33 @@
  #projects.eco-globe-projects .eco-globe-map,
  #projects.eco-globe-projects .eco-globe-clouds{animation:none!important}
 }
+
+
+/* Eco Club · UX refinements 2026-11-04. Keep the existing visual system. */
+#projects.eco-globe-projects .eco-globe-action{
+ bottom:-23px;min-width:190px;max-width:92%;padding:6px 17px;
+ font-size:clamp(10px,.92vw,13px);line-height:1.25;
+ white-space:normal;
+}
+#projects.eco-globe-projects .eco-globe-action::after{font-size:14px;line-height:1.1}
+#projects.eco-globe-projects .eco-orbit-card{cursor:pointer}
+#projects.eco-globe-projects .eco-orbit-card:focus-visible{
+ outline:3px solid #248b52;outline-offset:3px;
+}
+#projects.eco-globe-projects .eco-orbit-card .project-copy h3{min-height:42px}
+.eco-orbit-dialog-details{border-top:1px solid #c9e4d0;margin-top:18px;padding-top:17px}
+.eco-orbit-dialog-details h4{font-size:16px;color:#0d4830;margin:0 0 9px}
+.eco-orbit-dialog-details ul{margin:0 0 18px;padding-left:21px;line-height:1.65;font-size:14px}
+.eco-orbit-join{display:inline-flex;align-items:center;justify-content:center;min-height:43px;
+ padding:10px 19px;border-radius:25px;background:#125d3e;color:#fff!important;
+ font-weight:800;text-decoration:none}
+.eco-orbit-join:hover,.eco-orbit-join:focus-visible{background:#0a3e2a}
+@media(max-width:950px){
+ #projects.eco-globe-projects .eco-globe-action{bottom:-15px;min-width:155px;padding:5px 12px}
+ #projects.eco-globe-projects .eco-orbit-card .project-copy h3{min-height:34px}
+}
+@media(max-width:540px){
+ #projects.eco-globe-projects .eco-globe-action{bottom:-12px;min-width:135px;font-size:9px;padding:5px 10px}
+ #projects.eco-globe-projects .eco-globe-action::after{font-size:11px}
+ .eco-orbit-dialog-details ul{font-size:13px}
+}
