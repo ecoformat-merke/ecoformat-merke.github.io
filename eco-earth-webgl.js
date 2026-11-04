@@ -59,7 +59,7 @@
     return p;
   }
   function decodeEmbeddedImage(filename){
-    return fetch('./'+filename,{cache:'force-cache'}).then(function(r){
+    return fetch('./'+filename+'?v=20261104-3b',{cache:'force-cache'}).then(function(r){
       if(!r.ok)throw new Error('Texture unavailable: '+filename);
       return r.text();
     }).then(function(svg){
