@@ -150,4 +150,5 @@
  // Never hide the originals until listeners and the first active state exist.
  update(scrollIndex(),false);
  stage.classList.add('eco-orbit-ready');
+ journey.classList.add('eco-orbit-enabled');
 })();
