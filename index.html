@@ -1688,6 +1688,7 @@ footer{background:var(--d);color:#fff;padding:55px 0 30px}.foot{display:flex;jus
 body.eco-teacher-modal-open{overflow:hidden}
 @media(max-width:600px){.eco-teacher-modal{padding:0}.eco-teacher-dialog{border-radius:0;height:100dvh}.eco-teacher-modal-head h2{font-size:17px}.eco-teacher-note{font-size:11px}}
 </style><style>.eco-awards-section{padding:65px 0;background:linear-gradient(145deg,#f9fcf5,#e9f3e7)}.eco-awards-section h3{color:#174a34;margin:25px 0 14px}.eco-badges-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(185px,1fr));gap:12px}.eco-badge-card{border:1px solid #dfebdd;border-radius:16px;padding:17px;background:#f7fbf5;display:flex;align-items:center;gap:12px}.eco-badge-symbol{font-size:30px}.eco-award-person,.eco-champ-row{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;padding:14px 6px;border-bottom:1px solid #e5eee6}.eco-award-icons{display:flex;gap:7px;flex-wrap:wrap}.eco-award-icon{border-radius:20px;background:#e3f2e5;padding:6px 10px}.eco-champ-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}.eco-champ-head select{padding:9px;border:1px solid #cbdfd0;border-radius:12px;background:white}.eco-muted{color:#648574;font-size:13px}</style><link rel="stylesheet" href="./eco-projects-globe.css"/>
+<link rel="stylesheet" href="./eco-projects-premium.css"/>
 </head>
 <body>
 <header><div class="container nav">
@@ -2021,11 +2022,13 @@ body.eco-teacher-modal-open{overflow:hidden}
 <button class="eco-orbit-more" type="button" data-ru="Подробнее о проекте" data-kz="Жоба туралы толығырақ">Подробнее о проекте</button></article>
 <div class="eco-orbit-center">
   <span class="eco-globe-halo" aria-hidden="true"></span>
+  <span class="eco-premium-sparkles" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
   <span class="eco-globe-orbit orbit-a" aria-hidden="true"></span>
   <span class="eco-globe-orbit orbit-b" aria-hidden="true"></span>
   <button type="button" class="eco-globe-hit" id="ecoOrbitGlobe" aria-label="Вращать глобус и переходить между проектами">
     <span class="eco-globe-world" aria-hidden="true">
       <span class="eco-globe-map"></span>
+      <span class="eco-globe-clouds" aria-hidden="true"></span>
       <span class="eco-globe-glow"></span>
       <span class="eco-globe-equator"></span>
     </span>
@@ -2038,12 +2041,14 @@ body.eco-teacher-modal-open{overflow:hidden}
   <button type="button" id="ecoOrbitNext" class="eco-orbit-control" data-ru="Далее →" data-kz="Келесі →">Далее →</button>
 </div>
 <div class="eco-orbit-rail" role="group" aria-label="Шесть направлений Eco Club">
+  <button type="button" id="ecoOrbitRailUp" class="eco-orbit-rail-arrow" aria-label="Предыдущий экологический проект" title="Назад">⌃</button>
   <button type="button" class="eco-orbit-dot" data-eco-step="0" aria-current="step"><span class="eco-orbit-sr" data-ru="Показать проект 1" data-kz="1-жобаны көрсету">Показать проект 1</span></button>
   <button type="button" class="eco-orbit-dot" data-eco-step="1"><span class="eco-orbit-sr" data-ru="Показать проект 2" data-kz="2-жобаны көрсету">Показать проект 2</span></button>
   <button type="button" class="eco-orbit-dot" data-eco-step="2"><span class="eco-orbit-sr" data-ru="Показать проект 3" data-kz="3-жобаны көрсету">Показать проект 3</span></button>
   <button type="button" class="eco-orbit-dot" data-eco-step="3"><span class="eco-orbit-sr" data-ru="Показать проект 4" data-kz="4-жобаны көрсету">Показать проект 4</span></button>
   <button type="button" class="eco-orbit-dot" data-eco-step="4"><span class="eco-orbit-sr" data-ru="Показать проект 5" data-kz="5-жобаны көрсету">Показать проект 5</span></button>
   <button type="button" class="eco-orbit-dot" data-eco-step="5"><span class="eco-orbit-sr" data-ru="Показать проект 6" data-kz="6-жобаны көрсету">Показать проект 6</span></button>
+  <button type="button" id="ecoOrbitRailDown" class="eco-orbit-rail-arrow" aria-label="Следующий экологический проект" title="Далее">⌄</button>
 </div>
 <p class="eco-orbit-sr" id="ecoOrbitAnnouncement" role="status" aria-live="polite"></p>
 </div></div>
