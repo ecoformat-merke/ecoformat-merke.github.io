@@ -1687,7 +1687,8 @@ footer{background:var(--d);color:#fff;padding:55px 0 30px}.foot{display:flex;jus
 .eco-teacher-modal-actions small{color:#527263;flex:1;font-size:11px}
 body.eco-teacher-modal-open{overflow:hidden}
 @media(max-width:600px){.eco-teacher-modal{padding:0}.eco-teacher-dialog{border-radius:0;height:100dvh}.eco-teacher-modal-head h2{font-size:17px}.eco-teacher-note{font-size:11px}}
-</style><style>.eco-awards-section{padding:65px 0;background:linear-gradient(145deg,#f9fcf5,#e9f3e7)}.eco-awards-section h3{color:#174a34;margin:25px 0 14px}.eco-badges-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(185px,1fr));gap:12px}.eco-badge-card{border:1px solid #dfebdd;border-radius:16px;padding:17px;background:#f7fbf5;display:flex;align-items:center;gap:12px}.eco-badge-symbol{font-size:30px}.eco-award-person,.eco-champ-row{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;padding:14px 6px;border-bottom:1px solid #e5eee6}.eco-award-icons{display:flex;gap:7px;flex-wrap:wrap}.eco-award-icon{border-radius:20px;background:#e3f2e5;padding:6px 10px}.eco-champ-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}.eco-champ-head select{padding:9px;border:1px solid #cbdfd0;border-radius:12px;background:white}.eco-muted{color:#648574;font-size:13px}</style></head>
+</style><style>.eco-awards-section{padding:65px 0;background:linear-gradient(145deg,#f9fcf5,#e9f3e7)}.eco-awards-section h3{color:#174a34;margin:25px 0 14px}.eco-badges-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(185px,1fr));gap:12px}.eco-badge-card{border:1px solid #dfebdd;border-radius:16px;padding:17px;background:#f7fbf5;display:flex;align-items:center;gap:12px}.eco-badge-symbol{font-size:30px}.eco-award-person,.eco-champ-row{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;padding:14px 6px;border-bottom:1px solid #e5eee6}.eco-award-icons{display:flex;gap:7px;flex-wrap:wrap}.eco-award-icon{border-radius:20px;background:#e3f2e5;padding:6px 10px}.eco-champ-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}.eco-champ-head select{padding:9px;border:1px solid #cbdfd0;border-radius:12px;background:white}.eco-muted{color:#648574;font-size:13px}</style><link rel="stylesheet" href="./eco-projects-globe.css"/>
+</head>
 <body>
 <header><div class="container nav">
 <a class="brand" href="#home"><img alt="Eco Club" src="eco-club-logo.png"/><span>ECO CLUB</span></a>
@@ -1979,45 +1980,84 @@ body.eco-teacher-modal-open{overflow:hidden}
 <div class="impact-v17"><div class="impact-icon-v17">🧠</div><b data-kz="Экологиялық сана артады" data-ru="Больше осознанности">Больше осознанности</b><span data-kz="Білім мен практикалық әрекеттер арқылы экологиялық әдеттерді қалыптастырамыз." data-ru="Формируем экологические привычки через знания и практические действия.">Формируем экологические привычки через знания и практические действия.</span></div>
 </div></div>
 </section>
-<section class="section projects projects-v2" id="projects"><div class="container">
+<section class="section projects projects-v2 eco-globe-projects" id="projects"><div class="container">
 <div class="projects-intro reveal"><div><div class="eyebrow" data-kz="ЖОБАЛАР" data-ru="ПРОЕКТЫ">ПРОЕКТЫ</div><h2 class="title" data-kz="Біздің экологиялық жобаларымыз" data-ru="Наши экологические проекты">Наши экологические проекты</h2></div><p class="projects-lead" data-kz="Нақты іске айналатын идеялар. Әр бағыт — таза, жасыл және саналы мектеп ортасына қосылған үлес." data-ru="Идеи, которые превращаются в реальные дела. Каждое направление — это вклад в более чистую, зелёную и осознанную школьную среду.">Идеи, которые превращаются в реальные дела. Каждое направление — это вклад в более чистую, зелёную и осознанную школьную среду.</p></div>
-<div class="project-showcase"><article class="project-v2 reveal">
+<div class="eco-orbit-journey" id="ecoOrbitJourney"><div class="eco-orbit-stage" id="ecoOrbitStage"><div class="project-showcase" id="ecoOrbitProjects"><article class="project-v2 eco-orbit-card" data-eco-project="1">
 <div class="project-no">01</div>
 <span class="project-kicker" data-kz="Жинау және қайта өңдеу" data-ru="Сбор и переработка">Сбор и переработка</span>
 <div class="project-art"><img alt="Раздельный сбор отходов" loading="lazy" src="project-recycling.jpg"/></div>
 <div class="project-copy"><h3 data-kz="Қалдықтарды бөлек жинау" data-ru="Раздельный сбор отходов">Раздельный сбор отходов</h3><p data-kz="Макулатура, пластик қақпақтар, батареялар және басқа да қайталама материалдарды жинап, қайта өңдеуге тапсырамыз." data-ru="Собираем и передаём на переработку макулатуру, пластиковые крышечки, батарейки и другие вторичные материалы.">Собираем и передаём на переработку макулатуру, пластиковые крышечки, батарейки и другие вторичные материалы.</p></div>
 <div class="project-status"><i></i><span data-kz="Іске асырылып жатқан жоба" data-ru="Действующий проект">Действующий проект</span></div>
-</article><article class="project-v2 reveal">
+<button class="eco-orbit-more" type="button" data-ru="Подробнее о проекте" data-kz="Жоба туралы толығырақ">Подробнее о проекте</button></article><article class="project-v2 eco-orbit-card" data-eco-project="2">
 <div class="project-no">02</div>
 <span class="project-kicker" data-kz="Абаттандыру" data-ru="Благоустройство">Благоустройство</span>
 <div class="project-art"><img alt="Зелёная школа" loading="lazy" src="project-green-school.jpg"/></div>
 <div class="project-copy"><h3 data-kz="Жасыл мектеп" data-ru="Зелёная школа">Зелёная школа</h3><p data-kz="Мектеп аумағын көгалдандырамыз: бұталар, ағаштар мен гүлдер отырғызып, жайлы орта қалыптастырамыз." data-ru="Озеленяем школьную территорию: высаживаем кустарники, деревья и цветы, создаём уютную и комфортную среду.">Озеленяем школьную территорию: высаживаем кустарники, деревья и цветы, создаём уютную и комфортную среду.</p></div>
 <div class="project-status"><i></i><span data-kz="Дамытамыз" data-ru="Развиваем">Развиваем</span></div>
-</article><article class="project-v2 reveal">
+<button class="eco-orbit-more" type="button" data-ru="Подробнее о проекте" data-kz="Жоба туралы толығырақ">Подробнее о проекте</button></article><article class="project-v2 eco-orbit-card" data-eco-project="3">
 <div class="project-no">03</div>
 <span class="project-kicker" data-kz="Еріктілік" data-ru="Волонтёрство">Волонтёрство</span>
 <div class="project-art"><img alt="Чистый десант" loading="lazy" src="project-cleanup.jpg"/></div>
 <div class="project-copy"><h3 data-kz="Таза десант" data-ru="Чистый десант">Чистый десант</h3><p data-kz="Мектеп аумағы мен қоғамдық орындарды тазалау бойынша сенбіліктер және экологиялық акциялар өткіземіз." data-ru="Проводим субботники и экологические акции по уборке школьной территории и общественных мест.">Проводим субботники и экологические акции по уборке школьной территории и общественных мест.</p></div>
 <div class="project-status"><i></i><span data-kz="Практика" data-ru="Практика">Практика</span></div>
-</article><article class="project-v2 reveal">
+<button class="eco-orbit-more" type="button" data-ru="Подробнее о проекте" data-kz="Жоба туралы толығырақ">Подробнее о проекте</button></article><article class="project-v2 eco-orbit-card" data-eco-project="4">
 <div class="project-no">04</div>
 <span class="project-kicker" data-kz="Ағарту" data-ru="Просвещение">Просвещение</span>
 <div class="project-art"><img alt="Эко-просвещение" loading="lazy" src="project-education.jpg"/></div>
 <div class="project-copy"><h3 data-kz="Эко-ағарту" data-ru="Эко-просвещение">Эко-просвещение</h3><p data-kz="Эко-сабақтар, шеберлік сабақтары мен тақырыптық іс-шаралар өткізіп, оқушылардың экологиялық мәдениетін қалыптастырамыз." data-ru="Проводим эко-уроки, мастер-классы и тематические мероприятия, формируем экологическую культуру среди учащихся.">Проводим эко-уроки, мастер-классы и тематические мероприятия, формируем экологическую культуру среди учащихся.</p></div>
 <div class="project-status"><i></i><span data-kz="Үйренеміз және бөлісеміз" data-ru="Учимся и делимся">Учимся и делимся</span></div>
-</article><article class="project-v2 reveal">
+<button class="eco-orbit-more" type="button" data-ru="Подробнее о проекте" data-kz="Жоба туралы толығырақ">Подробнее о проекте</button></article><article class="project-v2 eco-orbit-card" data-eco-project="5">
 <div class="project-no">05</div>
 <span class="project-kicker" data-kz="Саналы тұтыну" data-ru="Разумное потребление">Разумное потребление</span>
 <div class="project-art"><img alt="Зелёный обмен" loading="lazy" src="project-exchange.jpg"/></div>
 <div class="project-copy"><h3 data-kz="Жасыл алмасу" data-ru="Зелёный обмен">Зелёный обмен</h3><p data-kz="Заттарға екінші өмір береміз: кітаптар, кеңсе және мектеп құралдары мен пайдалы заттар алмасуын ұйымдастырамыз." data-ru="Даём вторую жизнь вещам: организуем обмен книгами, канцелярией, школьными принадлежностями и другими полезными вещами.">Даём вторую жизнь вещам: организуем обмен книгами, канцелярией, школьными принадлежностями и другими полезными вещами.</p></div>
 <div class="project-status"><i></i><span data-kz="Қайта пайдалану" data-ru="Повторное использование">Повторное использование</span></div>
-</article><article class="project-v2 reveal">
+<button class="eco-orbit-more" type="button" data-ru="Подробнее о проекте" data-kz="Жоба туралы толығырақ">Подробнее о проекте</button></article><article class="project-v2 eco-orbit-card" data-eco-project="6">
 <div class="project-no">06</div>
 <span class="project-kicker" data-kz="Эко-мониторинг" data-ru="Эко-мониторинг">Эко-мониторинг</span>
 <div class="project-art"><img alt="Эко-патруль" loading="lazy" src="project-patrol.jpg"/></div>
 <div class="project-copy"><h3 data-kz="Эко-патруль" data-ru="Эко-патруль">Эко-патруль</h3><p data-kz="Мектептегі экологиялық тәртіпті, ресурстарды ұқыпты пайдалануды бақылап, жақсарту жолдарын ұсынамыз." data-ru="Следим за экологическим поведением в школе, бережным использованием ресурсов и предлагаем улучшения.">Следим за экологическим поведением в школе, бережным использованием ресурсов и предлагаем улучшения.</p></div>
 <div class="project-status"><i></i><span data-kz="Бақылаймыз және жақсартамыз" data-ru="Наблюдаем и улучшаем">Наблюдаем и улучшаем</span></div>
-</article></div>
+<button class="eco-orbit-more" type="button" data-ru="Подробнее о проекте" data-kz="Жоба туралы толығырақ">Подробнее о проекте</button></article>
+<div class="eco-orbit-center">
+  <span class="eco-globe-halo" aria-hidden="true"></span>
+  <span class="eco-globe-orbit orbit-a" aria-hidden="true"></span>
+  <span class="eco-globe-orbit orbit-b" aria-hidden="true"></span>
+  <button type="button" class="eco-globe-hit" id="ecoOrbitGlobe" aria-label="Вращать глобус и переходить между проектами">
+    <span class="eco-globe-world" aria-hidden="true">
+      <span class="eco-globe-map"></span>
+      <span class="eco-globe-glow"></span>
+      <span class="eco-globe-equator"></span>
+    </span>
+    <span class="eco-globe-action" data-ru="🌍 ВРАЩАЙТЕ ГЛОБУС" data-kz="🌍 ГЛОБУСТЫ АЙНАЛДЫРЫҢЫЗ">🌍 ВРАЩАЙТЕ ГЛОБУС</span>
+  </button>
+</div></div>
+<div class="eco-orbit-controls">
+  <button type="button" id="ecoOrbitPrev" class="eco-orbit-control" data-ru="← Назад" data-kz="← Артқа">← Назад</button>
+  <span class="eco-orbit-position" id="ecoOrbitPosition" aria-live="off">01 / 06</span>
+  <button type="button" id="ecoOrbitNext" class="eco-orbit-control" data-ru="Далее →" data-kz="Келесі →">Далее →</button>
+</div>
+<div class="eco-orbit-rail" role="group" aria-label="Шесть направлений Eco Club">
+  <button type="button" class="eco-orbit-dot" data-eco-step="0" aria-current="step"><span class="eco-orbit-sr" data-ru="Показать проект 1" data-kz="1-жобаны көрсету">Показать проект 1</span></button>
+  <button type="button" class="eco-orbit-dot" data-eco-step="1"><span class="eco-orbit-sr" data-ru="Показать проект 2" data-kz="2-жобаны көрсету">Показать проект 2</span></button>
+  <button type="button" class="eco-orbit-dot" data-eco-step="2"><span class="eco-orbit-sr" data-ru="Показать проект 3" data-kz="3-жобаны көрсету">Показать проект 3</span></button>
+  <button type="button" class="eco-orbit-dot" data-eco-step="3"><span class="eco-orbit-sr" data-ru="Показать проект 4" data-kz="4-жобаны көрсету">Показать проект 4</span></button>
+  <button type="button" class="eco-orbit-dot" data-eco-step="4"><span class="eco-orbit-sr" data-ru="Показать проект 5" data-kz="5-жобаны көрсету">Показать проект 5</span></button>
+  <button type="button" class="eco-orbit-dot" data-eco-step="5"><span class="eco-orbit-sr" data-ru="Показать проект 6" data-kz="6-жобаны көрсету">Показать проект 6</span></button>
+</div>
+<p class="eco-orbit-sr" id="ecoOrbitAnnouncement" role="status" aria-live="polite"></p>
+</div></div>
+<p class="eco-orbit-hint" data-ru="Прокручивайте страницу, нажимайте на точки или перелистывайте проекты, чтобы открыть все шесть направлений." data-kz="Барлық алты бағытты ашу үшін бетті айналдырыңыз, нүктелерді басыңыз немесе жобаларды ауыстырыңыз.">Прокручивайте страницу, нажимайте на точки или перелистывайте проекты, чтобы открыть все шесть направлений.</p>
+<dialog id="ecoOrbitDialog" class="eco-orbit-dialog" aria-labelledby="ecoOrbitDialogTitle">
+  <div class="eco-orbit-dialog-head">
+    <span class="eco-orbit-dialog-kicker" id="ecoOrbitDialogKicker"></span>
+    <button type="button" id="ecoOrbitDialogClose" class="eco-orbit-close" aria-label="Закрыть">×</button>
+  </div>
+  <img id="ecoOrbitDialogImg" class="eco-orbit-dialog-image" alt="" loading="lazy"/>
+  <h3 id="ecoOrbitDialogTitle"></h3>
+  <p id="ecoOrbitDialogDescription"></p>
+  <span class="eco-orbit-dialog-status" id="ecoOrbitDialogStatus"></span>
+</dialog>
 <div class="projects-cycle reveal"><div class="cycle-label"><span data-kz="Жоба қалай пайда болады?" data-ru="Как рождается проект?">Как рождается проект?</span><strong data-kz="Идеядан — нақты нәтижеге" data-ru="От идеи — к реальному результату">От идеи — к реальному результату</strong></div><div class="cycle-steps">
 <div><b>01</b><span data-kz="Мәселе" data-ru="Проблема">Проблема</span></div><em>→</em>
 <div><b>02</b><span data-kz="Шешім" data-ru="Решение">Решение</span></div><em>→</em>
@@ -3231,4 +3271,5 @@ load();
 
 <script defer src="./eco-hero.js"></script>
 <script defer src="./eco-campus-hero.js"></script>
+<script defer src="./eco-projects-globe.js"></script>
 </body></html>
