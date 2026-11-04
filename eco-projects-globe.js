@@ -16,7 +16,7 @@
  var prev=document.getElementById('ecoOrbitPrev'),next=document.getElementById('ecoOrbitNext');
  var dialogClose=document.getElementById('ecoOrbitDialogClose');
  var reduced=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
- var current=-1,selectedCard=null,ticking=false,startedX=null,startedY=null,suppressClick=false;
+ var current=-1,lastMobile=null,selectedCard=null,ticking=false,startedX=null,startedY=null,suppressClick=false;
 
  function kz(){return document.documentElement.lang==='kk'}
  function clamp(v,a,b){return Math.max(a,Math.min(b,v))}
@@ -32,9 +32,9 @@
  function scrollIndex(){return Math.min(cards.length-1,Math.floor(scrollProgress()*cards.length))}
  function update(index,announce){
   index=clamp(index,0,cards.length-1);
-  if(index===current && !announce)return;
-  current=index;
   var mobile=window.matchMedia('(max-width:950px)').matches;
+  if(index===current && mobile===lastMobile && !announce)return;
+  current=index;lastMobile=mobile;
   cards.forEach(function(card,i){
    var visible=mobile?i===current:i<=current;
    card.classList.toggle('is-visible',visible);
