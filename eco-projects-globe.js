@@ -14,6 +14,7 @@
  var readout=document.getElementById('ecoOrbitPosition');
  var live=document.getElementById('ecoOrbitAnnouncement');
  var prev=document.getElementById('ecoOrbitPrev'),next=document.getElementById('ecoOrbitNext');
+ var railUp=document.getElementById('ecoOrbitRailUp'),railDown=document.getElementById('ecoOrbitRailDown');
  var dialogClose=document.getElementById('ecoOrbitDialogClose');
  var reduced=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
  var current=-1,lastMobile=null,selectedCard=null,ticking=false,startedX=null,startedY=null,suppressClick=false;
@@ -41,6 +42,7 @@
    card.classList.toggle('is-active',i===current);
    // Avoid inaccessible buttons remaining tabbable behind faded panels.
    card.setAttribute('aria-hidden',String(!visible));
+   card.tabIndex=visible?0:-1;
    var open=card.querySelector('.eco-orbit-more');
    if(open)open.tabIndex=visible?0:-1;
   });
@@ -51,6 +53,8 @@
   if(readout)readout.textContent=String(current+1).padStart(2,'0')+' / '+String(cards.length).padStart(2,'0');
   if(prev)prev.disabled=current===0;
   if(next)next.disabled=current===cards.length-1;
+  if(railUp)railUp.disabled=current===0;
+  if(railDown)railDown.disabled=current===cards.length-1;
   if(announce&&live){
    live.textContent=(kz()?'Жоба ':'Проект ')+(current+1)+': '+currentTitle(cards[current]);
   }
@@ -98,12 +102,26 @@
   selectedCard=null;
  }
  cards.forEach(function(card,index){
+  // Entire capsule opens the original full project description.
+  // Keep keyboard access, even though the old tiny "more" control is hidden in premium mode.
+  card.setAttribute('role','button');
+  card.addEventListener('click',function(e){
+   if(e.target.closest('.eco-orbit-more'))return;
+   update(index,true);openDetail(card);
+  });
+  card.addEventListener('keydown',function(e){
+   if(e.key==='Enter'||e.key===' '){
+    e.preventDefault();update(index,true);openDetail(card);
+   }
+  });
   var more=card.querySelector('.eco-orbit-more');
-  if(more)more.addEventListener('click',function(){update(index,true);openDetail(card)});
+  if(more)more.addEventListener('click',function(e){e.stopPropagation();update(index,true);openDetail(card)});
  });
  dots.forEach(function(dot,index){dot.addEventListener('click',function(){goTo(index)})});
  if(prev)prev.addEventListener('click',function(){goTo(current-1)});
  if(next)next.addEventListener('click',function(){goTo(current+1)});
+ if(railUp)railUp.addEventListener('click',function(){goTo(current-1)});
+ if(railDown)railDown.addEventListener('click',function(){goTo(current+1)});
  if(dialogClose)dialogClose.addEventListener('click',closeDetail);
  if(dialog){
   dialog.addEventListener('click',function(e){if(e.target===dialog)closeDetail()});
