@@ -15,6 +15,9 @@
 #projects.eco-globe-projects .projects-intro .title{max-width:760px}
 #projects.eco-globe-projects .projects-lead{max-width:430px}
 .eco-orbit-journey{position:relative;height:clamp(1550px,225vh,2550px);margin-top:36px}
+/* If scripts fail or are disabled, all six original cards remain readable. */
+.eco-orbit-journey:not(.eco-orbit-enabled){height:auto}
+.eco-orbit-stage:not(.eco-orbit-ready){position:relative;top:auto;height:auto;min-height:670px}
 .eco-orbit-stage{position:sticky;top:82px;height:calc(100vh - 90px);min-height:650px;max-height:920px;isolation:isolate;display:flex;align-items:center}
 #projects.eco-globe-projects .project-showcase{
   display:grid;grid-template-columns:minmax(0,1fr) minmax(310px,1.13fr) minmax(0,1fr);
@@ -240,6 +243,17 @@
    opacity:1;visibility:visible;pointer-events:auto;transform:translateY(0) scale(1)
  }
  .eco-orbit-rail{right:0;top:28%}
+ .eco-orbit-stage:not(.eco-orbit-ready){height:auto;min-height:0;position:relative}
+ #projects.eco-globe-projects .eco-orbit-stage:not(.eco-orbit-ready) .project-showcase{
+   height:auto;min-height:0;display:flex;flex-direction:column;gap:14px;padding-bottom:15px
+ }
+ #projects.eco-globe-projects .eco-orbit-stage:not(.eco-orbit-ready) .eco-orbit-card{
+   position:relative;inset:auto;min-height:190px;height:auto;max-width:none;width:100%
+ }
+ .eco-orbit-stage:not(.eco-orbit-ready) .eco-orbit-center{
+   position:relative;top:auto;left:auto;right:auto;min-height:340px;width:100%;order:-1
+ }
+ .eco-orbit-stage:not(.eco-orbit-ready) .eco-orbit-controls{position:relative;bottom:auto;margin-top:14px}
 }
 @media(max-width:540px){
  #projects.eco-globe-projects{padding-bottom:50px}
