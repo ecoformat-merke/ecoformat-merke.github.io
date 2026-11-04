@@ -1,0 +1,132 @@
+/* Green Planet 3.0 / approved high-realism Eco Club project layout.
+   Overrides V1/V2 only inside the existing project section; JS is progressive
+   enhancement and cards/text stay normal HTML (not a flattened screenshot). */
+#projects.eco-globe-projects{
+ background:
+   radial-gradient(circle at 48% 40%,rgba(139,242,206,.29),transparent 32%),
+   radial-gradient(ellipse at 3% 78%,rgba(204,236,142,.24),transparent 33%),
+   radial-gradient(ellipse at 99% 12%,rgba(169,236,104,.31),transparent 30%),
+   linear-gradient(180deg,#f8fdf6 0%,#ebf8e9 57%,#f6fbf3 100%);
+ /* Do not use overflow hidden: the sticky scroll-story relies on visible
+    scrolling. Overflow clip avoids creation of a scroll container. */
+ overflow:clip;
+}
+#projects.eco-globe-projects .eco-globe-hit{
+ width:min(104%,530px);filter:drop-shadow(0 25px 33px rgba(28,117,77,.24));
+}
+#projects.eco-globe-projects .eco-globe-world{
+ background:radial-gradient(circle at 31% 18%,#b9faff,#35bdc8 38%,#0a648e 80%);
+ box-shadow:
+   inset -12px -7px 24px rgba(5,72,84,.33),
+   inset 5px 7px 15px rgba(245,255,239,.45),
+   0 0 0 3px rgba(242,255,239,.96),
+   0 0 0 9px rgba(133,234,160,.19),
+   0 0 30px rgba(36,221,188,.66),
+   0 0 80px rgba(101,219,115,.36);
+}
+#projects.eco-globe-projects .eco-globe-map{
+ /* Same-origin satellite photography. Used as visual fallback if WebGL fails. */
+ background-image:url("./eco-earth-satellite.svg");
+ background-size:50% 100%;background-repeat:repeat-x;
+ filter:brightness(1.3) saturate(1.5) contrast(1.06);
+}
+#projects.eco-globe-projects .eco-globe-clouds{
+ background-image:url("./eco-earth-cloud-layer.svg");
+ background-size:50% 100%;background-repeat:repeat-x;
+ opacity:.49;mix-blend-mode:screen;z-index:1;
+}
+#projects.eco-globe-projects .eco-earth-webgl{
+ position:absolute;inset:0;width:100%;height:100%;z-index:2;
+ opacity:0;pointer-events:none;transition:opacity .55s ease;
+}
+#projects.eco-globe-projects .eco-webgl-ready .eco-earth-webgl{opacity:1}
+#projects.eco-globe-projects .eco-webgl-ready .eco-globe-map,
+#projects.eco-globe-projects .eco-webgl-ready .eco-globe-clouds{opacity:0;animation-play-state:paused}
+#projects.eco-globe-projects .eco-globe-glow{
+ z-index:3;opacity:.76;
+ background:
+  radial-gradient(ellipse at 22% 19%,rgba(244,255,242,.40),transparent 23%),
+  radial-gradient(ellipse at 42% 27%,rgba(218,255,244,.24),transparent 40%),
+  radial-gradient(ellipse at 65% 73%,transparent 29%,rgba(4,55,65,.29) 94%),
+  linear-gradient(108deg,rgba(193,255,212,.19),transparent 47%,rgba(1,31,40,.25));
+ box-shadow:inset -17px -5px 30px rgba(3,53,57,.32),
+  inset 13px 8px 24px rgba(245,255,248,.31);
+}
+#projects.eco-globe-projects .eco-globe-equator{display:none!important}
+#projects.eco-globe-projects .eco-globe-halo{
+ width:min(139%,660px);
+ background:radial-gradient(circle,rgba(255,255,231,.12) 0%,
+ rgba(157,235,149,.24) 45%,rgba(213,247,166,.17) 56%,transparent 73%);
+ box-shadow:0 0 85px rgba(93,220,153,.28),0 0 34px rgba(248,255,188,.19);
+}
+#projects.eco-globe-projects .eco-globe-orbit{
+ border-color:rgba(251,255,210,.78);box-shadow:0 0 9px rgba(255,255,206,.62);
+}
+#projects.eco-globe-projects .eco-globe-orbit.orbit-b{
+ border-color:rgba(253,255,231,.73);
+}
+#projects.eco-globe-projects .eco-globe-action{
+ z-index:6;background:linear-gradient(135deg,rgba(3,92,60,.91),rgba(3,62,53,.91));
+ border:1px solid rgba(177,248,151,.56);
+ color:#fcfff4;padding:10px 25px;border-radius:40px;
+ box-shadow:0 3px 13px rgba(3,61,47,.31);
+ text-shadow:0 1px 3px #0a513b;
+}
+#projects.eco-globe-projects .eco-globe-action::after{content:'↶   ↔   ↷';font-size:19px}
+#projects.eco-globe-projects .eco-premium-sparkles i{
+ background:#fffef0;box-shadow:0 0 0 3px rgba(254,255,185,.35),
+  0 0 16px 5px rgba(238,255,125,.8)
+}
+/* Clean 6 illustrations: mask the baked-in rectangular background and
+   leftover surrounding lettering while retaining the primary subject. */
+#projects.eco-globe-projects .eco-orbit-card .project-art{
+ width:100%;height:100%;max-height:180px;overflow:hidden;
+ isolation:isolate;border-radius:50%;
+ -webkit-mask-image:radial-gradient(ellipse 72% 75% at 50% 51%,#000 45%,transparent 77%);
+ mask-image:radial-gradient(ellipse 72% 75% at 50% 51%,#000 45%,transparent 77%);
+}
+#projects.eco-globe-projects .eco-orbit-card .project-art img{
+ width:118%;height:118%;max-width:none;max-height:none;
+ margin-left:-9%;margin-top:-3%;object-fit:contain;
+ mix-blend-mode:multiply;filter:saturate(1.35) brightness(1.035)
+  drop-shadow(0 8px 9px rgba(42,110,48,.10));
+}
+#projects.eco-globe-projects .eco-orbit-card{
+ border:2px solid rgba(255,255,255,.96);
+ background:linear-gradient(110deg,rgba(255,255,255,.985),rgba(249,255,244,.96));
+ box-shadow:0 12px 30px rgba(39,121,59,.11),inset 0 0 0 1px rgba(185,220,158,.34);
+}
+#projects.eco-globe-projects .eco-orbit-card .project-no{
+ background:linear-gradient(145deg,#e2ffa7,#a6e95b);
+ box-shadow:0 3px 11px rgba(149,207,94,.4);color:#153c26;
+}
+#projects.eco-globe-projects .eco-orbit-card .project-copy h3{
+ font-weight:900;color:#083821;letter-spacing:-.25px;
+}
+#projects.eco-globe-projects .eco-orbit-card .project-copy p{
+ color:#42584c;line-height:1.49;
+}
+#projects.eco-globe-projects .eco-orbit-card.is-active{
+ border-color:#a3d979!important;
+ box-shadow:0 16px 36px rgba(55,139,72,.16),0 0 0 2px rgba(168,229,130,.26);
+}
+@media(max-width:1220px){
+ #projects.eco-globe-projects .eco-orbit-card .project-art{max-height:140px}
+}
+@media(max-width:950px){
+ #projects.eco-globe-projects .eco-orbit-card .project-art{
+  max-height:160px;min-width:0
+ }
+ #projects.eco-globe-projects .eco-globe-hit{width:min(88%,min(44vh,360px))}
+}
+@media(max-width:540px){
+ #projects.eco-globe-projects .eco-orbit-card .project-art{max-height:125px}
+ #projects.eco-globe-projects .eco-globe-hit{width:min(84%,min(36vh,310px))}
+ #projects.eco-globe-projects .eco-globe-action{padding:6px 14px;font-size:10px}
+ #projects.eco-globe-projects .eco-globe-action::after{font-size:14px}
+}
+@media(prefers-reduced-motion:reduce){
+ #projects.eco-globe-projects .eco-earth-webgl{transition:none}
+ #projects.eco-globe-projects .eco-globe-map,
+ #projects.eco-globe-projects .eco-globe-clouds{animation:none!important}
+}
