@@ -10,7 +10,9 @@
     radial-gradient(ellipse at 96% 11%,rgba(155,214,74,.27),transparent 26%),
     radial-gradient(ellipse at 3% 63%,rgba(149,207,65,.17),transparent 31%),
     linear-gradient(180deg,#f5fcf4,#eaf7e8 48%,#eef8ed 80%,#f8fcf7);
-  overflow:hidden;padding-top:78px;padding-bottom:84px
+  /* Do not use overflow:hidden here: it creates a scroll container and
+     prevents the nested position:sticky globe from staying in view. */
+  overflow:visible;overflow:clip;padding-top:78px;padding-bottom:84px
 }
 #projects.eco-globe-projects::before,#projects.eco-globe-projects::after{
   content:"";position:absolute;pointer-events:none;z-index:0;
