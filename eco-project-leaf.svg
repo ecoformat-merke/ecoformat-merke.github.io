@@ -1,0 +1,4 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="230" height="170" viewBox="0 0 230 170">
+<defs><linearGradient id="l" x1=".1" y1=".9" x2=".9" y2=".1"><stop stop-color="#196a27"/><stop offset=".45" stop-color="#69bf20"/><stop offset=".85" stop-color="#aff153"/><stop offset="1" stop-color="#dff99e"/></linearGradient><filter id="s"><feDropShadow dx="0" dy="8" stdDeviation="5" flood-color="#245333" flood-opacity=".25"/></filter></defs>
+<g filter="url(#s)"><path d="M10 139 Q46 64 109 72 Q168 82 218 7 Q222 100 154 143 Q76 174 10 139Z" fill="url(#l)"/><path d="M13 141 Q100 128 205 25" fill="none" stroke="#d6f7a0" stroke-width="3" stroke-linecap="round" opacity=".86"/><g stroke="#b8ec7b" stroke-width="2" fill="none" opacity=".68"><path d="M85 119Q88 84 70 78"/><path d="M119 93Q126 58 115 51"/><path d="M148 64Q160 40 158 34"/><path d="M85 119Q57 114 39 120"/><path d="M119 93Q104 139 89 152"/><path d="M148 64Q159 110 139 138"/></g></g>
+</svg>
