@@ -1,0 +1,332 @@
+/* ECO CLUB — Green Planet Premium V2
+   Reference: approved illustrated Earth + six capsule projects.
+   Deliberately scoped to #projects. All original project text, photos, IDs
+   and RU/KZ data attributes remain in index.html. */
+#projects.eco-globe-projects{
+  --eco-earth-green:#a7e95f;
+  position:relative;isolation:isolate;
+  background:
+    radial-gradient(ellipse at 48% 42%,rgba(104,214,163,.28) 0%,rgba(195,244,200,.22) 34%,transparent 68%),
+    radial-gradient(ellipse at 96% 11%,rgba(155,214,74,.27),transparent 26%),
+    radial-gradient(ellipse at 3% 63%,rgba(149,207,65,.17),transparent 31%),
+    linear-gradient(180deg,#f5fcf4,#eaf7e8 48%,#eef8ed 80%,#f8fcf7);
+  overflow:hidden;padding-top:78px;padding-bottom:84px
+}
+#projects.eco-globe-projects::before,#projects.eco-globe-projects::after{
+  content:"";position:absolute;pointer-events:none;z-index:0;
+  width:clamp(170px,19vw,310px);aspect-ratio:230/170;
+  background:url('./eco-project-leaf.svg') center/contain no-repeat;
+  opacity:.62;filter:blur(3px) saturate(1.18);
+}
+#projects.eco-globe-projects::before{top:98px;left:-130px;transform:rotate(-30deg)}
+#projects.eco-globe-projects::after{bottom:10px;right:-110px;transform:rotate(145deg)}
+#projects.eco-globe-projects .container{
+  position:relative;z-index:1;width:min(1460px,calc(100% - 90px));
+}
+#projects.eco-globe-projects .projects-intro{
+  position:relative;display:grid;grid-template-columns:minmax(0,1.15fr) minmax(320px,.8fr);
+  gap:5%;align-items:center;margin:0 auto 6px;padding:0 4.3%;
+}
+#projects.eco-globe-projects .projects-intro .eyebrow{
+  display:flex;align-items:center;gap:16px;letter-spacing:2.6px;font-size:13px;
+}
+#projects.eco-globe-projects .projects-intro .eyebrow::after{
+  content:"";width:35px;height:2px;background:#1b6940;display:block
+}
+#projects.eco-globe-projects .projects-intro .title{
+  position:relative;max-width:750px;font-size:clamp(38px,4.25vw,62px);
+  line-height:1.04;letter-spacing:-1.4px;margin-top:17px;color:#063c29
+}
+#projects.eco-globe-projects .projects-intro .title::after{
+  content:"";display:inline-block;width:54px;height:35px;vertical-align:baseline;
+  background:url('./eco-project-leaf.svg') center/contain no-repeat;
+  transform:rotate(20deg);margin-left:5px;
+}
+#projects.eco-globe-projects .projects-lead{
+  border-left:1px solid #89bb80;padding:5px 0 6px 47px;
+  color:#486259;font-size:clamp(15px,1.24vw,19px);
+  line-height:1.62;max-width:530px;
+}
+/* Sticky stage retains the proven scroll-by-scroll six-stage behavior. */
+#projects.eco-globe-projects .eco-orbit-journey{
+  height:clamp(1500px,215vh,2500px);margin-top:6px
+}
+#projects.eco-globe-projects .eco-orbit-stage{
+  top:82px;height:calc(100dvh - 88px);
+  max-height:880px;min-height:640px
+}
+#projects.eco-globe-projects .project-showcase{
+  grid-template-columns:minmax(0,1fr) minmax(365px,1fr) minmax(0,1fr);
+  grid-template-rows:repeat(3,minmax(0,1fr));
+  gap:17px 27px;width:100%;height:min(690px,calc(100% - 66px));min-height:590px
+}
+/* Elliptic, soft-touch capsules as in the approved mockup. */
+#projects.eco-globe-projects .eco-orbit-card{
+  position:relative;display:grid;
+  grid-template-columns:clamp(98px,9vw,148px) minmax(0,1fr);
+  grid-template-rows:1fr;align-items:center;column-gap:11px;
+  min-height:0;padding:19px 21px 19px 13px;
+  background:linear-gradient(115deg,rgba(255,255,255,.98),rgba(253,255,247,.92));
+  border:2px solid rgba(255,255,255,.95);border-radius:999px;
+  overflow:visible;
+  box-shadow:0 15px 30px rgba(30,102,55,.1),inset 0 0 0 1px rgba(178,220,161,.38);
+  will-change:opacity,transform;
+}
+#projects.eco-globe-projects .eco-orbit-card::before{
+  content:none;display:none
+}
+#projects.eco-globe-projects .eco-orbit-card::after{
+  content:"";position:absolute;z-index:6;
+  right:-30px;top:calc(50% - 11px);height:19px;width:19px;
+  border-radius:50%;border:3px solid #b0e356;
+  background:radial-gradient(circle,#f7ffdd 5%,#6ec132 48%,#408b3a 80%);
+  box-shadow:0 0 0 5px rgba(255,255,255,.84),0 0 18px rgba(166,220,55,.92);
+  pointer-events:none
+}
+#projects.eco-globe-projects .eco-orbit-card:nth-of-type(even)::after{right:auto;left:-30px}
+#projects.eco-globe-projects .eco-orbit-card:hover{
+  border-color:#d0efa9;box-shadow:0 20px 39px rgba(30,102,55,.18),0 0 0 3px #d6f1ba;
+  transform:translateY(-3px)
+}
+#projects.eco-globe-projects .eco-orbit-card.is-active{
+  border-color:#aee67a!important;
+  box-shadow:0 19px 42px rgba(67,142,63,.2),0 0 0 3px rgba(142,208,74,.35)
+}
+#projects.eco-globe-projects .eco-orbit-card .project-art{
+  grid-column:1;grid-row:1;position:relative;
+  height:100%;min-height:0;max-height:170px;
+  display:flex;justify-content:center;align-items:center;margin:0;padding:0;
+}
+#projects.eco-globe-projects .eco-orbit-card .project-art img{
+  width:100%;height:100%;max-height:165px;object-fit:contain;
+  filter:saturate(1.27) drop-shadow(0 10px 12px rgba(31,102,48,.08));
+}
+#projects.eco-globe-projects .eco-orbit-card .project-copy{
+  position:relative;grid-column:2;grid-row:1;align-self:center;
+  margin:0;padding:0;z-index:2
+}
+#projects.eco-globe-projects .eco-orbit-card .project-copy h3{
+  margin:0 0 10px 48px;
+  padding:0;max-width:none;min-height:34px;
+  display:flex;align-items:center;
+  color:#0b3022;font-size:clamp(16px,1.4vw,23px);
+  font-weight:900;line-height:1.13;letter-spacing:-.3px
+}
+#projects.eco-globe-projects .eco-orbit-card .project-copy p{
+  display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:4;
+  overflow:hidden;max-width:none;color:#394e43;
+  margin:0;font-size:clamp(11px,1vw,14px);line-height:1.49
+}
+#projects.eco-globe-projects .eco-orbit-card .project-no{
+  position:absolute;z-index:4;top:20px;
+  left:calc(clamp(98px,9vw,148px) + 25px);
+  display:grid;place-items:center;
+  width:39px;height:39px;border-radius:50%;
+  background:linear-gradient(150deg,#d7fc98,#a7e663);
+  box-shadow:0 3px 10px #9eca6280;
+  color:#173e27;font-size:23px;letter-spacing:-1px;font-weight:1000;
+}
+#projects.eco-globe-projects .eco-orbit-card .project-kicker,
+#projects.eco-globe-projects .eco-orbit-card .project-status{display:none}
+#projects.eco-globe-projects .eco-orbit-card .eco-orbit-more{display:none}
+#projects.eco-globe-projects .eco-orbit-card[tabindex="0"]{cursor:pointer}
+#projects.eco-globe-projects .eco-orbit-card:focus-visible{
+  outline:3px solid #6cc954;outline-offset:4px
+}
+/* Premium sphere: NASA Blue Marble world map + drifting cloud layer.
+   No JS dependency. The locally hosted SVG remains a graceful backup. */
+#projects.eco-globe-projects .eco-orbit-center{z-index:1}
+#projects.eco-globe-projects .eco-globe-hit{
+  width:min(102%,510px);max-width:none;
+  filter:drop-shadow(0 24px 26px rgba(2,74,52,.22));
+}
+#projects.eco-globe-projects .eco-globe-world{
+  background:radial-gradient(circle at 35% 23%,#52cbdd,#087293 42%,#053c67);
+  box-shadow:inset -15px -10px 35px #04283b,0 0 0 3px rgba(226,255,220,.82),
+    0 0 0 10px rgba(176,247,151,.13),
+    0 0 28px rgba(89,230,206,.84),0 0 83px rgba(95,214,132,.33);
+}
+#projects.eco-globe-projects .eco-globe-map{
+  background-image:
+    url('https://raw.githubusercontent.com/mrdoob/three.js/master/examples/textures/planets/earth_atmos_2048.jpg'),
+    url('./eco-earth-texture.svg');
+  background-size:50% 100%,50% 100%;background-position:0 0,0 0;
+  background-repeat:repeat-x,repeat-x;
+  filter:saturate(1.65) brightness(1.24) contrast(1.07);
+  animation:eco-premium-earth-spin 51s linear infinite;animation-play-state:paused
+}
+#projects.eco-globe-projects .eco-globe-clouds{
+  position:absolute;inset:0 auto 0 0;width:400%;height:100%;
+  background-image:url('https://raw.githubusercontent.com/mrdoob/three.js/master/examples/textures/planets/earth_clouds_1024.png');
+  background-size:50% 100%;background-repeat:repeat-x;
+  mix-blend-mode:screen;opacity:.42;
+  animation:eco-premium-cloud-spin 78s linear infinite;
+  animation-play-state:paused;pointer-events:none;will-change:transform
+}
+#projects.eco-globe-projects .eco-orbit-inview .eco-globe-map,
+#projects.eco-globe-projects .eco-orbit-inview .eco-globe-clouds{animation-play-state:running}
+@keyframes eco-premium-earth-spin{
+  from{transform:translate3d(-11%,0,0)}
+  to{transform:translate3d(-61%,0,0)}
+}
+@keyframes eco-premium-cloud-spin{
+  from{transform:translate3d(-15%,0,0)}
+  to{transform:translate3d(-65%,0,0)}
+}
+#projects.eco-globe-projects .eco-globe-glow{
+  background:
+    radial-gradient(ellipse at 29% 16%,rgba(245,255,245,.64),transparent 21%),
+    radial-gradient(ellipse at 35% 37%,rgba(178,251,227,.16),transparent 39%),
+    radial-gradient(ellipse at 66% 65%,transparent 19%,rgba(0,38,64,.54) 88%),
+    linear-gradient(108deg,rgba(202,255,212,.28) 0%,transparent 34%,rgba(0,26,41,.44) 100%);
+  box-shadow:inset -28px -10px 43px rgba(4,39,54,.54),
+    inset 17px 12px 24px rgba(235,255,250,.35);
+}
+#projects.eco-globe-projects .eco-globe-halo{
+  width:min(134%,635px);
+  background:radial-gradient(circle,rgba(255,255,224,.07) 35%,rgba(156,238,164,.15) 48%,transparent 73%);
+  box-shadow:0 0 100px rgba(98,221,119,.26),0 0 30px rgba(97,224,201,.12)
+}
+#projects.eco-globe-projects .eco-globe-orbit{
+  width:min(137%,650px);height:62%;transform:rotate(-21deg);
+  border:1.5px solid rgba(242,251,170,.91);
+  box-shadow:0 0 11px rgba(255,252,181,.75);
+}
+#projects.eco-globe-projects .eco-globe-orbit.orbit-b{
+  width:min(125%,595px);height:78%;
+  transform:rotate(27deg);border-style:dashed;
+  border-color:rgba(255,255,230,.82);opacity:.9
+}
+#projects.eco-globe-projects .eco-globe-action{
+  bottom:17%;padding:8px 24px;border-radius:35px;
+  background:rgba(4,62,50,.58);
+  box-shadow:0 8px 21px rgba(2,42,36,.22);
+  font-size:clamp(12px,1.2vw,16px);letter-spacing:.07em;
+  text-transform:uppercase
+}
+#projects.eco-globe-projects .eco-globe-action::after{
+  content:"◡  ↔  ◡";display:block;line-height:1.4;
+  font-size:25px;font-weight:500;letter-spacing:.1em
+}
+#projects.eco-globe-projects .eco-globe-equator{
+  inset:auto -9% 36%;height:22%;border:2px solid rgba(251,255,177,.56);
+  box-shadow:0 0 13px rgba(237,255,191,.66)
+}
+.eco-premium-sparkles{
+  position:absolute;z-index:3;inset:0;pointer-events:none
+}
+.eco-premium-sparkles i{
+  position:absolute;width:7px;height:7px;border-radius:50%;
+  background:#fffbe1;box-shadow:0 0 0 3px #fbffcd50,0 0 16px 5px #e9ff9c;
+  animation:eco-premium-twinkle 3.4s ease-in-out infinite
+}
+.eco-premium-sparkles i:nth-child(1){top:23%;left:17%;animation-delay:-1s}
+.eco-premium-sparkles i:nth-child(2){top:12%;right:28%;animation-delay:-.3s}
+.eco-premium-sparkles i:nth-child(3){bottom:19%;left:23%;animation-delay:-2.4s}
+.eco-premium-sparkles i:nth-child(4){bottom:25%;right:10%;animation-delay:-1.9s}
+@keyframes eco-premium-twinkle{50%{transform:scale(1.6);opacity:.62}}
+#projects.eco-globe-projects .eco-orbit-rail{right:-22px;gap:17px}
+#projects.eco-globe-projects .eco-orbit-dot{
+  width:13px;height:13px;border:2px solid #528b5f;background:#f7fff0
+}
+#projects.eco-globe-projects .eco-orbit-dot[aria-current="step"]{
+  background:#15583f;border-color:#c4eb71;
+  box-shadow:0 0 0 5px #d5f5b8,0 0 12px rgba(117,214,75,.7)
+}
+#projects.eco-globe-projects .eco-orbit-controls{
+  bottom:0;gap:14px
+}
+#projects.eco-globe-projects .eco-orbit-control{
+  border-radius:999px;padding:10px 19px;font-weight:850;
+  border:1px solid #add7aa;box-shadow:0 6px 18px rgba(14,92,44,.1)
+}
+#projects.eco-globe-projects .eco-orbit-hint{
+  margin:8px auto 0;max-width:420px;font-size:13px;line-height:1.55;color:#365c42
+}
+#projects.eco-globe-projects .eco-orbit-hint::before{
+  content:"↧";display:block;font-size:26px;line-height:1.15;
+  color:#26884d;margin-bottom:5px
+}
+#projects.eco-globe-projects .eco-orbit-hint::after{
+  content:"⌄";display:block;font-size:32px;color:#22864b;line-height:1;margin-top:4px
+}
+/* Reset capsule/heading geometry for narrow laptops before mobile stack. */
+@media(max-width:1220px) and (min-width:951px){
+ #projects.eco-globe-projects .container{width:calc(100% - 42px)}
+ #projects.eco-globe-projects .project-showcase{
+   grid-template-columns:minmax(0,1fr) minmax(300px,.89fr) minmax(0,1fr);column-gap:17px
+ }
+ #projects.eco-globe-projects .eco-orbit-card{grid-template-columns:100px minmax(0,1fr);padding:13px 12px}
+ #projects.eco-globe-projects .eco-orbit-card .project-no{left:119px;top:15px;width:32px;height:32px;font-size:18px}
+ #projects.eco-globe-projects .eco-orbit-card .project-copy h3{font-size:15px;margin-left:39px;min-height:28px}
+ #projects.eco-globe-projects .eco-orbit-card .project-copy p{font-size:11px}
+ #projects.eco-globe-projects .eco-orbit-card .project-art img{max-height:122px}
+}
+@media(max-width:950px){
+ #projects.eco-globe-projects{padding-top:66px}
+ #projects.eco-globe-projects .container{width:min(650px,calc(100% - 32px))}
+ #projects.eco-globe-projects .projects-intro{grid-template-columns:1fr;gap:19px;padding:0 6px}
+ #projects.eco-globe-projects .projects-intro .title{font-size:clamp(35px,7vw,54px)}
+ #projects.eco-globe-projects .projects-lead{padding:7px 0 7px 18px;border-left:2px solid #acd19e}
+ #projects.eco-globe-projects .eco-orbit-journey{height:clamp(1300px,255vh,2350px)}
+ #projects.eco-globe-projects .eco-orbit-stage{
+   top:72px;height:calc(100dvh - 78px);min-height:530px;max-height:none
+ }
+ #projects.eco-globe-projects .project-showcase{
+   position:relative;display:flex;flex-direction:column;justify-content:center;
+   align-items:center;height:calc(100% - 62px);min-height:0;gap:0
+ }
+ #projects.eco-globe-projects .eco-orbit-center{height:54%;top:0;left:0;right:0}
+ #projects.eco-globe-projects .eco-globe-hit{width:min(88%,min(43vh,355px))}
+ #projects.eco-globe-projects .eco-globe-halo{width:min(107%,430px)}
+ #projects.eco-globe-projects .eco-globe-orbit{width:min(114%,470px)}
+ #projects.eco-globe-projects .eco-globe-orbit.orbit-b{width:min(105%,425px)}
+ #projects.eco-globe-projects .eco-orbit-card{
+   left:0;right:0;bottom:0;height:43%;min-height:185px;
+   grid-template-columns:clamp(88px,20vw,140px) minmax(0,1fr);gap:12px;
+   padding:15px 17px;max-width:590px;margin:auto
+ }
+ #projects.eco-globe-projects .eco-orbit-card .project-no{
+   top:20px;left:calc(clamp(88px,20vw,140px) + 29px)
+ }
+ #projects.eco-globe-projects .eco-orbit-card .project-copy h3{font-size:clamp(17px,3vw,22px)}
+ #projects.eco-globe-projects .eco-orbit-card .project-copy p{font-size:clamp(12px,1.8vw,14px)}
+ #projects.eco-globe-projects .eco-orbit-card .project-art img{max-height:140px}
+ #projects.eco-globe-projects .eco-orbit-card::after{display:none}
+ #projects.eco-globe-projects .eco-orbit-rail{right:-6px;top:27%}
+ #projects.eco-globe-projects .eco-orbit-controls{bottom:0}
+}
+@media(max-width:540px){
+ #projects.eco-globe-projects{padding-top:46px;padding-bottom:52px}
+ #projects.eco-globe-projects .container{width:calc(100% - 26px)}
+ #projects.eco-globe-projects .projects-intro .title{font-size:clamp(32px,9vw,43px)}
+ #projects.eco-globe-projects .projects-intro .title::after{width:36px;height:23px}
+ #projects.eco-globe-projects .projects-lead{font-size:13px;line-height:1.6}
+ #projects.eco-globe-projects .eco-orbit-journey{height:235vh}
+ #projects.eco-globe-projects .eco-orbit-stage{top:69px;height:calc(100dvh - 72px);min-height:495px}
+ #projects.eco-globe-projects .project-showcase{height:calc(100% - 57px)}
+ #projects.eco-globe-projects .eco-orbit-center{height:50%}
+ #projects.eco-globe-projects .eco-globe-hit{width:min(83%,min(36vh,305px))}
+ #projects.eco-globe-projects .eco-globe-action{font-size:10px;padding:5px 14px}
+ #projects.eco-globe-projects .eco-globe-action::after{font-size:16px}
+ #projects.eco-globe-projects .eco-orbit-card{
+   left:0;right:0;height:46%;min-height:192px;
+   grid-template-columns:85px minmax(0,1fr);gap:6px;
+   border-radius:29px;padding:11px 12px;
+ }
+ #projects.eco-globe-projects .eco-orbit-card .project-no{top:14px;left:103px;width:31px;height:31px;font-size:18px}
+ #projects.eco-globe-projects .eco-orbit-card .project-copy h3{
+   font-size:17px;line-height:1.1;margin-left:40px;margin-bottom:7px;min-height:30px
+ }
+ #projects.eco-globe-projects .eco-orbit-card .project-copy p{
+   font-size:11.5px;line-height:1.45;-webkit-line-clamp:5
+ }
+ #projects.eco-globe-projects .eco-orbit-card .project-art img{max-height:120px}
+ #projects.eco-globe-projects .eco-orbit-rail{right:-10px}
+ #projects.eco-globe-projects .eco-orbit-hint{font-size:11px}
+}
+@media(prefers-reduced-motion:reduce){
+ #projects.eco-globe-projects .eco-globe-map,
+ #projects.eco-globe-projects .eco-globe-clouds,
+ #projects.eco-globe-projects .eco-premium-sparkles i{animation:none!important}
+}
