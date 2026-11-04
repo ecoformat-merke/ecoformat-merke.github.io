@@ -138,6 +138,68 @@
   join.href='#application';join.textContent=kz()?'Клубқа қосылу →':'Вступить в Eco Club →';
   join.addEventListener('click',closeDetail);
   detailBox.appendChild(join);
+
+  // Project evidence panel: use the current results section rather than
+  // historical paper/cap totals (the site explicitly started a new count).
+  var evidence=document.createElement('section');
+  evidence.className='eco-orbit-evidence';
+  var heading=document.createElement('h4');
+  heading.textContent=kz()?'Нәтижелер мен фотосуреттер':'Результаты и фотографии';
+  evidence.appendChild(heading);
+  var note=document.createElement('p');
+  note.className='eco-orbit-evidence-note';
+  if(idx===0){
+    var paper=document.getElementById('paperKgCounter');
+    var caps=document.getElementById('capsCountCounter');
+    var paperVal=paper&&Number((paper.textContent||'').replace(/[^0-9.,]/g,'').replace(',','.'));
+    var capsVal=caps&&Number((caps.textContent||'').replace(/[^0-9.,]/g,'').replace(',','.'));
+    if(Number.isFinite(paperVal)&&Number.isFinite(capsVal)&&(paperVal>0||capsVal>0)){
+      note.textContent=kz()
+       ?'Ағымдағы есеп: '+paperVal+' кг макулатура, '+capsVal+' қақпақ. Дерек: «Нәтижелер» бөлімі. Бұрынғы жинақтар есепке алынбайды.'
+       :'Текущий отсчёт: '+paperVal+' кг макулатуры, '+capsVal+' крышек. Источник: раздел «Результаты». Предыдущие сборы не учитываются.';
+    }else{
+      note.textContent=kz()
+       ?'Осы бағыттың нәтижелері «Нәтижелер» бөлімінде жаңартылады. Қазір расталған жаңа көрсеткіштерді көрсету мүмкін емес.'
+       :'Показатели этого направления обновляются в разделе «Результаты». Подтверждённых новых значений для отображения сейчас нет.';
+    }
+  }else{
+    note.textContent=kz()
+     ?'Бұл бағыт бойынша жеке расталған сандық көрсеткіштер әлі жарияланбаған. Жоспарланған іс-шаралар орындалған нәтиже ретінде көрсетілмейді.'
+     :'Подтверждённые числовые результаты по этому направлению пока не опубликованы. Планы не учитываются как выполненные мероприятия.';
+  }
+  evidence.appendChild(note);
+  var links=document.createElement('div');links.className='eco-orbit-evidence-links';
+  var resultsLink=document.createElement('a');resultsLink.href='#results';
+  resultsLink.textContent=kz()?'Нақты көрсеткіштер →':'Актуальные показатели →';
+  var galleryLink=document.createElement('a');galleryLink.href='#gallery';
+  galleryLink.textContent=kz()?'Фотогалерея →':'Фотогалерея →';
+  [resultsLink,galleryLink].forEach(function(a){
+    a.addEventListener('click',closeDetail);
+    links.appendChild(a);
+  });
+  evidence.appendChild(links);
+  var gallery=document.querySelector('#gallery .gallery-clean-grid');
+  if(gallery){
+    var photos=Array.prototype.slice.call(gallery.querySelectorAll('img[src]')).slice(0,3);
+    if(photos.length){
+      var caption=document.createElement('p');caption.className='eco-orbit-photo-caption';
+      caption.textContent=kz()
+       ?'Eco Club жалпы фотогалереясынан. Суреттер нақты осы жобаға тиесілі деп белгіленбеген.'
+       :'Снимки из общей галереи Eco Club. Их принадлежность именно этому проекту не подтверждена.';
+      evidence.appendChild(caption);
+      var strip=document.createElement('div');strip.className='eco-orbit-photo-strip';
+      photos.forEach(function(photo){
+        var thumb=document.createElement('a');thumb.href='#gallery';
+        thumb.setAttribute('aria-label',kz()?'Фотогалереяны ашу':'Открыть фотогалерею');
+        thumb.addEventListener('click',closeDetail);
+        var shot=document.createElement('img');shot.src=photo.getAttribute('src');
+        shot.alt=photo.getAttribute('alt')||'Eco Club';shot.loading='lazy';
+        thumb.appendChild(shot);strip.appendChild(thumb);
+      });
+      evidence.appendChild(strip);
+    }
+  }
+  detailBox.insertBefore(evidence,join);
  }
  function openDetail(card){
   if(!dialog)return;
