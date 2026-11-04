@@ -227,7 +227,7 @@
       var name=document.createElement('strong');
       name.textContent=(kz()?(event.nameKz||event.nameRu):(event.nameRu||event.nameKz))||'Eco Club';
       entry.appendChild(name);
-      if(/^\\d{4}-\\d{2}-\\d{2}$/.test(String(event.date||''))){
+      if(/^\d{4}-\d{2}-\d{2}$/.test(String(event.date||''))){
         var date=document.createElement('small');date.textContent=event.date;entry.appendChild(date);
       }
       var validPhotos=Array.isArray(event.photos)?event.photos.filter(function(url){
