@@ -199,6 +199,56 @@
       evidence.appendChild(strip);
     }
   }
+
+  // Only explicitly linked public events can be assigned to a project.
+  // Broad education/activity categories cannot prove project attribution.
+  var published=Array.isArray(window.ecoPublishedEvents)?window.ecoPublishedEvents:[];
+  var assigned=published.filter(function(event){
+    if(!event||!/^EV-[A-Za-z0-9-]+$/.test(String(event.id||'')))return false;
+    var relation=event.projectId!=null?event.projectId:
+                 event.projectKey!=null?event.projectKey:event.project;
+    return String(relation==null?'':relation).trim()===String(idx+1);
+  });
+  var publishedBox=document.createElement('div');
+  publishedBox.className='eco-orbit-published';
+  var sub=document.createElement('h4');
+  sub.textContent=kz()?'Жобаға бекітілген іс-шаралар':'Мероприятия, привязанные к проекту';
+  publishedBox.appendChild(sub);
+  if(!assigned.length){
+    var empty=document.createElement('p');empty.className='eco-orbit-evidence-note';
+    empty.textContent=kz()
+     ?'Жарияланған іс-шаралар арасында осы жобаға нақты байланыстырылған жазба жоқ.'
+     :'Среди опубликованных мероприятий пока нет записей с подтверждённой привязкой к этому проекту.';
+    publishedBox.appendChild(empty);
+  }else{
+    var eventList=document.createElement('div');eventList.className='eco-orbit-published-list';
+    assigned.slice(0,6).forEach(function(event){
+      var entry=document.createElement('article');entry.className='eco-orbit-published-event';
+      var name=document.createElement('strong');
+      name.textContent=(kz()?(event.nameKz||event.nameRu):(event.nameRu||event.nameKz))||'Eco Club';
+      entry.appendChild(name);
+      if(/^\\d{4}-\\d{2}-\\d{2}$/.test(String(event.date||''))){
+        var date=document.createElement('small');date.textContent=event.date;entry.appendChild(date);
+      }
+      var validPhotos=Array.isArray(event.photos)?event.photos.filter(function(url){
+        try{var u=new URL(url);return u.protocol==='https:'&&u.hostname==='drive.google.com'
+          &&u.pathname==='/thumbnail'&&/^[A-Za-z0-9_-]{15,}$/.test(u.searchParams.get('id')||'');}
+        catch(e){return false;}
+      }).slice(0,3):[];
+      if(validPhotos.length){
+        var images=document.createElement('div');images.className='eco-orbit-photo-strip';
+        validPhotos.forEach(function(url){
+          var pic=document.createElement('img');pic.src=url;pic.loading='lazy';
+          pic.alt=kz()?'Расталған іс-шара фотосуреті':'Фото опубликованного мероприятия';
+          images.appendChild(pic);
+        });
+        entry.appendChild(images);
+      }
+      eventList.appendChild(entry);
+    });
+    publishedBox.appendChild(eventList);
+  }
+  evidence.appendChild(publishedBox);
   detailBox.insertBefore(evidence,join);
  }
  function openDetail(card){
@@ -276,6 +326,7 @@
   },{rootMargin:'180px 0px 180px 0px'});
   watcher.observe(stage);
  }else{stage.classList.add('eco-orbit-inview')}
+ window.addEventListener('eco:published-events',function(){if(selectedCard&&dialog&&dialog.open)detail(selectedCard)});
  window.addEventListener('scroll',requestUpdate,{passive:true});
  window.addEventListener('resize',requestUpdate,{passive:true});
  // Never hide the originals until listeners and the first active state exist.
