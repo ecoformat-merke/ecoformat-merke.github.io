@@ -226,6 +226,21 @@
 .eco-premium-sparkles i:nth-child(4){bottom:25%;right:10%;animation-delay:-1.9s}
 @keyframes eco-premium-twinkle{50%{transform:scale(1.6);opacity:.62}}
 #projects.eco-globe-projects .eco-orbit-rail{right:-22px;gap:17px}
+#projects.eco-globe-projects .eco-orbit-rail-arrow{
+ width:38px;height:38px;min-width:38px;border-radius:50%;
+ border:1px solid #cce6b9;background:rgba(249,255,240,.92);
+ color:#2d824d;box-shadow:0 5px 16px rgba(56,110,67,.12);
+ font-family:inherit;font-size:24px;line-height:1;cursor:pointer;
+ display:grid;place-items:center;
+ transition:transform .2s,background .2s;
+}
+#projects.eco-globe-projects .eco-orbit-rail-arrow:hover,
+#projects.eco-globe-projects .eco-orbit-rail-arrow:focus-visible{
+ transform:scale(1.08);background:#ddf6cc;outline:2px solid #71b97e;outline-offset:2px
+}
+#projects.eco-globe-projects .eco-orbit-rail-arrow:disabled{
+ opacity:.42;cursor:default;transform:none;
+}
 #projects.eco-globe-projects .eco-orbit-dot{
   width:13px;height:13px;border:2px solid #528b5f;background:#f7fff0
 }
