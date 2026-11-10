@@ -1,0 +1,64 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() { return request.auth != null; }
+    function owner(uid) { return signedIn() && request.auth.uid == uid; }
+    function isAdmin() {
+      return signedIn()
+        && exists(/databases/$(database)/documents/profiles/$(request.auth.uid))
+        && get(/databases/$(database)/documents/profiles/$(request.auth.uid)).data.role == 'admin'
+        && get(/databases/$(database)/documents/profiles/$(request.auth.uid)).data.status == 'active';
+    }
+    function googleVerified() {
+      return signedIn()
+        && request.auth.token.firebase.sign_in_provider == 'google.com'
+        && request.auth.token.email_verified == true;
+    }
+    match /profiles/{uid} {
+      allow get: if owner(uid) || isAdmin();
+      allow list: if isAdmin();
+      allow create: if owner(uid) && googleVerified()
+        && request.resource.data.keys().hasOnly(['uid','displayName','email','requestedRole','requestedClass','role','status','createdAt'])
+        && request.resource.data.keys().hasAll(['uid','displayName','email','requestedRole','requestedClass','role','status','createdAt'])
+        && request.resource.data.uid == uid
+        && request.resource.data.email == request.auth.token.email
+        && request.resource.data.displayName is string
+        && request.resource.data.displayName.size() <= 120
+        && request.resource.data.requestedRole in ['student','teacher']
+        && request.resource.data.requestedClass is string
+        && request.resource.data.requestedClass.size() <= 20
+        && request.resource.data.role == 'visitor'
+        && request.resource.data.status == 'pending'
+        && request.resource.data.createdAt == request.time;
+
+      allow update: if isAdmin() && request.auth.uid != uid
+        && resource.data.role != 'admin'
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['role','status'])
+        && (
+           (request.resource.data.status == 'active'
+             && (request.resource.data.role == resource.data.requestedRole
+                 || (request.resource.data.role == 'leader' && resource.data.requestedRole == 'teacher')))
+           || (request.resource.data.status in ['pending','blocked']
+               && request.resource.data.role == 'visitor')
+        );
+      allow delete: if false;
+    }
+    match /roleAudit/{auditId} {
+      allow get, list: if isAdmin();
+      allow create: if isAdmin()
+        && request.resource.data.keys().hasOnly(['actorUid','targetUid','action','oldRole','newRole','oldStatus','newStatus','at'])
+        && request.resource.data.keys().hasAll(['actorUid','targetUid','action','oldRole','newRole','oldStatus','newStatus','at'])
+        && request.resource.data.actorUid == request.auth.uid
+        && request.resource.data.targetUid is string
+        && request.resource.data.targetUid != request.auth.uid
+        && request.resource.data.action in ['approve','block','pending']
+        && request.resource.data.oldRole is string
+        && request.resource.data.newRole in ['visitor','student','teacher','leader']
+        && request.resource.data.oldStatus is string
+        && request.resource.data.newStatus in ['active','blocked','pending']
+        && request.resource.data.at == request.time;
+      allow update, delete: if false;
+    }
+    match /{document=**} { allow read, write: if false; }
+  }
+}
