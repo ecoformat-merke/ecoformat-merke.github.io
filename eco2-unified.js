@@ -75,19 +75,27 @@ function paint(){
  if(!siteCopy){content.hidden=true;return}
  const k=lang()==='kk'?'Kz':'Ru';const title=String(siteCopy['title'+k]||''),body=String(siteCopy['body'+k]||'');
  content.hidden=!title&&!body;$('eco2-copy-title').textContent=title;$('eco2-copy-body').textContent=body;
+ const hero=document.querySelector('#home .ln-hero-copy p[data-ru]'),news=document.querySelector('#news h2.title');
+ const apply=(el,ru,kz)=>{if(!el)return; if(ru)el.setAttribute('data-ru',ru);if(kz)el.setAttribute('data-kz',kz);el.textContent=el.getAttribute('data-'+(lang()==='kk'?'kz':'ru'))||''};
+ apply(hero,siteCopy.heroDescRu,siteCopy.heroDescKz);apply(news,siteCopy.newsTitleRu,siteCopy.newsTitleKz);
 }
 function watchCopy(){contentUnsubscribe=onSnapshot(doc(db,'siteContent','home'),snap=>{siteCopy=snap.exists()?snap.data():null;paint()},err=>{console.warn('Eco Club site text:',err.code)})}
 $('eco2-edit').onclick=()=>{
  if(profile?.role!=='admin'||profile.status!=='active')return;
  const f=$('eco2-editpanel');f.hidden=false;
  for(const key of ['titleRu','titleKz','bodyRu','bodyKz'])$('eco2-'+key).value=siteCopy?.[key]||'';
+ const hero=document.querySelector('#home .ln-hero-copy p[data-ru]'),news=document.querySelector('#news h2.title');
+ for(const key of ['heroDescRu','heroDescKz','newsTitleRu','newsTitleKz']){
+ const el=key.startsWith('hero')?hero:news,lc=key.endsWith('Ru')?'ru':'kz';
+ $('eco2-'+key).value=siteCopy?.[key]||el?.getAttribute('data-'+lc)||'';
+ }
 };
 $('eco2-edit-cancel').onclick=()=>{$('eco2-editpanel').hidden=true};
 $('eco2-editform').onsubmit=async e=>{
  e.preventDefault();if(!user||profile?.role!=='admin'||profile?.status!=='active')return;
  $('eco2-edit-save').disabled=true;
  try{
- const value={titleRu:$('eco2-titleRu').value.trim(),titleKz:$('eco2-titleKz').value.trim(),bodyRu:$('eco2-bodyRu').value.trim(),bodyKz:$('eco2-bodyKz').value.trim(),updatedAt:serverTimestamp(),updatedBy:user.uid};
+ const value={titleRu:$('eco2-titleRu').value.trim(),titleKz:$('eco2-titleKz').value.trim(),bodyRu:$('eco2-bodyRu').value.trim(),bodyKz:$('eco2-bodyKz').value.trim(),heroDescRu:$('eco2-heroDescRu').value.trim(),heroDescKz:$('eco2-heroDescKz').value.trim(),newsTitleRu:$('eco2-newsTitleRu').value.trim(),newsTitleKz:$('eco2-newsTitleKz').value.trim(),updatedAt:serverTimestamp(),updatedBy:user.uid};
  await setDoc(doc(db,'siteContent','home'),value);
  $('eco2-editpanel').hidden=true;
  }catch(err){alert('Не удалось сохранить: '+(err?.message||err))}finally{$('eco2-edit-save').disabled=false}
