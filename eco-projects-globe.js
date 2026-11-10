@@ -204,7 +204,7 @@
   // Broad education/activity categories cannot prove project attribution.
   var published=Array.isArray(window.ecoPublishedEvents)?window.ecoPublishedEvents:[];
   var assigned=published.filter(function(event){
-    if(!event||!/^EV-[A-Za-z0-9-]+$/.test(String(event.id||'')))return false;
+    if(!event||!/^EV2?-[A-Za-z0-9-]+$/.test(String(event.id||'')))return false;
     var relation=event.projectId!=null?event.projectId:
                  event.projectKey!=null?event.projectKey:event.project;
     return String(relation==null?'':relation).trim()===String(idx+1);
