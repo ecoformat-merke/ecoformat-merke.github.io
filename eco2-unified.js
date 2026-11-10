@@ -25,6 +25,8 @@ function roleMenu(){
  $('eco2-admin-link').hidden=profile.role!=='admin';
  $('eco2-edit').hidden=profile.role!=='admin';
  $('eco2-logout').hidden=false;
+ const shortcut=document.querySelector('.ln-actions a[href="login.html"]');
+ if(shortcut){shortcut.textContent=say('Открыть кабинет','Жеке кабинетті ашу');shortcut.setAttribute('data-ru','Открыть кабинет');shortcut.setAttribute('data-kz','Жеке кабинетті ашу')}
  setMenuOpen(window.matchMedia('(min-width: 801px)').matches);
 }
 function openPage(page){
@@ -74,7 +76,7 @@ async function load(){
  }catch(err){status('Ошибка профиля: '+(err?.message||err),true);showGate(true);showView('eco2-signedout')}
  finally{roleLoading=false}
 }
-onAuthStateChanged(auth,u=>{user=u;profile=null;if(contentUnsubscribe){contentUnsubscribe();contentUnsubscribe=null}if(u)load();else{showGate(true);showView('eco2-signedout');closePage()}},err=>{showGate(true);showView('eco2-signedout');status(err.message,true)});
+onAuthStateChanged(auth,u=>{user=u;profile=null;if(!u){const shortcut=document.querySelector('.ln-actions a[href="login.html"]');if(shortcut){shortcut.textContent=say('Войти / Регистрация','Кіру / Тіркелу');shortcut.setAttribute('data-ru','Войти / Регистрация');shortcut.setAttribute('data-kz','Кіру / Тіркелу')}}if(contentUnsubscribe){contentUnsubscribe();contentUnsubscribe=null}if(u)load();else{showGate(true);showView('eco2-signedout');closePage()}},err=>{showGate(true);showView('eco2-signedout');status(err.message,true)});
 function paint(){
  if(!siteCopy){content.hidden=true;return}
  const k=lang()==='kk'?'Kz':'Ru';const title=String(siteCopy['title'+k]||''),body=String(siteCopy['body'+k]||'');
