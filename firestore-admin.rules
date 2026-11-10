@@ -114,8 +114,8 @@ service cloud.firestore {
       allow get: if docId == 'home';
       allow list: if false;
       allow create, update: if docId == 'home' && isAdmin()
-        && request.resource.data.keys().hasOnly(['titleRu','titleKz','bodyRu','bodyKz','updatedAt','updatedBy'])
-        && request.resource.data.keys().hasAll(['titleRu','titleKz','bodyRu','bodyKz','updatedAt','updatedBy'])
+        && request.resource.data.keys().hasOnly(['titleRu','titleKz','bodyRu','bodyKz','heroDescRu','heroDescKz','newsTitleRu','newsTitleKz','updatedAt','updatedBy'])
+        && request.resource.data.keys().hasAll(['titleRu','titleKz','bodyRu','bodyKz','heroDescRu','heroDescKz','newsTitleRu','newsTitleKz','updatedAt','updatedBy'])
         && request.resource.data.titleRu is string
         && request.resource.data.titleRu.size() <= 110
         && request.resource.data.titleKz is string
@@ -124,6 +124,14 @@ service cloud.firestore {
         && request.resource.data.bodyRu.size() <= 1200
         && request.resource.data.bodyKz is string
         && request.resource.data.bodyKz.size() <= 1200
+        && request.resource.data.heroDescRu is string
+        && request.resource.data.heroDescRu.size() <= 420
+        && request.resource.data.heroDescKz is string
+        && request.resource.data.heroDescKz.size() <= 420
+        && request.resource.data.newsTitleRu is string
+        && request.resource.data.newsTitleRu.size() <= 120
+        && request.resource.data.newsTitleKz is string
+        && request.resource.data.newsTitleKz.size() <= 120
         && request.resource.data.updatedBy == request.auth.uid
         && request.resource.data.updatedAt == request.time;
       allow delete: if false;
