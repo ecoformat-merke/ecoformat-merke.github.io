@@ -1,0 +1,26 @@
+
+#eco2-login[hidden],#eco2-menu[hidden],#eco2-drawer[hidden],#eco2-editpanel[hidden],#eco2-copy[hidden],#eco2-loading[hidden],#eco2-signedout[hidden],#eco2-register[hidden],#eco2-wait[hidden],#eco2-classrow[hidden],#eco2-teacher-link[hidden],#eco2-student-link[hidden],#eco2-admin-link[hidden],#eco2-edit[hidden],#eco2-logout[hidden]{display:none!important}
+body.eco2-gated{overflow:hidden}
+#eco2-login{position:fixed;inset:0;z-index:99999;overflow:auto;background:radial-gradient(circle at 80% 20%,#d6eeda,#f3faf4 53%);display:grid;place-items:center;padding:25px}
+.eco2-auth-card{background:#fff;box-shadow:0 26px 85px #153c3021;border:1px solid #dbeade;padding:32px;border-radius:24px;width:min(100%,480px);font-family:Inter,Segoe UI,Arial,sans-serif;color:#113d2c}
+.eco2-auth-card h2{font-size:clamp(25px,4vw,34px);margin:12px 0}.eco2-auth-card p{color:#5e786a;margin:12px 0}.eco2-auth-card button,.eco2-auth-card select,.eco2-auth-card input{font:inherit;padding:12px;border-radius:11px}.eco2-auth-card input:not([type=checkbox]),.eco2-auth-card select{display:block;width:100%;border:1px solid #c8dbcf;margin:6px 0 15px}.eco2-auth-card label{font-size:13px;display:block;font-weight:700}.eco2-auth-card button{border:0;background:#0e6544;color:#fff;font-weight:800;cursor:pointer}.eco2-auth-card button:disabled{opacity:.6}
+.eco2-auth-card .eco2-light{background:#e8f4ec;color:#155e42}
+.eco2-auth-card .eco2-action{width:100%;margin-top:12px}
+#eco2-menu{position:fixed;right:20px;bottom:20px;z-index:1100;background:#fff;border:1px solid #cce2d1;box-shadow:0 12px 45px #092e213b;border-radius:17px;padding:13px;display:flex;flex-direction:column;gap:7px;min-width:220px;max-width:calc(100vw - 40px);font-family:Inter,Segoe UI,Arial,sans-serif}
+#eco2-menu button{border:0;background:#eaf4ee;color:#0e5a3e;border-radius:9px;padding:10px;text-align:left;font:700 13px Inter,Segoe UI,Arial,sans-serif;cursor:pointer}
+#eco2-menu #eco2-who{font-size:12px;color:#406d55;font-weight:800;padding:4px 6px;overflow-wrap:anywhere}
+#eco2-drawer{position:fixed;inset:0;background:#0b2d20b8;z-index:100005;display:flex;justify-content:center;align-items:center;padding:12px}
+.eco2-drawer-box{width:min(1100px,100%);height:min(92vh,950px);background:white;border-radius:20px;display:flex;flex-direction:column;overflow:hidden}
+.eco2-drawer-head{padding:11px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #daeadf;font:800 15px Inter,Arial,sans-serif}
+.eco2-drawer-head button{padding:7px 12px;border:0;border-radius:9px;background:#e6f3e9;color:#0d5a3b;font-weight:800;cursor:pointer}
+#eco2-frame{border:0;flex:1;width:100%;background:#f0f8f1}
+body.eco2-modal-open{overflow:hidden}
+#eco2-copy{border:1px solid #d3e8d8;background:#f3fbf4;border-radius:18px;padding:24px;margin:32px auto;max-width:1150px;color:#17452e}
+#eco2-copy-title{font-size:clamp(21px,3vw,31px);font-weight:900;margin:0 0 10px}#eco2-copy-body{font-size:16px;white-space:pre-wrap}
+#eco2-editpanel{position:fixed;z-index:100007;inset:0;display:grid;place-items:center;background:#0b2d20b8;padding:16px;overflow:auto}
+#eco2-editform{width:min(580px,100%);background:#fff;border-radius:20px;padding:25px;display:grid;grid-template-columns:1fr 1fr;gap:13px;color:#16432e;box-shadow:0 20px 65px #0b241b38}
+#eco2-editform h2,#eco2-editform .wide{grid-column:1/-1}#eco2-editform label{font-size:13px;font-weight:800}
+#eco2-editform input,#eco2-editform textarea{display:block;margin-top:6px;padding:10px;width:100%;border:1px solid #bcd8c5;border-radius:9px;font:inherit}
+#eco2-editform textarea{min-height:95px}#eco2-editform button{border:0;background:#136d49;color:white;border-radius:10px;padding:12px;cursor:pointer;font-weight:800}
+#eco2-editform button.secondary{background:#e8f4eb;color:#175c3f}
+@media(max-width:600px){#eco2-menu{bottom:8px;right:8px;left:8px;max-width:none;min-width:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}#eco2-who{grid-column:1/-1}#eco2-editform{grid-template-columns:1fr}#eco2-editform h2,#eco2-editform .wide{grid-column:1}#eco2-login{padding:12px}.eco2-auth-card{padding:23px}}
