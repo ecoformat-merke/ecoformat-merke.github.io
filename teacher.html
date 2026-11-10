@@ -30,7 +30,7 @@ const config={apiKey:'AIzaSyCo05dvjXihGbfYhU_FHQ4OXg6SO_oRCU0',authDomain:'eco-c
 const app=initializeApp(config),auth=getAuth(app),db=getFirestore(app),$=id=>document.getElementById(id);
 let me=null,editing=null,items=[];
 // Replace this value ONLY after deploying the new standalone Eco Club 2.0 Bridge.
-const BRIDGE_URL='';
+const BRIDGE_URL='https://script.google.com/macros/s/AKfycbwaTybrSW8JlfklG9ib5261YMLB9LdWxKqt4vDCwguVj6tyOinzMy0pDWxsi4HeKGD2/exec';
 if(/^https:\/\/script\.google\.com\/macros\/s\/[\w-]+\/exec$/.test(BRIDGE_URL)){$('submitBridge').disabled=false;$('bridgeStatus').textContent='Защищённый шлюз настроен. Результат отправки откроется в новой вкладке.'}
 const fields=['nameRu','nameKz','descRu','descKz','projectId','category','className','eventDate','instagram'];
 function tell(message,isError=false){$('message').textContent=message;$('message').className='msg'+(isError?' error':'');}
