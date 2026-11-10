@@ -110,6 +110,24 @@ service cloud.firestore {
         ]);
       allow delete: if canDraft();
     }
+    match /siteContent/{docId} {
+      allow get: if docId == 'home';
+      allow list: if false;
+      allow create, update: if docId == 'home' && isAdmin()
+        && request.resource.data.keys().hasOnly(['titleRu','titleKz','bodyRu','bodyKz','updatedAt','updatedBy'])
+        && request.resource.data.keys().hasAll(['titleRu','titleKz','bodyRu','bodyKz','updatedAt','updatedBy'])
+        && request.resource.data.titleRu is string
+        && request.resource.data.titleRu.size() <= 110
+        && request.resource.data.titleKz is string
+        && request.resource.data.titleKz.size() <= 110
+        && request.resource.data.bodyRu is string
+        && request.resource.data.bodyRu.size() <= 1200
+        && request.resource.data.bodyKz is string
+        && request.resource.data.bodyKz.size() <= 1200
+        && request.resource.data.updatedBy == request.auth.uid
+        && request.resource.data.updatedAt == request.time;
+      allow delete: if false;
+    }
     match /roleAudit/{auditId} {
       allow get, list: if isAdmin();
       allow create: if isAdmin()
