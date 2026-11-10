@@ -10,9 +10,12 @@ const login=$('eco2-login'),menu=$('eco2-menu'),drawer=$('eco2-drawer'),frame=$(
 function lang(){return document.documentElement.lang==='kk'?'kk':'ru'}
 function say(ru,kz){return lang()==='kk'?kz:ru}
 function status(message,bad=false){$('eco2-message').textContent=message;$('eco2-message').style.color=bad?'#a32625':'#275c43'}
-function showGate(show){login.hidden=!show;document.body.classList.toggle('eco2-gated',show);$('eco2-menu').hidden=show}
+function showGate(show){login.hidden=!show;document.body.classList.toggle('eco2-gated',show);$('eco2-menu').hidden=show;if(show){$('eco2-menu-toggle').hidden=true;setMenuOpen(false)}else{$('eco2-menu-toggle').hidden=false}}
 function showView(name){for(const x of ['eco2-loading','eco2-signedout','eco2-register','eco2-wait'])$(x).hidden=x!==name}
 function safeDisplay(){const r=profile?.status==='active'?profile.role:'visitor';return ({admin:['Администратор','Әкімші'],leader:['Руководитель','Жетекші'],teacher:['Учитель','Мұғалім'],student:['Ученик','Оқушы'],visitor:['Заявка','Өтінім']})[r]?.[lang()==='kk'?1:0]||r}
+let menuExpanded=window.matchMedia('(min-width: 801px)').matches;
+function setMenuOpen(value){menuExpanded=Boolean(value);menu.hidden=!menuExpanded;$('eco2-menu-toggle').setAttribute('aria-expanded',String(menuExpanded));$('eco2-menu-toggle').textContent=menuExpanded?'× Закрыть меню':'☘ Кабинет'}
+$('eco2-menu-toggle').onclick=()=>setMenuOpen(!menuExpanded);
 function roleMenu(){
  const active=profile?.status==='active';showGate(!active);
  if(!active)return;
@@ -22,6 +25,7 @@ function roleMenu(){
  $('eco2-admin-link').hidden=profile.role!=='admin';
  $('eco2-edit').hidden=profile.role!=='admin';
  $('eco2-logout').hidden=false;
+ setMenuOpen(window.matchMedia('(min-width: 801px)').matches);
 }
 function openPage(page){
  const allowed=['dashboard.html','teacher.html','student.html','admin-users.html'];
@@ -30,7 +34,7 @@ function openPage(page){
  if(page==='teacher.html'&&!['teacher','leader','admin'].includes(profile.role))return;
  if(page==='student.html'&&profile.role!=='student')return;
  if(page==='admin-users.html'&&profile.role!=='admin')return;
- frame.src=page;drawer.hidden=false;document.body.classList.add('eco2-modal-open');$('eco2-close').focus();
+ setMenuOpen(false); frame.src=page;drawer.hidden=false;document.body.classList.add('eco2-modal-open');$('eco2-close').focus();
 }
 function closePage(){drawer.hidden=true;frame.src='about:blank';document.body.classList.remove('eco2-modal-open')}
 document.querySelectorAll('[data-eco2-page]').forEach(n=>n.addEventListener('click',e=>{e.preventDefault();openPage(n.dataset.eco2Page)}));
