@@ -3307,6 +3307,7 @@ load();
   <button id="eco2-student-link" type="button" hidden data-eco2-page="student.html">Кабинет ученика</button>
   <button id="eco2-admin-link" type="button" hidden data-eco2-page="admin-users.html">Пользователи и роли</button>
   <button id="eco2-edit" type="button" hidden>✎ Редактировать сайт</button>
+  <button id="eco2-edit-sections" type="button" hidden>✎ Редактировать разделы</button>
   <button id="eco2-logout" type="button">Выйти</button>
 </aside>
 <div id="eco2-drawer" hidden role="dialog" aria-modal="true" aria-label="Личный раздел Eco Club">
@@ -3314,6 +3315,27 @@ load();
   <iframe id="eco2-frame" title="Кабинет Eco Club 2.0" src="about:blank"></iframe></div>
 </div>
 
+<div id="eco2-section-editor" hidden role="dialog" aria-modal="true" aria-label="Редактор разделов Eco Club">
+  <form id="eco2-section-form">
+    <h2>Редактирование разделов Eco Club</h2>
+    <p class="wide" style="font-size:13px;color:#577263">Меняйте заголовок и описание на двух языках. Карточки, фотографии и статистика управляются отдельно.</p>
+    <label class="wide">Раздел сайта
+      <select id="eco2-section-id" required>
+        <option value="about">О нас</option><option value="tasks">Практические задачи</option>
+        <option value="results">Результаты</option><option value="projects">Проекты</option>
+        <option value="gallery">Фотогалерея</option><option value="team">Команда</option>
+        <option value="members">Участники</option><option value="application">Вступить</option>
+      </select>
+    </label>
+    <label>Заголовок RU<input id="eco2-section-titleRu" maxlength="140" required></label>
+    <label>Тақырып KZ<input id="eco2-section-titleKz" maxlength="140" required></label>
+    <label class="wide">Описание RU<textarea id="eco2-section-descRu" maxlength="900" required></textarea></label>
+    <label class="wide">Сипаттама KZ<textarea id="eco2-section-descKz" maxlength="900" required></textarea></label>
+    <p class="wide" id="eco2-section-status" role="status"></p>
+    <button id="eco2-section-cancel" type="button" class="secondary">Отмена</button>
+    <button id="eco2-section-save" type="submit">Сохранить раздел</button>
+  </form>
+</div>
 <div id="eco2-editpanel" hidden role="dialog" aria-modal="true" aria-label="Редактирование контента Eco Club">
  <form id="eco2-editform"><h2>Редактировать объявление на сайте</h2>
   <label>Заголовок RU<input id="eco2-titleRu" maxlength="110"></label><label>Тақырып KZ<input id="eco2-titleKz" maxlength="110"></label>
