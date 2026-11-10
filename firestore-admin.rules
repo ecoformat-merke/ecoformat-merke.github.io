@@ -56,6 +56,83 @@ service cloud.firestore {
         && request.resource.data.role == 'admin'
         && request.resource.data.status == 'active';
       allow delete: if false;
+      match /teacherDrafts/{draftId} {
+        function activeTeacher() {
+          return owner(uid)
+            && get(/databases/$(database)/documents/profiles/$(uid)).data.status == 'active'
+            && get(/databases/$(database)/documents/profiles/$(uid)).data.role in ['teacher','leader','admin'];
+        }
+        function validDraft() {
+          return request.resource.data.keys().hasOnly([
+            'ownerUid','status','createdAt','updatedAt',
+            'nameRu','nameKz','descRu','descKz','projectId',
+            'category','className','eventDate','instagram'
+          ])
+          && request.resource.data.keys().hasAll([
+            'ownerUid','status','createdAt','updatedAt',
+            'nameRu','nameKz','descRu','descKz','projectId',
+            'category','className','eventDate','instagram'
+          ])
+          && request.resource.data.ownerUid == uid
+          && request.resource.data.status == 'draft'
+          && request.resource.data.nameRu is string
+          && request.resource.data.nameRu.size() > 0
+          && request.resource.data.nameRu.size() <= 160
+          && request.resource.data.nameKz is string
+          && request.resource.data.nameKz.size() > 0
+          && request.resource.data.nameKz.size() <= 160
+          && request.resource.data.descRu is string
+          && request.resource.data.descRu.size() > 0
+          && request.resource.data.descRu.size() <= 1800
+          && request.resource.data.descKz is string
+          && request.resource.data.descKz.size() > 0
+          && request.resource.data.descKz.size() <= 1800
+          && request.resource.data.projectId in ['1','2','3','4','5','6']
+          && request.resource.data.category in ['education','upbringing','activity']
+          && request.resource.data.className is string
+          && request.resource.data.className.size() > 0
+          && request.resource.data.className.size() <= 80
+          && request.resource.data.eventDate is string
+          && request.resource.data.eventDate.matches('^\\d{4}-\\d{2}-\\d{2}/{auditId} {
+      allow get, list: if isAdmin();
+      allow create: if isAdmin()
+        && request.resource.data.keys().hasOnly(['actorUid','targetUid','action','oldRole','newRole','oldStatus','newStatus','at'])
+        && request.resource.data.keys().hasAll(['actorUid','targetUid','action','oldRole','newRole','oldStatus','newStatus','at'])
+        && request.resource.data.actorUid == request.auth.uid
+        && request.resource.data.targetUid is string
+        && request.resource.data.targetUid != request.auth.uid
+        && (
+          (request.resource.data.action in ['approve','block','pending']
+           && request.resource.data.newRole in ['visitor','student','teacher','leader']
+           && request.resource.data.newStatus in ['active','blocked','pending'])
+          ||
+          (request.resource.data.action == 'promote-admin'
+           && isOwnerAdmin()
+           && request.resource.data.newRole == 'admin'
+           && request.resource.data.newStatus == 'active')
+        )
+        && request.resource.data.oldRole is string
+        && request.resource.data.oldStatus is string
+        && request.resource.data.at == request.time;
+      allow update, delete: if false;
+    }
+    match /{document=**} { allow read, write: if false; }
+  }
+})
+          && request.resource.data.instagram is string
+          && request.resource.data.instagram.size() <= 400
+          && request.resource.data.updatedAt == request.time;
+        }
+        allow get, list: if activeTeacher();
+        allow create: if activeTeacher() && validDraft()
+          && request.resource.data.createdAt == request.time;
+        allow update: if activeTeacher() && validDraft()
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+            'updatedAt','nameRu','nameKz','descRu','descKz',
+            'projectId','category','className','eventDate','instagram'
+          ]);
+        allow delete: if activeTeacher();
+      }
     }
     match /roleAudit/{auditId} {
       allow get, list: if isAdmin();
