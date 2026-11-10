@@ -1,0 +1,74 @@
+<!DOCTYPE html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Eco Club 2.0 — Управление пользователями</title>
+<style>
+*{box-sizing:border-box}body{font-family:Inter,Segoe UI,Arial,sans-serif;margin:0;background:#f1f7f2;color:#153c2c}
+header{background:#fff;border-bottom:1px solid #d7e7dc;padding:20px max(20px,calc((100vw - 1150px)/2));display:flex;justify-content:space-between;gap:14px;align-items:center;flex-wrap:wrap}
+a{color:#155b40;text-decoration:none;font-weight:750}.container{max-width:1190px;margin:30px auto;padding:0 20px}
+h1{font-size:clamp(28px,4vw,42px);margin:6px 0}p{line-height:1.6}.hint{color:#637d6b;font-size:13px}
+.panel{background:#fff;border:1px solid #d8e8db;border-radius:18px;padding:23px;margin:22px 0;box-shadow:0 14px 40px #14462610}
+.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:13px;margin:20px 0}.metric{background:#e9f4eb;border-radius:13px;padding:18px}.metric strong{display:block;font-size:32px}
+button{cursor:pointer;font:inherit;border:0;border-radius:10px;padding:10px 14px;background:#e9f2ec;color:#15563b;font-weight:750}
+button.main{background:#146442;color:#fff}button.danger{background:#fff0ed;color:#9a3425}button:disabled{opacity:.5;cursor:not-allowed}
+input,select{font:inherit;border:1px solid #ccdace;border-radius:9px;padding:10px;background:white;max-width:100%}
+.controls{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:15px 0}
+table{border-collapse:collapse;width:100%;font-size:13px}th,td{padding:13px 10px;border-bottom:1px solid #e3eee5;text-align:left;vertical-align:top}
+td small{display:block;color:#769081;overflow-wrap:anywhere}th{font-size:12px;color:#557364}
+.tag{display:inline-block;border-radius:30px;padding:5px 10px;background:#edf5ef;white-space:nowrap}
+.line-actions{display:flex;flex-wrap:wrap;gap:6px;align-items:center}.line-actions select{max-width:150px}
+.scroll{overflow-x:auto}.hidden{display:none!important}.error{padding:13px;border-radius:10px;background:#fff0ee;color:#a02727;overflow-wrap:anywhere}
+.actions{display:flex;gap:10px;align-items:center}#loading{color:#587667}
+@media(max-width:700px){.metrics{grid-template-columns:1fr 1fr 1fr}.metric strong{font-size:23px}.panel{padding:15px}header{padding:14px 18px}}
+</style></head><body>
+<header><a href="./">🌿 Eco Club</a><div class="actions"><a href="login.html">Личный кабинет</a><button id="logout" class="hidden">Выйти</button></div></header>
+<main class="container">
+<h1>Управление пользователями</h1><p class="hint">Eco Club 2.0 · Регистрация, подтверждение и роли · Администраторы не могут назначать других администраторов через эту страницу.</p>
+<div id="loading" class="panel">Проверяем Google-аккаунт и права доступа…</div>
+<div id="error" class="error hidden" role="alert"></div>
+<div id="restricted" class="panel hidden"><h2>Нет доступа</h2><p>Раздел доступен только активному администратору Eco Club. Проверьте, каким Google-аккаунтом выполнен вход.</p><a href="login.html">Перейти ко входу</a></div>
+<div id="main" class="hidden">
+<div class="metrics"><div class="metric">Всего<strong id="total">—</strong></div><div class="metric">Ожидают<strong id="pending">—</strong></div><div class="metric">Активны<strong id="active">—</strong></div></div>
+<section class="panel"><h2>Заявки и пользователи</h2><div class="controls"><input id="search" type="search" placeholder="Поиск по имени, email, классу" aria-label="Поиск"><select id="filter"><option value="all">Все</option><option value="pending">Ожидают</option><option value="active">Активные</option><option value="blocked">Заблокированные</option></select><button id="reload">Обновить</button></div>
+<p class="hint">Для обычных заявок разрешается роль «Ученик» или «Учитель». Роль «Руководитель» доступна только для проверенного педагогического аккаунта. Действия записываются в журнал, но в этом этапе журнал не является неизменяемым серверным аудитом.</p>
+<div class="scroll"><table><thead><tr><th>Пользователь</th><th>Заявка</th><th>Роль / статус</th><th>Действия</th></tr></thead><tbody id="users"></tbody></table></div>
+</section><section class="panel"><h2>История решений</h2><p class="hint">Последние 50 записей Firestore. История создаётся клиентским приложением при подтверждении или блокировке.</p><div class="scroll"><table><thead><tr><th>Время</th><th>Действие</th><th>Новая роль</th><th>UID пользователя</th></tr></thead><tbody id="audit"></tbody></table></div></section>
+</div></main>
+<script type="module">
+import{initializeApp}from'https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js';
+import{getAuth,onAuthStateChanged,signOut}from'https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js';
+import{getFirestore,doc,getDoc,collection,getDocs,query,orderBy,limit,writeBatch,serverTimestamp}from'https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js';
+const cfg={apiKey:'AIzaSyCo05dvjXihGbfYhU_FHQ4OXg6SO_oRCU0',authDomain:'eco-club-40261.firebaseapp.com',projectId:'eco-club-40261',appId:'1:289680452873:web:c4fe4d451f1a488b9d37d8'};
+const app=initializeApp(cfg),auth=getAuth(app),db=getFirestore(app),$=id=>document.getElementById(id);
+let me=null,users=[];
+function showError(e){$('error').textContent=String(e?.message||e);$('error').classList.remove('hidden')}
+function clearError(){$('error').classList.add('hidden')}
+function el(tag,text,cls){const node=document.createElement(tag);if(text!==undefined)node.textContent=String(text);if(cls)node.className=cls;return node}
+function date(v){return v?.toDate?.().toLocaleString('ru-RU')||'—'}
+function roleLabel(v){return({visitor:'Заявка',student:'Ученик',teacher:'Учитель',leader:'Руководитель',admin:'Администратор'})[v]||v||'—'}
+function stateLabel(v){return({pending:'Ожидает',active:'Активен',blocked:'Заблокирован'})[v]||v||'—'}
+async function init(user){me=user;clearError();$('logout').classList.toggle('hidden',!user);if(!user){$('loading').classList.add('hidden');$('restricted').classList.remove('hidden');return}
+try{const own=await getDoc(doc(db,'profiles',user.uid));if(!own.exists()||own.data().status!=='active'||own.data().role!=='admin'){ $('loading').classList.add('hidden');$('restricted').classList.remove('hidden');return}
+$('restricted').classList.add('hidden');$('loading').classList.add('hidden');$('main').classList.remove('hidden');await reload();
+}catch(e){$('loading').classList.add('hidden');$('restricted').classList.remove('hidden');showError(e)}}
+async function reload(){clearError();$('reload').disabled=true;try{
+const [u,a]=await Promise.all([getDocs(collection(db,'profiles')),getDocs(query(collection(db,'roleAudit'),orderBy('at','desc'),limit(50)))]);
+users=u.docs.map(d=>({...d.data(),id:d.id}));$('total').textContent=users.length;$('pending').textContent=users.filter(x=>x.status==='pending').length;$('active').textContent=users.filter(x=>x.status==='active').length;renderUsers();
+const target=$('audit');target.replaceChildren();if(a.empty){target.append(el('tr','История пока пуста'));return}
+a.forEach(d=>{const r=d.data(),tr=el('tr');[date(r.at),r.action||'',roleLabel(r.newRole),r.targetUid||''].forEach(v=>tr.append(el('td',v)));target.append(tr)});
+}catch(e){showError(e)}finally{$('reload').disabled=false}}
+function renderUsers(){const tbody=$('users');tbody.replaceChildren();const needle=$('search').value.toLocaleLowerCase('ru'),filter=$('filter').value;const filtered=users.filter(p=>(filter==='all'||p.status===filter)&&[p.displayName,p.email,p.requestedClass,p.id].some(s=>String(s||'').toLocaleLowerCase('ru').includes(needle))).sort((a,b)=>(a.status==='pending'?0:1)-(b.status==='pending'?0:1));
+if(!filtered.length){const tr=el('tr');const td=el('td','Нет пользователей');td.colSpan=4;tr.append(td);tbody.append(tr);return}
+for(const p of filtered){const tr=el('tr'),identity=el('td');identity.append(el('strong',p.displayName||'Без имени'),el('small',p.email||''));const request=el('td');request.append(el('strong',roleLabel(p.requestedRole)),el('small',p.requestedClass||'—'));const status=el('td');status.append(el('span',roleLabel(p.role)+' · '+stateLabel(p.status),'tag'));const actions=el('td','');const actionsRow=el('div',undefined,'line-actions');
+if(p.id===me.uid||p.role==='admin'){actionsRow.append(el('small',p.id===me.uid?'Ваш аккаунт':'Защищённая роль'));}else{
+const select=el('select');const options=[['student','Ученик'],['teacher','Учитель']];if(p.requestedRole==='teacher')options.push(['leader','Руководитель']);for(const [value,label]of options){const option=el('option',label);option.value=value;if(p.role===value||(p.role==='visitor'&&value===p.requestedRole))option.selected=true;select.append(option)}
+const approve=el('button','Подтвердить','main');approve.onclick=()=>change(p,'approve',select.value);const block=el('button','Блокировать','danger');block.onclick=()=>change(p,'block','visitor');actionsRow.append(select,approve,block);
+if(p.status==='blocked'){const reset=el('button','Вернуть на проверку');reset.onclick=()=>change(p,'pending','visitor');actionsRow.append(reset)}
+}
+actions.append(actionsRow);tr.append(identity,request,status,actions);tbody.append(tr)}}
+async function change(p,action,newRole){if(!me||p.id===me.uid||p.role==='admin')return;
+const newStatus=action==='approve'?'active':action==='block'?'blocked':'pending';
+if(!confirm('Изменить статус пользователя '+(p.displayName||p.id)+' на «'+stateLabel(newStatus)+'»?'))return;
+clearError();const prevRole=p.role,prevStatus=p.status;
+try{const batch=writeBatch(db);batch.update(doc(db,'profiles',p.id),{role:newRole,status:newStatus});batch.set(doc(collection(db,'roleAudit')),{actorUid:me.uid,targetUid:p.id,action,oldRole:prevRole,newRole,oldStatus:prevStatus,newStatus,at:serverTimestamp()});await batch.commit();await reload()}catch(e){showError(e)}}
+$('search').oninput=renderUsers;$('filter').onchange=renderUsers;$('reload').onclick=reload;$('logout').onclick=()=>signOut(auth).then(()=>location.href='login.html');
+onAuthStateChanged(auth,init,showError);
+</script></body></html>
