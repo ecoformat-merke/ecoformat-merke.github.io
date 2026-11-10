@@ -5,7 +5,7 @@ import {getFirestore,doc,getDoc,setDoc,serverTimestamp,onSnapshot} from 'https:/
 const app=initializeApp({apiKey:'AIzaSyCo05dvjXihGbfYhU_FHQ4OXg6SO_oRCU0',authDomain:'eco-club-40261.firebaseapp.com',projectId:'eco-club-40261',appId:'1:289680452873:web:c4fe4d451f1a488b9d37d8'});
 const auth=getAuth(app),db=getFirestore(app),$=id=>document.getElementById(id);
 let user=null,profile=null,siteCopy=null,contentUnsubscribe=null,roleLoading=false;
-const base='/eco-club-m.auezov/';
+const base='./';
 const login=$('eco2-login'),menu=$('eco2-menu'),drawer=$('eco2-drawer'),frame=$('eco2-frame'),content=$('eco2-copy');
 function lang(){return document.documentElement.lang==='kk'?'kk':'ru'}
 function say(ru,kz){return lang()==='kk'?kz:ru}
@@ -40,7 +40,7 @@ $('eco2-google').onclick=async()=>{status('');$('eco2-google').disabled=true;try
 $('eco2-exit').onclick=async()=>{closePage();await signOut(auth)};
 $('eco2-logout').onclick=()=>signOut(auth);
 $('eco2-role').onchange=()=>{$('eco2-classrow').hidden=$('eco2-role').value!=='student';$('eco2-class').required=$('eco2-role').value==='student'};
-$('eco2-registration').onsubmit=async e=>{
+$('eco2-registration-form').onsubmit=async e=>{
  e.preventDefault();if(!user)return;
  const role=$('eco2-role').value,cls=$('eco2-class').value.trim();
  if(role==='student'&&!cls)return status('Укажите класс',true);
