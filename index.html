@@ -3164,7 +3164,7 @@ function updateCounts(){
  cards.forEach(function(c,i){var num=c.querySelector('.life-event-number');if(num)num.textContent=String(i+1).padStart(2,'0');var badge=c.querySelector('.life-form-badge');if(badge)badge.textContent=String(i+1).padStart(2,'0')+' / '+count;});
  if(typeof window.ecoEventsApplyFilter==='function')window.ecoEventsApplyFilter();
 }
-function render(events){cached=events.filter(function(e){return e&&/^EV-[A-Za-z0-9-]+$/.test(String(e.id||''));});
+function render(events){cached=events.filter(function(e){return e&&/^EV2?-[A-Za-z0-9-]+$/.test(String(e.id||''));});
  grid.querySelectorAll('.eco-dynamic-event').forEach(function(n){n.remove();});
  var known=new Set(Array.from(grid.querySelectorAll('[data-eco-event-id]')).map(function(n){return n.dataset.ecoEventId;}));
  cached.forEach(function(item){if(!known.has(item.id)){grid.append(makeCard(item));known.add(item.id);}});
