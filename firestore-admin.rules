@@ -136,6 +136,30 @@ service cloud.firestore {
         && request.resource.data.updatedAt == request.time;
       allow delete: if false;
     }
+    // Administrator-managed section intros; data values are text, never executable HTML.
+    match /siteSections/{sectionId} {
+      allow get: if sectionId in ['about','tasks','results','projects','gallery','team','members','application'];
+      allow list: if false;
+      allow create, update: if sectionId in ['about','tasks','results','projects','gallery','team','members','application']
+        && isAdmin()
+        && request.resource.data.keys().hasOnly(['titleRu','titleKz','descRu','descKz','updatedAt','updatedBy'])
+        && request.resource.data.keys().hasAll(['titleRu','titleKz','descRu','descKz','updatedAt','updatedBy'])
+        && request.resource.data.titleRu is string
+        && request.resource.data.titleRu.size() > 0
+        && request.resource.data.titleRu.size() <= 140
+        && request.resource.data.titleKz is string
+        && request.resource.data.titleKz.size() > 0
+        && request.resource.data.titleKz.size() <= 140
+        && request.resource.data.descRu is string
+        && request.resource.data.descRu.size() > 0
+        && request.resource.data.descRu.size() <= 900
+        && request.resource.data.descKz is string
+        && request.resource.data.descKz.size() > 0
+        && request.resource.data.descKz.size() <= 900
+        && request.resource.data.updatedBy == request.auth.uid
+        && request.resource.data.updatedAt == request.time;
+      allow delete: if false;
+    }
     match /roleAudit/{auditId} {
       allow get, list: if isAdmin();
       allow create: if isAdmin()
