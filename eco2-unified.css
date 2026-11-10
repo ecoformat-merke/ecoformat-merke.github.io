@@ -24,3 +24,8 @@ body.eco2-modal-open{overflow:hidden}
 #eco2-editform textarea{min-height:95px}#eco2-editform button{border:0;background:#136d49;color:white;border-radius:10px;padding:12px;cursor:pointer;font-weight:800}
 #eco2-editform button.secondary{background:#e8f4eb;color:#175c3f}
 @media(max-width:600px){#eco2-menu{bottom:8px;right:8px;left:8px;max-width:none;min-width:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}#eco2-who{grid-column:1/-1}#eco2-editform{grid-template-columns:1fr}#eco2-editform h2,#eco2-editform .wide{grid-column:1}#eco2-login{padding:12px}.eco2-auth-card{padding:23px}}
+
+#eco2-menu-toggle[hidden]{display:none!important}#eco2-menu-toggle{position:fixed;right:18px;bottom:18px;z-index:1101;border:1px solid #bcd6c4;border-radius:50px;background:#0e6544;color:white;font:800 14px Inter,Segoe UI,Arial,sans-serif;padding:12px 16px;box-shadow:0 8px 28px #14362638;cursor:pointer}
+@media(min-width:801px){#eco2-menu-toggle{bottom:18px;right:18px}#eco2-menu{max-height:calc(100vh - 100px);overflow:auto}}
+@media(max-width:800px){#eco2-menu-toggle{right:14px;bottom:14px}#eco2-menu{right:12px;left:12px;bottom:64px;max-width:none;max-height:min(68vh,500px);overflow-y:auto;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));box-shadow:0 10px 35px #14362649}#eco2-who{grid-column:1/-1}}
+@media(max-width:480px){#eco2-drawer{padding:0}.eco2-drawer-box{height:100dvh;width:100%;border-radius:0}#eco2-menu button{font-size:12px;padding:11px 8px}#eco2-editpanel{padding:5px}#eco2-editform{max-height:96dvh;overflow-y:auto;padding:17px}}
