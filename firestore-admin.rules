@@ -9,6 +9,11 @@ service cloud.firestore {
         && get(/databases/$(database)/documents/profiles/$(request.auth.uid)).data.role == 'admin'
         && get(/databases/$(database)/documents/profiles/$(request.auth.uid)).data.status == 'active';
     }
+    // Only the founding, verified Google account may appoint another administrator.
+    function isOwnerAdmin() {
+      return isAdmin() && googleVerified()
+        && request.auth.token.email == 'gulyantsdanil@gmail.com';
+    }
     function googleVerified() {
       return signedIn()
         && request.auth.token.firebase.sign_in_provider == 'google.com'
@@ -41,6 +46,15 @@ service cloud.firestore {
            || (request.resource.data.status in ['pending','blocked']
                && request.resource.data.role == 'visitor')
         );
+      // Distinct owner-only operation; ordinary admins cannot create admins.
+      allow update: if isOwnerAdmin()
+        && request.auth.uid != uid
+        && resource.data.role in ['visitor', 'teacher']
+        && resource.data.requestedRole == 'teacher'
+        && resource.data.status in ['pending', 'active']
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['role','status'])
+        && request.resource.data.role == 'admin'
+        && request.resource.data.status == 'active';
       allow delete: if false;
     }
     match /roleAudit/{auditId} {
@@ -51,11 +65,18 @@ service cloud.firestore {
         && request.resource.data.actorUid == request.auth.uid
         && request.resource.data.targetUid is string
         && request.resource.data.targetUid != request.auth.uid
-        && request.resource.data.action in ['approve','block','pending']
+        && (
+          (request.resource.data.action in ['approve','block','pending']
+           && request.resource.data.newRole in ['visitor','student','teacher','leader']
+           && request.resource.data.newStatus in ['active','blocked','pending'])
+          ||
+          (request.resource.data.action == 'promote-admin'
+           && isOwnerAdmin()
+           && request.resource.data.newRole == 'admin'
+           && request.resource.data.newStatus == 'active')
+        )
         && request.resource.data.oldRole is string
-        && request.resource.data.newRole in ['visitor','student','teacher','leader']
         && request.resource.data.oldStatus is string
-        && request.resource.data.newStatus in ['active','blocked','pending']
         && request.resource.data.at == request.time;
       allow update, delete: if false;
     }
