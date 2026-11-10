@@ -50,7 +50,9 @@ document.querySelectorAll('a[href="login.html"],a[href="teacher.html"],a[href="s
 });
 $('eco2-close').onclick=closePage;drawer.addEventListener('click',e=>{if(e.target===drawer)closePage()});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!drawer.hidden)closePage()});
-$('eco2-google').onclick=async()=>{status('');$('eco2-google').disabled=true;try{await signInWithPopup(auth,new GoogleAuthProvider())}catch(e){status(e?.message||'Ошибка входа',true)}finally{$('eco2-google').disabled=false}};
+async function selectGoogleAccount(){status('');const provider=new GoogleAuthProvider();provider.setCustomParameters({prompt:'select_account'});await signInWithPopup(auth,provider)}
+$('eco2-google').onclick=async()=>{$('eco2-google').disabled=true;try{await selectGoogleAccount()}catch(e){status(e?.message||'Ошибка входа',true)}finally{$('eco2-google').disabled=false}};
+$('eco2-switch-account').onclick=async()=>{$('eco2-switch-account').disabled=true;try{await signOut(auth);await selectGoogleAccount()}catch(e){status('Не удалось войти: '+(e?.message||e),true)}finally{$('eco2-switch-account').disabled=false}};
 $('eco2-exit').onclick=async()=>{closePage();await signOut(auth)};
 $('eco2-logout').onclick=()=>signOut(auth);
 $('eco2-role').onchange=()=>{$('eco2-classrow').hidden=$('eco2-role').value!=='student';$('eco2-class').required=$('eco2-role').value==='student'};
@@ -69,7 +71,7 @@ $('eco2-refresh').onclick=()=>load();
 async function load(){
  if(!user||roleLoading)return;roleLoading=true;showView('eco2-loading');
  try{const p=await getDoc(doc(db,'profiles',user.uid));profile=p.exists()?p.data():null;
- if(!profile){showView('eco2-register');showGate(true)}
+ if(!profile){showView('eco2-register');showGate(true);status('Сейчас выбран аккаунт: '+(user.email||'Google')+'. Если это не ваш зарегистрированный аккаунт, нажмите «Войти в существующий аккаунт».')}
  else if(profile.status==='active'){roleMenu();showView('eco2-loading')}
  else{$('eco2-wait-title').textContent=profile.status==='blocked'?'Доступ ограничен / Қолжетімділік шектелген':'Заявка ожидает проверки / Өтінім тексерілуде';showView('eco2-wait');showGate(true)}
  if(profile?.status==='active'&&!contentUnsubscribe)watchCopy();
