@@ -21,7 +21,7 @@ td small{display:block;color:#769081;overflow-wrap:anywhere}th{font-size:12px;co
 </style></head><body>
 <header><a href="./">🌿 Eco Club</a><div class="actions"><a href="login.html">Личный кабинет</a><button id="logout" class="hidden">Выйти</button></div></header>
 <main class="container">
-<h1>Управление пользователями</h1><p class="hint">Eco Club 2.0 · Регистрация, подтверждение и роли · Администраторы не могут назначать других администраторов через эту страницу.</p>
+<h1>Управление пользователями</h1><p class="hint">Eco Club 2.0 · Регистрация, подтверждение и роли · Назначить нового администратора может только основной владелец Eco Club через дополнительное подтверждение.</p>
 <div id="loading" class="panel">Проверяем Google-аккаунт и права доступа…</div>
 <div id="error" class="error hidden" role="alert"></div>
 <div id="restricted" class="panel hidden"><h2>Нет доступа</h2><p>Раздел доступен только активному администратору Eco Club. Проверьте, каким Google-аккаунтом выполнен вход.</p><a href="login.html">Перейти ко входу</a></div>
@@ -30,7 +30,7 @@ td small{display:block;color:#769081;overflow-wrap:anywhere}th{font-size:12px;co
 <section class="panel"><h2>Заявки и пользователи</h2><div class="controls"><input id="search" type="search" placeholder="Поиск по имени, email, классу" aria-label="Поиск"><select id="filter"><option value="all">Все</option><option value="pending">Ожидают</option><option value="active">Активные</option><option value="blocked">Заблокированные</option></select><button id="reload">Обновить</button></div>
 <p class="hint">Для обычных заявок разрешается роль «Ученик» или «Учитель». Роль «Руководитель» доступна только для проверенного педагогического аккаунта. Действия записываются в журнал, но в этом этапе журнал не является неизменяемым серверным аудитом.</p>
 <div class="scroll"><table><thead><tr><th>Пользователь</th><th>Заявка</th><th>Роль / статус</th><th>Действия</th></tr></thead><tbody id="users"></tbody></table></div>
-</section><section class="panel"><h2>История решений</h2><p class="hint">Последние 50 записей Firestore. История создаётся клиентским приложением при подтверждении или блокировке.</p><div class="scroll"><table><thead><tr><th>Время</th><th>Действие</th><th>Новая роль</th><th>UID пользователя</th></tr></thead><tbody id="audit"></tbody></table></div></section>
+</section><section class="panel"><h2>История решений</h2><p class="hint">Последние 50 записей Firestore, включая назначения администраторов. Клиентская история пока не является защищённым серверным аудитом.</p><div class="scroll"><table><thead><tr><th>Время</th><th>Действие</th><th>Новая роль</th><th>UID пользователя</th></tr></thead><tbody id="audit"></tbody></table></div></section>
 </div></main>
 <script type="module">
 import{initializeApp}from'https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js';
@@ -38,7 +38,7 @@ import{getAuth,onAuthStateChanged,signOut}from'https://www.gstatic.com/firebasej
 import{getFirestore,doc,getDoc,collection,getDocs,query,orderBy,limit,writeBatch,serverTimestamp}from'https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js';
 const cfg={apiKey:'AIzaSyCo05dvjXihGbfYhU_FHQ4OXg6SO_oRCU0',authDomain:'eco-club-40261.firebaseapp.com',projectId:'eco-club-40261',appId:'1:289680452873:web:c4fe4d451f1a488b9d37d8'};
 const app=initializeApp(cfg),auth=getAuth(app),db=getFirestore(app),$=id=>document.getElementById(id);
-let me=null,users=[];
+let me=null,users=[],ownerAdmin=false;const ownerEmail='gulyantsdanil@gmail.com';
 function showError(e){$('error').textContent=String(e?.message||e);$('error').classList.remove('hidden')}
 function clearError(){$('error').classList.add('hidden')}
 function el(tag,text,cls){const node=document.createElement(tag);if(text!==undefined)node.textContent=String(text);if(cls)node.className=cls;return node}
@@ -47,7 +47,7 @@ function roleLabel(v){return({visitor:'Заявка',student:'Ученик',teac
 function stateLabel(v){return({pending:'Ожидает',active:'Активен',blocked:'Заблокирован'})[v]||v||'—'}
 async function init(user){me=user;clearError();$('logout').classList.toggle('hidden',!user);if(!user){$('loading').classList.add('hidden');$('restricted').classList.remove('hidden');return}
 try{const own=await getDoc(doc(db,'profiles',user.uid));if(!own.exists()||own.data().status!=='active'||own.data().role!=='admin'){ $('loading').classList.add('hidden');$('restricted').classList.remove('hidden');return}
-$('restricted').classList.add('hidden');$('loading').classList.add('hidden');$('main').classList.remove('hidden');await reload();
+ownerAdmin=user.email===ownerEmail&&user.emailVerified===true&&user.providerData.some(p=>p.providerId==='google.com');$('restricted').classList.add('hidden');$('loading').classList.add('hidden');$('main').classList.remove('hidden');await reload();
 }catch(e){$('loading').classList.add('hidden');$('restricted').classList.remove('hidden');showError(e)}}
 async function reload(){clearError();$('reload').disabled=true;try{
 const [u,a]=await Promise.all([getDocs(collection(db,'profiles')),getDocs(query(collection(db,'roleAudit'),orderBy('at','desc'),limit(50)))]);
@@ -61,12 +61,22 @@ for(const p of filtered){const tr=el('tr'),identity=el('td');identity.append(el(
 if(p.id===me.uid||p.role==='admin'){actionsRow.append(el('small',p.id===me.uid?'Ваш аккаунт':'Защищённая роль'));}else{
 const select=el('select');const options=[['student','Ученик'],['teacher','Учитель']];if(p.requestedRole==='teacher')options.push(['leader','Руководитель']);for(const [value,label]of options){const option=el('option',label);option.value=value;if(p.role===value||(p.role==='visitor'&&value===p.requestedRole))option.selected=true;select.append(option)}
 const approve=el('button','Подтвердить','main');approve.onclick=()=>change(p,'approve',select.value);const block=el('button','Блокировать','danger');block.onclick=()=>change(p,'block','visitor');actionsRow.append(select,approve,block);
+if(ownerAdmin&&p.requestedRole==='teacher'&&p.role!=='admin'){
+  const promote=el('button','Назначить администратором');
+  promote.title='Только владелец Eco Club может назначить администратора';
+  promote.onclick=()=>change(p,'promote-admin','admin');
+  actionsRow.append(promote);
+}
 if(p.status==='blocked'){const reset=el('button','Вернуть на проверку');reset.onclick=()=>change(p,'pending','visitor');actionsRow.append(reset)}
 }
 actions.append(actionsRow);tr.append(identity,request,status,actions);tbody.append(tr)}}
 async function change(p,action,newRole){if(!me||p.id===me.uid||p.role==='admin')return;
-const newStatus=action==='approve'?'active':action==='block'?'blocked':'pending';
-if(!confirm('Изменить статус пользователя '+(p.displayName||p.id)+' на «'+stateLabel(newStatus)+'»?'))return;
+if(action==='promote-admin'&&(!ownerAdmin||p.requestedRole!=='teacher'||!['visitor','teacher'].includes(p.role)||!['pending','active'].includes(p.status)))return showError('Назначение администратора запрещено.');
+const newStatus=action==='approve'||action==='promote-admin'?'active':action==='block'?'blocked':'pending';
+if(action==='promote-admin'){
+ if(!confirm('Предоставить ПОЛНЫЕ права администратора пользователю '+(p.displayName||p.id)+' ('+p.email+')?'))return;
+ if(!confirm('Подтвердить назначение второго администратора? Он сможет управлять пользователями Eco Club.'))return;
+}else if(!confirm('Изменить статус пользователя '+(p.displayName||p.id)+' на «'+stateLabel(newStatus)+'»?'))return;
 clearError();const prevRole=p.role,prevStatus=p.status;
 try{const batch=writeBatch(db);batch.update(doc(db,'profiles',p.id),{role:newRole,status:newStatus});batch.set(doc(collection(db,'roleAudit')),{actorUid:me.uid,targetUid:p.id,action,oldRole:prevRole,newRole,oldStatus:prevStatus,newStatus,at:serverTimestamp()});await batch.commit();await reload()}catch(e){showError(e)}}
 $('search').oninput=renderUsers;$('filter').onchange=renderUsers;$('reload').onclick=reload;$('logout').onclick=()=>signOut(auth).then(()=>location.href='login.html');
