@@ -4,7 +4,7 @@ import {getAuth,GoogleAuthProvider,signInWithPopup,onAuthStateChanged,signOut} f
 import {getFirestore,doc,getDoc,setDoc,serverTimestamp,onSnapshot} from 'https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js';
 const app=initializeApp({apiKey:'AIzaSyCo05dvjXihGbfYhU_FHQ4OXg6SO_oRCU0',authDomain:'eco-club-40261.firebaseapp.com',projectId:'eco-club-40261',appId:'1:289680452873:web:c4fe4d451f1a488b9d37d8'});
 const auth=getAuth(app),db=getFirestore(app),$=id=>document.getElementById(id);
-let user=null,profile=null,siteCopy=null,contentUnsubscribe=null,roleLoading=false;
+let user=null,profile=null,siteCopy=null,contentUnsubscribe=null,roleLoading=false,sectionUnsubscribers=[];
 const base='./';
 const login=$('eco2-login'),menu=$('eco2-menu'),drawer=$('eco2-drawer'),frame=$('eco2-frame'),content=$('eco2-copy');
 function lang(){return document.documentElement.lang==='kk'?'kk':'ru'}
@@ -24,6 +24,7 @@ function roleMenu(){
  $('eco2-student-link').hidden=profile.role!=='student';
  $('eco2-admin-link').hidden=profile.role!=='admin';
  $('eco2-edit').hidden=profile.role!=='admin';
+ $('eco2-edit-sections').hidden=profile.role!=='admin';
  $('eco2-logout').hidden=false;
  const shortcut=document.querySelector('.ln-actions a[href="login.html"]');
  if(shortcut){shortcut.textContent=say('Открыть кабинет','Жеке кабинетті ашу');shortcut.setAttribute('data-ru','Открыть кабинет');shortcut.setAttribute('data-kz','Жеке кабинетті ашу')}
@@ -74,11 +75,11 @@ async function load(){
  if(!profile){showView('eco2-register');showGate(true);status('Сейчас выбран аккаунт: '+(user.email||'Google')+'. Если это не ваш зарегистрированный аккаунт, нажмите «Войти в существующий аккаунт».')}
  else if(profile.status==='active'){roleMenu();showView('eco2-loading')}
  else{$('eco2-wait-title').textContent=profile.status==='blocked'?'Доступ ограничен / Қолжетімділік шектелген':'Заявка ожидает проверки / Өтінім тексерілуде';showView('eco2-wait');showGate(true)}
- if(profile?.status==='active'&&!contentUnsubscribe)watchCopy();
+ if(profile?.status==='active'&&!contentUnsubscribe){watchCopy();watchSections()}
  }catch(err){status('Ошибка профиля: '+(err?.message||err),true);showGate(true);showView('eco2-signedout')}
  finally{roleLoading=false}
 }
-onAuthStateChanged(auth,u=>{user=u;profile=null;if(!u){const shortcut=document.querySelector('.ln-actions a[href="login.html"]');if(shortcut){shortcut.textContent=say('Войти / Регистрация','Кіру / Тіркелу');shortcut.setAttribute('data-ru','Войти / Регистрация');shortcut.setAttribute('data-kz','Кіру / Тіркелу')}}if(contentUnsubscribe){contentUnsubscribe();contentUnsubscribe=null}if(u)load();else{showGate(true);showView('eco2-signedout');closePage()}},err=>{showGate(true);showView('eco2-signedout');status(err.message,true)});
+onAuthStateChanged(auth,u=>{user=u;profile=null;if(!u){const shortcut=document.querySelector('.ln-actions a[href="login.html"]');if(shortcut){shortcut.textContent=say('Войти / Регистрация','Кіру / Тіркелу');shortcut.setAttribute('data-ru','Войти / Регистрация');shortcut.setAttribute('data-kz','Кіру / Тіркелу')}}if(contentUnsubscribe){contentUnsubscribe();contentUnsubscribe=null}sectionUnsubscribers.forEach(fn=>fn());sectionUnsubscribers=[];if(u)load();else{showGate(true);showView('eco2-signedout');closePage()}},err=>{showGate(true);showView('eco2-signedout');status(err.message,true)});
 function paint(){
  if(!siteCopy){content.hidden=true;return}
  const k=lang()==='kk'?'Kz':'Ru';const title=String(siteCopy['title'+k]||''),body=String(siteCopy['body'+k]||'');
@@ -108,5 +109,75 @@ $('eco2-editform').onsubmit=async e=>{
  $('eco2-editpanel').hidden=true;
  }catch(err){alert('Не удалось сохранить: '+(err?.message||err))}finally{$('eco2-edit-save').disabled=false}
 };
-new MutationObserver(paint).observe(document.documentElement,{attributes:true,attributeFilter:['lang']});
+new MutationObserver(()=>{paint();for(const id of sectionIds)paintSection(id)}).observe(document.documentElement,{attributes:true,attributeFilter:['lang']});
+
+const sectionIds=['about','tasks','results','projects','gallery','team','members','application'];
+const sectionData=new Map();
+const sectionDefaults=new Map();
+function sectionEls(id){
+  const root=document.getElementById(id);
+  return root?{heading:root.querySelector('h2.title'),lead:root.querySelector('.lead, .projects-lead')}:null;
+}
+function originalSection(id){
+  const el=sectionEls(id);
+  if(!el||!el.heading||!el.lead)return null;
+  if(!sectionDefaults.has(id))sectionDefaults.set(id,{
+    titleRu:el.heading.getAttribute('data-ru')||'',
+    titleKz:el.heading.getAttribute('data-kz')||'',
+    descRu:el.lead.getAttribute('data-ru')||'',
+    descKz:el.lead.getAttribute('data-kz')||''
+  });
+  return sectionDefaults.get(id);
+}
+function paintSection(id){
+  const nodes=sectionEls(id),defaults=originalSection(id);
+  if(!nodes||!defaults)return;
+  const data=sectionData.get(id)||defaults;
+  const apply=(el,ru,kz)=>{
+    const a=String(ru||''),b=String(kz||'');
+    el.setAttribute('data-ru',a);el.setAttribute('data-kz',b);
+    el.textContent=lang()==='kk'?b:a;
+  };
+  apply(nodes.heading,data.titleRu||defaults.titleRu,data.titleKz||defaults.titleKz);
+  apply(nodes.lead,data.descRu||defaults.descRu,data.descKz||defaults.descKz);
+}
+function watchSections(){
+  sectionUnsubscribers.forEach(fn=>fn());sectionUnsubscribers=[];
+  for(const id of sectionIds){
+    originalSection(id);
+    sectionUnsubscribers.push(onSnapshot(doc(db,'siteSections',id),
+      snap=>{sectionData.set(id,snap.exists()?snap.data():null);paintSection(id)},
+      error=>console.warn('Eco Club section',id,error.code||error.message)
+    ));
+  }
+}
+function fillSectionForm(){
+  const id=$('eco2-section-id').value,defaults=originalSection(id);
+  if(!defaults){$('eco2-section-status').textContent='Раздел недоступен для редактирования';return}
+  const data=sectionData.get(id)||defaults;
+  for(const k of ['titleRu','titleKz','descRu','descKz'])$('eco2-section-'+k).value=String(data[k]||defaults[k]);
+  $('eco2-section-status').textContent='';
+}
+$('eco2-edit-sections').onclick=()=>{
+  if(profile?.status!=='active'||profile?.role!=='admin')return;
+  $('eco2-section-editor').hidden=false;fillSectionForm();setMenuOpen(false);
+};
+$('eco2-section-id').onchange=fillSectionForm;
+$('eco2-section-cancel').onclick=()=>{$('eco2-section-editor').hidden=true};
+$('eco2-section-form').onsubmit=async e=>{
+  e.preventDefault();
+  if(!user||profile?.status!=='active'||profile?.role!=='admin')return;
+  const id=$('eco2-section-id').value;if(!sectionIds.includes(id))return;
+  const value={};
+  for(const k of ['titleRu','titleKz','descRu','descKz'])value[k]=$('eco2-section-'+k).value.trim();
+  value.updatedBy=user.uid;value.updatedAt=serverTimestamp();
+  $('eco2-section-save').disabled=true;$('eco2-section-status').textContent='Сохраняем…';
+  try{
+    await setDoc(doc(db,'siteSections',id),value);
+    $('eco2-section-editor').hidden=true;
+    document.getElementById(id)?.scrollIntoView({block:'start',behavior:'smooth'});
+  }catch(error){$('eco2-section-status').textContent='Не удалось сохранить: '+(error?.message||error)}
+  finally{$('eco2-section-save').disabled=false}
+};
+
 // The public site remains static HTML. This gate controls the UI, not secrecy of published source.
