@@ -1,0 +1,54 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Eco Club 2.0 — Кабинет педагога</title><meta name="theme-color" content="#0b3527">
+<style>
+*{box-sizing:border-box}body{font:15px/1.55 Inter,Segoe UI,Arial,sans-serif;margin:0;color:#143a2b;background:#f1f7f2}header{background:white;border-bottom:1px solid #dbe9df;padding:18px max(20px,calc((100vw - 1150px)/2));display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:center}a{color:#0c6543;text-decoration:none;font-weight:750}main{max-width:1150px;margin:30px auto;padding:0 20px}.layout{display:grid;grid-template-columns:1.3fr .85fr;gap:20px}.panel{background:white;border:1px solid #daeadd;border-radius:19px;padding:25px;margin:0 0 20px;box-shadow:0 15px 40px #1640290a}h1{font-size:clamp(28px,4vw,44px);margin:10px 0 7px}h2{font-size:22px;margin:0 0 13px}.muted{color:#67806f;font-size:14px}.tag{background:#ebf4ed;padding:6px 11px;border-radius:50px;font-size:12px;font-weight:800;display:inline-block}form{display:grid;grid-template-columns:1fr 1fr;gap:13px}label{font-size:13px;font-weight:750;display:block}input,select,textarea{display:block;width:100%;font:inherit;padding:11px 12px;border:1px solid #cbdcd0;border-radius:10px;margin-top:5px;color:#173b2d;background:white}textarea{resize:vertical;min-height:95px}label.wide,.actions,.note{grid-column:1/-1}button,.btn{border:0;cursor:pointer;border-radius:10px;padding:11px 14px;font:inherit;font-weight:800;background:#0c6745;color:white;text-align:center;display:inline-block}button.secondary,.btn.secondary{background:#e8f3ea;color:#145d40}button:disabled{opacity:.55;cursor:wait}.actions{display:flex;gap:10px;flex-wrap:wrap}.note{background:#eff7f0;padding:12px;border-radius:11px;font-size:13px;color:#466e54}.entry{border-bottom:1px solid #e3eee6;padding:14px 0}.entry:last-child{border:0}.entry strong{display:block}.entry small{color:#759181}.entry .row{display:flex;gap:9px;margin-top:10px;flex-wrap:wrap}.msg{margin:15px 0;padding:14px;border-radius:10px;background:#e8f4ea;color:#135b3c}.msg.error{background:#fff0ee;color:#9d2923}.hidden{display:none!important}@media(max-width:760px){.layout{grid-template-columns:1fr}form{grid-template-columns:1fr}label.wide,.actions,.note{grid-column:1}.panel{padding:18px}}
+</style></head><body>
+<header><a href="dashboard.html">🌿 ECO CLUB 2.0</a><div><a href="./">Главный сайт</a> · <a href="dashboard.html">Мой кабинет</a></div></header>
+<main><span class="tag">Eco Club 2.0 · Педагог</span><h1>Кабинет педагога</h1><p class="muted">Черновики мероприятий доступны только вашему аккаунту. Публикация по-прежнему проходит через действующий сервис v37.</p>
+<div id="loading" class="panel">Проверяем Google-аккаунт и роль…</div><p id="message" class="msg hidden" role="status"></p><section id="app" class="layout hidden">
+<div><div class="panel"><h2>Подготовить мероприятие</h2><form id="form">
+<label>Название RU<input name="nameRu" maxlength="160" required></label>
+<label>Атауы KZ<input name="nameKz" maxlength="160" required></label>
+<label class="wide">Описание RU<textarea name="descRu" maxlength="1800" required></textarea></label>
+<label class="wide">Сипаттамасы KZ<textarea name="descKz" maxlength="1800" required></textarea></label>
+<label>Направление Eco Club<select name="projectId" required><option value="">Выберите направление</option><option value="1">01 — Раздельный сбор отходов</option><option value="2">02 — Зелёная школа</option><option value="3">03 — Чистый десант</option><option value="4">04 — Эко-просвещение</option><option value="5">05 — Зелёный обмен</option><option value="6">06 — Эко-патруль</option></select></label>
+<label>Категория<select name="category" required><option value="education">Экологическое образование</option><option value="upbringing">Экологическое воспитание</option><option value="activity">Экологическая деятельность</option></select></label>
+<label>Класс<input name="className" maxlength="80" placeholder="6 Е" required></label>
+<label>Дата мероприятия<input name="eventDate" type="date" required></label>
+<label class="wide">Instagram (необязательно)<input name="instagram" maxlength="400" type="url" placeholder="https://www.instagram.com/p/..."></label>
+<div class="note">Черновик сохраняется в Firestore. **Фотографии сюда не загружаются.** Для окончательной отправки и загрузки 1–3 фотографий откройте рабочую форму v37. Сохранение черновика НЕ означает отправку на модерацию.</div>
+<div class="actions"><button id="save" type="submit">Сохранить черновик</button><button type="button" class="secondary" id="clear">Новый черновик</button></div>
+</form></div>
+<div class="panel"><h2>Окончательная отправка</h2><p class="muted">Скопируйте подготовленные данные и откройте действующий кабинет педагога. Google Apps Script самостоятельно проверяет, разрешён ли ваш Google-аккаунт.</p><div class="actions"><button type="button" id="copy" class="secondary">Скопировать поля</button><a class="btn" target="_blank" rel="noopener noreferrer" href="https://script.google.com/macros/s/AKfycbwK-7VMbKJg5PpCrLzIDI3zKkouEQau3-t7SNtUgWv46O_N7tlAY0PboFSTWYZYtbfw/exec?page=teacher">Открыть форму v37</a></div><p class="muted">Если появится «Доступ запрещён», педагог ещё не добавлен в список разрешённых аккаунтов Apps Script. Роль Firebase не отменяет эту проверку.</p></div></div>
+<aside><div class="panel"><h2>Мои черновики</h2><p id="identity" class="muted"></p><div id="drafts">Пока нет черновиков.</div></div><div class="panel"><h2>Что уже работает</h2><p>✓ Вход через Google</p><p>✓ Проверка роли в Firestore</p><p>✓ Личные черновики с ограниченным доступом</p><p class="muted">История заявок v37 и загрузка фотографий будут объединены после разработки защищённого серверного соединения.</p></div></aside>
+</section></main>
+<script type="module">
+import{initializeApp}from'https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js';
+import{getAuth,onAuthStateChanged}from'https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js';
+import{getFirestore,doc,getDoc,collection,getDocs,query,orderBy,addDoc,updateDoc,deleteDoc,serverTimestamp}from'https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js';
+const config={apiKey:'AIzaSyCo05dvjXihGbfYhU_FHQ4OXg6SO_oRCU0',authDomain:'eco-club-40261.firebaseapp.com',projectId:'eco-club-40261',appId:'1:289680452873:web:c4fe4d451f1a488b9d37d8'};
+const app=initializeApp(config),auth=getAuth(app),db=getFirestore(app),$=id=>document.getElementById(id);
+let me=null,editing=null,items=[];
+const fields=['nameRu','nameKz','descRu','descKz','projectId','category','className','eventDate','instagram'];
+function tell(message,isError=false){$('message').textContent=message;$('message').className='msg'+(isError?' error':'');}
+function values(){const f=new FormData($('form')),v={};for(const key of fields)v[key]=String(f.get(key)||'').trim();return v}
+function fill(data){for(const key of fields){const node=$('form').elements.namedItem(key);if(node)node.value=data[key]||''}}
+function draftCollection(){return collection(db,'profiles',me.uid,'teacherDrafts')}
+function safeDate(d){return d?.toDate?.().toLocaleString('ru-RU')||'—'}
+function node(tag,text){const x=document.createElement(tag);x.textContent=text;return x}
+function render(){const list=$('drafts');list.replaceChildren();if(!items.length){list.append(node('p','Черновиков пока нет.'));return}
+for(const item of items){const article=node('div','');article.className='entry';article.append(node('strong',item.nameRu||'Без названия'),node('small',item.className+' · '+item.eventDate+' · '+safeDate(item.updatedAt)));const row=node('div','');row.className='row';const edit=node('button','Открыть');edit.className='secondary';edit.onclick=()=>{editing=item.id;fill(item);window.scrollTo({top:0,behavior:'smooth'});tell('Черновик открыт для редактирования.');};const del=node('button','Удалить');del.className='secondary';del.onclick=async()=>{if(!confirm('Удалить черновик?'))return;try{await deleteDoc(doc(db,'profiles',me.uid,'teacherDrafts',item.id));if(editing===item.id)reset();await loadDrafts()}catch(e){tell(e.message,true)}};row.append(edit,del);article.append(row);list.append(article)}}
+async function loadDrafts(){const snap=await getDocs(query(draftCollection(),orderBy('updatedAt','desc')));items=snap.docs.map(d=>({id:d.id,...d.data()}));render()}
+function reset(){editing=null;$('form').reset()}
+$('clear').onclick=()=>{reset();tell('Новый черновик.');};
+$('form').onsubmit=async e=>{e.preventDefault();if(!me)return;const v=values();if(!['1','2','3','4','5','6'].includes(v.projectId))return tell('Выберите направление Eco Club.',true);$('save').disabled=true;try{
+if(editing)await updateDoc(doc(db,'profiles',me.uid,'teacherDrafts',editing),{...v,updatedAt:serverTimestamp()});
+else{const ref=await addDoc(draftCollection(),{...v,ownerUid:me.uid,status:'draft',createdAt:serverTimestamp(),updatedAt:serverTimestamp()});editing=ref.id}
+tell('Черновик сохранён. Он ещё НЕ передан на модерацию.');await loadDrafts()
+}catch(e){tell('Не удалось сохранить: '+e.message,true)}finally{$('save').disabled=false}};
+$('copy').onclick=async()=>{const v=values();const text=['Название RU: '+v.nameRu,'Атауы KZ: '+v.nameKz,'Описание RU: '+v.descRu,'Сипаттамасы KZ: '+v.descKz,'Направление: '+v.projectId,'Категория: '+v.category,'Класс: '+v.className,'Дата: '+v.eventDate,'Instagram: '+v.instagram].join('\n\n');try{await navigator.clipboard.writeText(text);tell('Поля скопированы. Вставьте их в действующую форму v37 и добавьте фотографии.')}catch(e){tell('Браузер заблокировал копирование: '+e.message,true)}};
+onAuthStateChanged(auth,async user=>{if(!user){location.replace('login.html');return}try{
+const p=await getDoc(doc(db,'profiles',user.uid));if(!p.exists()||p.data().status!=='active'||!['teacher','leader','admin'].includes(p.data().role)){location.replace('dashboard.html');return}
+me=user;$('identity').textContent=user.displayName+' · '+user.email;$('loading').classList.add('hidden');$('app').classList.remove('hidden');await loadDrafts();
+}catch(e){$('loading').classList.add('hidden');tell('Ошибка проверки доступа: '+e.message,true)}},e=>tell(e.message,true));
+</script></body></html>
