@@ -34,6 +34,14 @@ function openPage(page){
 }
 function closePage(){drawer.hidden=true;frame.src='about:blank';document.body.classList.remove('eco2-modal-open')}
 document.querySelectorAll('[data-eco2-page]').forEach(n=>n.addEventListener('click',e=>{e.preventDefault();openPage(n.dataset.eco2Page)}));
+document.querySelectorAll('a[href="login.html"],a[href="teacher.html"],a[href="student.html"],a[href="dashboard.html"],a[href="admin-users.html"]').forEach(link=>{
+ link.addEventListener('click',e=>{
+  e.preventDefault();
+  if(!user||profile?.status!=='active'){showGate(true);return}
+  const page=link.getAttribute('href')==='login.html'?'dashboard.html':link.getAttribute('href');
+  openPage(page);
+ });
+});
 $('eco2-close').onclick=closePage;drawer.addEventListener('click',e=>{if(e.target===drawer)closePage()});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!drawer.hidden)closePage()});
 $('eco2-google').onclick=async()=>{status('');$('eco2-google').disabled=true;try{await signInWithPopup(auth,new GoogleAuthProvider())}catch(e){status(e?.message||'Ошибка входа',true)}finally{$('eco2-google').disabled=false}};
