@@ -11,7 +11,7 @@ import{getFirestore,doc,getDoc}from'https://www.gstatic.com/firebasejs/12.6.0/fi
 const cfg={apiKey:'AIzaSyCo05dvjXihGbfYhU_FHQ4OXg6SO_oRCU0',authDomain:'eco-club-40261.firebaseapp.com',projectId:'eco-club-40261',appId:'1:289680452873:web:c4fe4d451f1a488b9d37d8'};
 const app=initializeApp(cfg),auth=getAuth(app),db=getFirestore(app),$=id=>document.getElementById(id);
 const API='https://script.google.com/macros/s/AKfycbz0DrR9pZv-R1L6T1HmhuYAAYJt2OoQgJf851uglXsxPtkGH9K1s_o0kCUB_LNRL9bmdA/exec';
-const normal=s=>String(s||'').replace(/\s+/g,'').toUpperCase().replace(/Ё/g,'Е');
+const normal=s=>String(s||'').replace(/\s+/g,'').toUpperCase().replace(/Ё/g,'Е').replace(/E/g,'Е');
 function eventList(klass){const cb='ecoStudentEvents'+Date.now()+Math.random().toString(36).slice(2),tag=document.createElement('script');let finished=false;const timer=setTimeout(()=>done(null),12000);
 function done(res){if(finished)return;finished=true;clearTimeout(timer);tag.remove();try{delete window[cb]}catch(e){window[cb]=undefined}const root=$('events');root.replaceChildren();if(!res||!res.success||!Array.isArray(res.events)){root.textContent='Не удалось загрузить публичные мероприятия.';return}
 const events=res.events.filter(x=>x&&normal(x.className)===normal(klass));if(!events.length){root.textContent='Опубликованных мероприятий для этого класса пока нет.';return}
