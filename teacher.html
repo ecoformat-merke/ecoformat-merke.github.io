@@ -42,7 +42,7 @@ function node(tag,text){const x=document.createElement(tag);x.textContent=text;r
 function render(){const list=$('drafts');list.replaceChildren();if(!items.length){list.append(node('p','Черновиков пока нет.'));return}
 for(const item of items){const article=node('div','');article.className='entry';article.append(node('strong',item.nameRu||'Без названия'),node('small',item.className+' · '+item.eventDate+' · '+safeDate(item.updatedAt)));const row=node('div','');row.className='row';const edit=node('button','Открыть');edit.className='secondary';edit.onclick=()=>{editing=item.id;fill(item);window.scrollTo({top:0,behavior:'smooth'});tell('Черновик открыт для редактирования.');};const del=node('button','Удалить');del.className='secondary';del.onclick=async()=>{if(!confirm('Удалить черновик?'))return;try{await deleteDoc(doc(db,'profiles',me.uid,'teacherDrafts',item.id));if(editing===item.id)reset();await loadDrafts()}catch(e){tell(e.message,true)}};row.append(edit,del);article.append(row);list.append(article)}}
 async function loadDrafts(){const snap=await getDocs(query(draftCollection(),orderBy('updatedAt','desc')));items=snap.docs.map(d=>({id:d.id,...d.data()}));render()}
-function reset(){editing=null;$('form').reset()}
+function reset(){editing=null;$('form').reset();if(me)sessionStorage.removeItem('eco2-pending-'+me.uid)}
 $('clear').onclick=()=>{reset();tell('Новый черновик.');};
 $('form').onsubmit=async e=>{e.preventDefault();if(!me)return;const v=values();if(!['1','2','3','4','5','6'].includes(v.projectId))return tell('Выберите направление Eco Club.',true);$('save').disabled=true;try{
 if(editing)await updateDoc(doc(db,'profiles',me.uid,'teacherDrafts',editing),{...v,updatedAt:serverTimestamp()});
@@ -57,7 +57,10 @@ $('submitBridge').onclick=async()=>{
  const photos=Array.from($('photos').files||[]);
  if(photos.length<1||photos.length>3)return tell('Прикрепите от 1 до 3 фотографий.',true);
  for(const p of photos)if(!['image/jpeg','image/png','image/webp'].includes(p.type)||p.size>3*1024*1024)return tell('Разрешены JPG, PNG, WebP до 3 МБ.',true);
- const id='EV2-'+crypto.randomUUID();$('submitBridge').disabled=true;
+ const fingerprint=JSON.stringify({actor:me.uid,fields:values(),files:photos.map(p=>[p.name,p.size,p.lastModified,p.type])});
+ const key='eco2-pending-'+me.uid;let pending;try{pending=JSON.parse(sessionStorage.getItem(key)||'null')}catch(e){pending=null}
+ const id=pending&&pending.fingerprint===fingerprint&&/^EV2-[\da-f-]{36}$/i.test(pending.id)?pending.id:'EV2-'+crypto.randomUUID();
+ sessionStorage.setItem(key,JSON.stringify({id,fingerprint}));$('submitBridge').disabled=true;
  try{
   // Create the new browser tab from a direct click, not a delayed popup.
   const target='ecoBridgeSubmit_'+Date.now();const win=window.open('about:blank',target);
