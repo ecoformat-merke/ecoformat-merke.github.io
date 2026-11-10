@@ -1690,7 +1690,7 @@ body.eco-teacher-modal-open{overflow:hidden}
 </style><style>.eco-awards-section{padding:65px 0;background:linear-gradient(145deg,#f9fcf5,#e9f3e7)}.eco-awards-section h3{color:#174a34;margin:25px 0 14px}.eco-badges-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(185px,1fr));gap:12px}.eco-badge-card{border:1px solid #dfebdd;border-radius:16px;padding:17px;background:#f7fbf5;display:flex;align-items:center;gap:12px}.eco-badge-symbol{font-size:30px}.eco-award-person,.eco-champ-row{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;padding:14px 6px;border-bottom:1px solid #e5eee6}.eco-award-icons{display:flex;gap:7px;flex-wrap:wrap}.eco-award-icon{border-radius:20px;background:#e3f2e5;padding:6px 10px}.eco-champ-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}.eco-champ-head select{padding:9px;border:1px solid #cbdfd0;border-radius:12px;background:white}.eco-muted{color:#648574;font-size:13px}</style><link rel="stylesheet" href="./eco-projects-globe.css"/>
 <link rel="stylesheet" href="./eco-projects-premium.css?v=20261104-stickyfix"/>
 <link rel="stylesheet" href="./eco-green-planet-v3.css?v=20261104-autolink"/>
-</head>
+<link rel="stylesheet" href="eco2-unified.css?v=1"></head>
 <body>
 <header><div class="container nav">
 <a class="brand" href="#home"><img alt="Eco Club" src="eco-club-logo.png"/><span>ECO CLUB</span></a>
@@ -3283,4 +3283,40 @@ load();
 <script defer src="./eco-campus-hero.js"></script>
 <script defer src="./eco-projects-globe.js?v=20261104-autolink"></script>
 <script defer src="./eco-earth-webgl.js?v=20261104-3b"></script>
-</body></html>
+
+<div id="eco2-login">
+ <div class="eco2-auth-card"><strong>🌿 ECO CLUB 2.0</strong><h2>Единый вход / Бірыңғай кіру</h2>
+  <div id="eco2-loading">Проверка аккаунта…</div>
+  <div id="eco2-signedout" hidden><p>Войдите через Google, чтобы открыть Eco Club. Для нового пользователя потребуется одобрение заявки.</p><button id="eco2-google" class="eco2-action" type="button">Войти через Google / Google арқылы кіру</button></div>
+  <div id="eco2-register" hidden><p>Регистрация в Eco Club / Eco Club тіркелуі</p><form id="eco2-registration-form">
+   <label>Роль / Рөл<select id="eco2-role" required><option value="student">Ученик / Оқушы</option><option value="teacher">Учитель / Мұғалім</option></select></label>
+   <label id="eco2-classrow">Класс / Сынып<input id="eco2-class" maxlength="20" placeholder="6 Е" required></label>
+   <label style="display:flex;gap:8px;align-items:flex-start"><input type="checkbox" id="eco2-consent" required><span>Я ознакомился(-ась) с правилами. Для несовершеннолетних требуется согласие законного представителя.</span></label>
+   <button id="eco2-register-button" class="eco2-action" type="submit">Отправить заявку / Өтінім жіберу</button>
+  </form></div>
+  <div id="eco2-wait" hidden><h3 id="eco2-wait-title">Заявка ожидает проверки</h3><p>Руководитель должен подтвердить ваш аккаунт.</p><button class="eco2-light" id="eco2-refresh" type="button">Обновить статус</button> <button class="eco2-light" id="eco2-exit" type="button">Выйти</button></div>
+  <p id="eco2-message" role="status"></p>
+ </div>
+</div>
+<aside id="eco2-menu" hidden aria-label="Меню пользователя Eco Club 2.0">
+  <span id="eco2-who"></span>
+  <button type="button" data-eco2-page="dashboard.html">Мой профиль / Жеке кабинет</button>
+  <button id="eco2-teacher-link" type="button" hidden data-eco2-page="teacher.html">Мои мероприятия</button>
+  <button id="eco2-student-link" type="button" hidden data-eco2-page="student.html">Кабинет ученика</button>
+  <button id="eco2-admin-link" type="button" hidden data-eco2-page="admin-users.html">Пользователи и роли</button>
+  <button id="eco2-edit" type="button" hidden>✎ Редактировать сайт</button>
+  <button id="eco2-logout" type="button">Выйти</button>
+</aside>
+<div id="eco2-drawer" hidden role="dialog" aria-modal="true" aria-label="Личный раздел Eco Club">
+ <div class="eco2-drawer-box"><div class="eco2-drawer-head">🌿 Eco Club 2.0 <button id="eco2-close" type="button">Закрыть ×</button></div>
+  <iframe id="eco2-frame" title="Кабинет Eco Club 2.0" src="about:blank"></iframe></div>
+</div>
+<section class="container" id="eco2-copy" hidden aria-label="Объявление Eco Club"><h2 id="eco2-copy-title"></h2><p id="eco2-copy-body"></p></section>
+<div id="eco2-editpanel" hidden role="dialog" aria-modal="true" aria-label="Редактирование контента Eco Club">
+ <form id="eco2-editform"><h2>Редактировать объявление на сайте</h2>
+  <label>Заголовок RU<input id="eco2-titleRu" maxlength="110"></label><label>Тақырып KZ<input id="eco2-titleKz" maxlength="110"></label>
+  <label class="wide">Текст RU<textarea id="eco2-bodyRu" maxlength="1200"></textarea></label>
+  <label class="wide">Мәтін KZ<textarea id="eco2-bodyKz" maxlength="1200"></textarea></label>
+  <button id="eco2-edit-cancel" type="button" class="secondary">Отмена</button><button id="eco2-edit-save" type="submit">Опубликовать</button>
+ </form>
+</div><script type="module" src="eco2-unified.js?v=1"></script></body></html>
