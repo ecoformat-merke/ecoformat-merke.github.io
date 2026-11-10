@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Eco Club 2.0 — Личный кабинет</title>
+<meta name="theme-color" content="#0b3527">
+<style>
+:root{font-family:Inter,Segoe UI,Arial,sans-serif;color:#133b2b;background:#eff6f1}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(circle at 85% 10%,#cfe9d5,transparent 40%),#eff6f1}
+header{padding:22px max(22px,calc((100vw - 1040px)/2));display:flex;justify-content:space-between;align-items:center;gap:15px}
+header a{font-weight:850;color:#125a3b;text-decoration:none}header button{border:1px solid #c5d9cd;background:white;border-radius:10px;padding:9px 15px;cursor:pointer}
+main{max-width:930px;margin:4vh auto 0;padding:16px;display:grid;grid-template-columns:1fr 1.1fr;gap:38px;align-items:center}
+.intro h1{font-size:clamp(38px,5vw,66px);line-height:1.05;margin:0 0 20px;color:#0e5037}
+.intro p{color:#5e7769;font-size:17px;line-height:1.7}
+.card{background:#fff;padding:clamp(22px,4vw,42px);border:1px solid #d6e8dc;box-shadow:0 25px 65px #0d45221c;border-radius:24px}
+.card h2{margin:0 0 12px;font-size:25px}p{line-height:1.6}.muted{color:#638072;font-size:14px}
+button.primary{width:100%;background:#116541;color:white;border:0;border-radius:12px;padding:15px;font-weight:750;font-size:15px;cursor:pointer}
+button.primary:disabled{opacity:.55;cursor:wait}
+button.secondary{background:#eef5f0;border:0;border-radius:10px;padding:11px 15px;color:#145b40;font-weight:700;cursor:pointer}
+.actions{display:flex;gap:10px;flex-wrap:wrap}.actions button{flex:1}
+input,select{width:100%;border:1px solid #c8d9ce;border-radius:10px;padding:13px;font-size:15px;margin:6px 0 15px;background:#fff}
+label{display:block;font-size:14px;font-weight:650}
+.check{display:flex;gap:9px;align-items:flex-start;font-size:13px;line-height:1.5;margin:8px 0 22px}
+.check input{width:auto;margin:4px 0 0}
+.hidden{display:none!important}.error{margin:14px 0;color:#a22828;border-radius:10px;padding:11px;background:#fff0f0;overflow-wrap:anywhere}
+.good{color:#176746;font-weight:750}.chip{display:inline-block;background:#edf5ed;padding:8px 12px;border-radius:20px;font-weight:700;font-size:13px}
+#name{font-weight:750}footer{max-width:930px;padding:12px 18px 40px;margin:40px auto 0;color:#719082;font-size:12px}
+@media(max-width:750px){main{grid-template-columns:1fr;gap:15px;margin:12px auto}.intro h1{font-size:40px}.intro p{font-size:15px}header{padding:18px 20px}}
+</style></head>
+<body>
+<header><a href="./">🌿 ECO CLUB</a><button type="button" id="language">ҚАЗ / РУС</button></header>
+<main><section class="intro"><h1 id="headline">Eco Club 2.0</h1><p id="intro">Единый вход для учеников, педагогов и руководителей. Ваш кабинет зависит от подтверждённой роли.</p><p class="muted" id="migration">Действующий сайт, Eco Passport и административные сервисы пока работают отдельно.</p></section>
+<section class="card">
+<div id="loading"><h2>Eco Club</h2><p>Проверяем авторизацию…</p></div>
+<div id="signedOut" class="hidden"><h2 id="loginTitle">Добро пожаловать!</h2><p class="muted" id="loginDesc">Войдите через свой Google-аккаунт, чтобы зарегистрироваться.</p><button class="primary" id="signin">Войти через Google</button></div>
+<div id="registerView" class="hidden"><h2 id="registerTitle">Регистрация</h2><p class="muted" id="identity"></p><p class="muted" id="registerDesc">Выберите роль для заявки. Доступ откроется после проверки руководителем.</p>
+<form id="registration"><label id="roleLabel" for="requestedRole">Вы регистрируетесь как</label><select id="requestedRole" required><option value="student">Ученик</option><option value="teacher">Учитель</option></select><label id="classLabel" for="className">Класс (для ученика)</label><input id="className" maxlength="20" placeholder="Например, 6Е" required><label class="check"><input type="checkbox" id="consent" required><span id="consentText">Я ознакомился с правилами участия. Для несовершеннолетних требуется необходимое согласие законного представителя.</span></label><button class="primary" id="submit" type="submit">Отправить заявку</button></form></div>
+<div id="dashboard" class="hidden"><span class="chip" id="status">Ожидает проверки</span><h2 id="dashboardTitle" style="margin-top:18px">Личный кабинет</h2><p id="name"></p><p class="muted" id="dashboardInfo"></p><p class="muted" id="roleNote"></p><div class="actions"><button class="secondary" id="refresh">Обновить статус</button><button class="secondary" id="signout">Выйти</button></div></div>
+<p id="error" class="error hidden" role="alert"></p>
+</section></main>
+<footer id="privacy">Регистрация — запрос доступа, не автоматическое назначение прав. Не передавайте пароли и сервисные ключи.</footer>
+<script type="module">
+import {initializeApp} from 'https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js';
+import {getAuth,GoogleAuthProvider,signInWithPopup,onAuthStateChanged,signOut} from 'https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js';
+import {getFirestore,doc,getDoc,setDoc,serverTimestamp} from 'https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js';
+const config={apiKey:"AIzaSyCo05dvjXihGbfYhU_FHQ4OXg6SO_oRCU0",authDomain:"eco-club-40261.firebaseapp.com",projectId:"eco-club-40261",appId:"1:289680452873:web:c4fe4d451f1a488b9d37d8"};
+const app=initializeApp(config),auth=getAuth(app),db=getFirestore(app),$=id=>document.getElementById(id);
+let lang='ru',currentUser=null,profile=null;
+const dictionary={
+ru:{intro:"Единый вход для учеников, педагогов и руководителей. Ваш кабинет зависит от подтверждённой роли.",loginTitle:"Добро пожаловать!",loginDesc:"Войдите через свой Google-аккаунт, чтобы зарегистрироваться.",signin:"Войти через Google",registerTitle:"Регистрация в Eco Club",registerDesc:"Выберите роль для заявки. Доступ откроется после проверки руководителем.",roleLabel:"Вы регистрируетесь как",classLabel:"Класс (для ученика)",consentText:"Я ознакомился с правилами участия. Для несовершеннолетних требуется необходимое согласие законного представителя.",submit:"Отправить заявку",refresh:"Обновить статус",signout:"Выйти",pending:"Ожидает проверки",active:"Подтверждён",blocked:"Доступ ограничен",visitor:"Заявка",student:"Ученик",teacher:"Учитель",leader:"Руководитель",admin:"Администратор",pendingText:"Ваша заявка отправлена. Руководитель проверит её перед предоставлением доступа.",activeText:"Вход подтверждён. Подключение существующих сервисов Eco Club — следующий этап.",blockedText:"Обратитесь к руководителю проекта.",missingClass:"Укажите класс ученика.",denied:"Недостаточно разрешений: проверьте правила Firestore и аккаунт Google."},
+kk:{intro:"Оқушылар, мұғалімдер және жетекшілер үшін бірыңғай кіру. Кабинет расталған рөлге байланысты ашылады.",loginTitle:"Қош келдіңіз!",loginDesc:"Тіркелу үшін Google аккаунтыңызбен кіріңіз.",signin:"Google арқылы кіру",registerTitle:"Eco Club тіркелуі",registerDesc:"Өтінім рөлін таңдаңыз. Жетекші тексерген соң қолжетімділік беріледі.",roleLabel:"Қатысу рөлі",classLabel:"Сынып (оқушы үшін)",consentText:"Қатысу ережелерімен таныстым. Кәмелетке толмағандар үшін заңды өкілдің қажетті келісімі талап етіледі.",submit:"Өтінім жіберу",refresh:"Мәртебені жаңарту",signout:"Шығу",pending:"Тексерілуде",active:"Расталды",blocked:"Қолжетімділік шектелген",visitor:"Өтінім",student:"Оқушы",teacher:"Мұғалім",leader:"Жетекші",admin:"Әкімші",pendingText:"Өтінім жіберілді. Жетекші оны тексереді.",activeText:"Кіру расталды. Eco Club қызметтерін қосу келесі кезеңде.",blockedText:"Жоба жетекшісіне хабарласыңыз.",missingClass:"Оқушы сыныбын енгізіңіз.",denied:"Қолжетімділік рұқсаты жоқ: Firestore ережелерін тексеріңіз."}
+};
+function t(k){return dictionary[lang][k]||dictionary.ru[k]||k}
+function localize(){document.documentElement.lang=lang;['intro','loginTitle','loginDesc','signin','registerTitle','registerDesc','roleLabel','classLabel','consentText','submit','refresh','signout'].forEach(k=>$(k).textContent=t(k));$('requestedRole').options[0].text=t('student');$('requestedRole').options[1].text=t('teacher');if(profile)render()}
+$('language').onclick=()=>{lang=lang==='ru'?'kk':'ru';localize()};
+function show(which){['loading','signedOut','registerView','dashboard'].forEach(id=>$(id).classList.toggle('hidden',id!==which))}
+function error(e){$('error').textContent=String(e?.message||e);$('error').classList.remove('hidden')}
+function clearError(){$('error').classList.add('hidden');$('error').textContent=''}
+function updateClass(){$('className').required=$('requestedRole').value==='student';$('className').disabled=$('requestedRole').value!=='student'}
+$('requestedRole').onchange=updateClass;
+async function load(user){clearError();show('loading');try{const snap=await getDoc(doc(db,'profiles',user.uid));if(!snap.exists()){profile=null;$('identity').textContent=user.displayName+' · '+user.email;updateClass();show('registerView')}else{profile=snap.data();render();show('dashboard')}}catch(e){error(e?.code==='permission-denied'?t('denied'):e);show('signedOut')}}
+function render(){const p=profile;const state=p.status==='active'?'active':p.status==='pending'?'pending':'blocked';const role=state==='active'?p.role:'visitor';$('status').textContent=t(state);$('dashboardTitle').textContent=state==='active'?t(role):t('visitor');$('name').textContent=currentUser?.displayName||p.displayName||'';$('dashboardInfo').textContent=state==='active'?t('activeText'):state==='pending'?t('pendingText'):t('blockedText');$('roleNote').textContent=state==='active'?'Eco Passport / мероприятия / модерация: подключаются на следующем этапе.':''}
+$('signin').onclick=async()=>{clearError();$('signin').disabled=true;try{await signInWithPopup(auth,new GoogleAuthProvider())}catch(e){error(e)}finally{$('signin').disabled=false}};
+$('registration').onsubmit=async e=>{e.preventDefault();clearError();if(!currentUser)return;const role=$('requestedRole').value,cls=$('className').value.trim();if(role==='student'&&!cls)return error(t('missingClass'));$('submit').disabled=true;try{await setDoc(doc(db,'profiles',currentUser.uid),{uid:currentUser.uid,displayName:(currentUser.displayName||'').slice(0,120),email:currentUser.email,requestedRole:role,requestedClass:role==='student'?cls.slice(0,20):'',role:'visitor',status:'pending',createdAt:serverTimestamp()});await load(currentUser)}catch(e){error(e)}finally{$('submit').disabled=false}};
+$('refresh').onclick=()=>currentUser&&load(currentUser);$('signout').onclick=()=>signOut(auth);
+onAuthStateChanged(auth,u=>{currentUser=u;profile=null;if(u)load(u);else{clearError();show('signedOut')}},error);
+localize();
+</script></body></html>
