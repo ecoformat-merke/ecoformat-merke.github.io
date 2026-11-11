@@ -1711,6 +1711,37 @@ body.eco-teacher-modal-open{overflow:hidden}
 #schedule .eco-plan-card a{color:#116c47;font-weight:700;text-decoration:underline;text-underline-offset:4px}
 #schedule .eco-plan-card a:focus-visible{outline:3px solid #76b83f;outline-offset:5px}
 @media(max-width:700px){#schedule .eco-plan-grid{grid-template-columns:1fr}#schedule .eco-plan-card{padding:22px}}
+</style><style id="eco-gallery-premium-2026">
+/* Image-first editorial gallery. No added captions or modifications to original photographs. */
+#gallery.gallery-clean{background:radial-gradient(ellipse at 12% 5%,#e7f4df 0,transparent 36%),linear-gradient(180deg,#f9fcf8 0%,#f0f7f2 100%);position:relative;scroll-margin-top:90px}
+#gallery .gallery-clean-head{max-width:860px}
+#gallery .eco-gallery-count{display:inline-flex;align-items:center;gap:8px;margin:17px 0 0;padding:9px 15px;border-radius:999px;background:#e0eee3;color:#14583b;font-size:13px;font-weight:700}
+#gallery .eco-gallery-count strong{font-size:17px;font-variant-numeric:tabular-nums}
+#gallery .gallery-clean-grid{column-gap:17px;margin-top:35px}
+#gallery .gallery-clean-item{margin-bottom:17px;border-radius:20px;isolation:isolate;box-shadow:0 10px 26px rgba(15,66,45,.09);outline-offset:5px}
+#gallery .gallery-clean-item:before{content:'↗';position:absolute;z-index:2;bottom:13px;right:13px;display:grid;place-items:center;width:35px;height:35px;border-radius:50%;background:rgba(255,255,255,.92);color:#144d35;font-size:19px;opacity:0;transform:translateY(5px);transition:opacity .25s,transform .25s;pointer-events:none}
+#gallery .gallery-clean-item:hover:before,#gallery .gallery-clean-item:focus-visible:before{opacity:1;transform:translateY(0)}
+#gallery .gallery-clean-item:focus-visible{outline:3px solid #31875c}
+#lightbox.eco-gallery-viewer{padding:80px 92px 142px;background:rgba(5,20,15,.97);z-index:100010;flex-direction:column;gap:0}
+#lightbox.eco-gallery-viewer .eco-viewer-heading{position:absolute;top:27px;left:clamp(18px,5vw,66px);color:#e5f8e8;font-size:15px;font-weight:800;letter-spacing:.04em}
+#lightbox.eco-gallery-viewer .eco-viewer-heading>span:first-child{color:#adf18e;margin-right:6px}
+#lightbox.eco-gallery-viewer .lightbox-close{top:15px;right:clamp(16px,3vw,42px);z-index:5;width:48px;height:48px;background:#ffffff23}
+#lightbox.eco-gallery-viewer .eco-viewer-main{display:flex;justify-content:center;align-items:center;flex:1;min-height:0;width:100%}
+#lightbox.eco-gallery-viewer #lightboxImage{display:block;max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain;border-radius:10px;box-shadow:0 20px 90px #0007}
+#lightbox.eco-gallery-viewer .lightbox-nav{width:51px;height:51px;z-index:4}
+#lightbox.eco-gallery-viewer .lightbox-prev{left:clamp(12px,2vw,35px)}
+#lightbox.eco-gallery-viewer .lightbox-next{right:clamp(12px,2vw,35px)}
+#lightbox.eco-gallery-viewer .eco-viewer-bottom{position:absolute;left:0;right:0;bottom:12px;display:flex;align-items:center;flex-direction:column;gap:8px}
+#lightbox.eco-gallery-viewer .lightbox-counter{position:static;transform:none;background:transparent;color:#ebf8ee;font-size:13px;letter-spacing:.13em;padding:0}
+#lightbox.eco-gallery-viewer .eco-viewer-thumbs{display:flex;gap:7px;overflow-x:auto;max-width:min(680px,calc(100vw - 35px));padding:4px 4px 7px;scrollbar-width:thin;scrollbar-color:#658473 transparent}
+#lightbox.eco-gallery-viewer .eco-viewer-thumb{flex:0 0 56px;height:49px;padding:2px;border:2px solid transparent;border-radius:8px;background:#ffffff16;opacity:.60;cursor:pointer}
+#lightbox.eco-gallery-viewer .eco-viewer-thumb.is-active{opacity:1;border-color:#bdf3a1}
+#lightbox.eco-gallery-viewer .eco-viewer-thumb img{width:100%;height:100%;max-width:none;max-height:none;object-fit:cover;border-radius:4px}
+#lightbox.eco-gallery-viewer .eco-viewer-help{color:#a5b7ac;font-size:11px;letter-spacing:.03em;margin:0}
+#lightbox.eco-gallery-viewer button:focus-visible{outline:3px solid #c6f4b0;outline-offset:3px}
+@media(max-width:760px){#lightbox.eco-gallery-viewer{padding:78px 8px 135px}#lightbox.eco-gallery-viewer .lightbox-nav{width:43px;height:43px;top:47%;background:#071d16a8}#lightbox.eco-gallery-viewer .lightbox-prev{left:8px}#lightbox.eco-gallery-viewer .lightbox-next{right:8px}#lightbox.eco-gallery-viewer #lightboxImage{max-width:calc(100vw - 20px);max-height:100%;border-radius:5px}#lightbox.eco-gallery-viewer .eco-viewer-heading{font-size:13px;top:28px}#gallery .gallery-clean-grid{column-gap:10px}#gallery .gallery-clean-item{margin-bottom:10px;border-radius:13px}}
+@media(max-width:460px){#gallery .gallery-clean-grid{columns:2 140px}#lightbox.eco-gallery-viewer .eco-viewer-thumb{flex-basis:49px;height:43px}#lightbox.eco-gallery-viewer .eco-viewer-help{font-size:10px}#gallery .gallery-clean-item:before{display:none}}
+@media(prefers-reduced-motion:reduce){#gallery .gallery-clean-item:before{transition:none}}
 </style></head>
 <body>
 <header><div class="container nav">
@@ -2323,6 +2354,7 @@ body.eco-teacher-modal-open{overflow:hidden}
 <section class="section gallery gallery-clean" id="gallery"><div class="container">
 <div class="gallery-clean-head reveal">
 <div class="eyebrow" data-kz="Фотогалерея" data-ru="Фотогалерея">Фотогалерея</div>
+<div class="eco-gallery-count" aria-label="15 фотографий"><span aria-hidden="true">✦</span><strong>15</strong> <span data-ru="моментов Eco Club" data-kz="Eco Club сәттері">моментов Eco Club</span></div>
 <h2 class="title" data-kz="Eco Club өмірі фотосуреттерде" data-ru="Жизнь Eco Club в фотографиях">Жизнь Eco Club в фотографиях</h2>
 <p class="lead" data-kz="Артық жазусыз — мектептің экологиялық өмірінің шынайы сәттері ғана. Кез келген фотосуретті үлкейтіп көру үшін оны басыңыз." data-ru="Без лишних подписей — только реальные моменты школьной экологической жизни. Нажмите на любую фотографию, чтобы открыть её крупнее.">Без лишних подписей — только реальные моменты школьной экологической жизни. Нажмите на любую фотографию, чтобы открыть её крупнее.</p>
 </div>
@@ -2449,12 +2481,13 @@ body.eco-teacher-modal-open{overflow:hidden}
 </form>
 </div>
 </div>
-<div class="lightbox" id="lightbox" onclick="if(event.target===this)closeLightbox()">
-<button aria-label="Закрыть" class="lightbox-close" onclick="closeLightbox()">×</button>
-<button aria-label="Предыдущее фото" class="lightbox-nav lightbox-prev" onclick="prevLightboxImage()">‹</button>
-<img alt="Eco Club" id="lightboxImage" src=""/>
-<button aria-label="Следующее фото" class="lightbox-nav lightbox-next" onclick="nextLightboxImage()">›</button>
-<div class="lightbox-counter" id="lightboxCounter">1 / 15</div>
+<div class="lightbox eco-gallery-viewer" id="lightbox" role="dialog" aria-modal="true" aria-label="Просмотр фотографий Eco Club" tabindex="-1" aria-hidden="true" onclick="if(event.target===this)closeLightbox()">
+<div class="eco-viewer-heading"><span aria-hidden="true">✦</span> <span data-ru="Моменты Eco Club" data-kz="Eco Club сәттері">Моменты Eco Club</span></div>
+<button type="button" aria-label="Закрыть" class="lightbox-close" onclick="closeLightbox()">×</button>
+<button type="button" aria-label="Предыдущее фото" class="lightbox-nav lightbox-prev" onclick="prevLightboxImage()">‹</button>
+<div class="eco-viewer-main"><img alt="Eco Club" id="lightboxImage" src="" decoding="async"/></div>
+<button type="button" aria-label="Следующее фото" class="lightbox-nav lightbox-next" onclick="nextLightboxImage()">›</button>
+<div class="eco-viewer-bottom"><div class="lightbox-counter" id="lightboxCounter" role="status" aria-live="polite" aria-atomic="true">1 / 15</div><div class="eco-viewer-thumbs" id="ecoViewerThumbs" role="group" aria-label="Выбор фотографии"></div><p class="eco-viewer-help" data-ru="← → — листать · Esc — закрыть" data-kz="← → — ауыстыру · Esc — жабу">← → — листать · Esc — закрыть</p></div>
 </div>
 <script>
 function lang(l){
@@ -2511,60 +2544,77 @@ const galleryImages = [
 ];
 
 let currentGalleryIndex = 0;
-
+let ecoViewerReturnFocus = null;
+let ecoViewerOriginalOverflow = '';
+let ecoViewerTouchX = null, ecoViewerTouchY = null;
+function ecoInitViewerThumbs(){
+ const holder=document.getElementById('ecoViewerThumbs');
+ if(!holder||holder.childElementCount)return;
+ galleryImages.forEach(function(src,i){
+   const btn=document.createElement('button');
+   btn.type='button';btn.className='eco-viewer-thumb';
+   btn.setAttribute('aria-label',(document.documentElement.lang==='kk'?'Фото ':'Фото ')+(i+1));
+   const image=document.createElement('img');image.src=src;image.alt='';image.loading='lazy';image.decoding='async';
+   btn.appendChild(image);btn.addEventListener('click',()=>{currentGalleryIndex=i;updateLightboxImage()});
+   holder.appendChild(btn);
+ });
+}
 function updateLightboxImage(){
-  const img = document.getElementById('lightboxImage');
-  const counter = document.getElementById('lightboxCounter');
-  if(!img) return;
-
-  img.src = galleryImages[currentGalleryIndex];
-  img.alt = 'Eco Club — фото ' + (currentGalleryIndex + 1);
-
-  if(counter){
-    counter.textContent = (currentGalleryIndex + 1) + ' / ' + galleryImages.length;
-  }
+ const img=document.getElementById('lightboxImage'),counter=document.getElementById('lightboxCounter');
+ if(!img)return;
+ img.src=galleryImages[currentGalleryIndex];
+ img.alt=(document.documentElement.lang==='kk'?'Eco Club фотосуреті ':'Eco Club — фото ')+(currentGalleryIndex+1);
+ if(counter)counter.textContent=String(currentGalleryIndex+1).padStart(2,'0')+' / '+String(galleryImages.length).padStart(2,'0');
+ const holder=document.getElementById('ecoViewerThumbs');
+ if(holder){Array.from(holder.children).forEach((b,i)=>{b.classList.toggle('is-active',i===currentGalleryIndex);b.setAttribute('aria-pressed',String(i===currentGalleryIndex))});
+ const selected=holder.children[currentGalleryIndex];
+ if(selected)selected.scrollIntoView({block:'nearest',inline:'nearest',behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'});}
+ // Prefetch only adjacent images once the user has explicitly opened the viewer.
+ [-1,1].forEach(offset=>{const pre=new Image();pre.src=galleryImages[(currentGalleryIndex+offset+galleryImages.length)%galleryImages.length]});
 }
-
 function openLightbox(srcOrIndex){
-  const box = document.getElementById('lightbox');
-  if(!box) return;
-
-  if(typeof srcOrIndex === 'number'){
-    currentGalleryIndex = Math.max(0, Math.min(galleryImages.length - 1, srcOrIndex));
-  } else {
-    const foundIndex = galleryImages.indexOf(String(srcOrIndex));
-    currentGalleryIndex = foundIndex >= 0 ? foundIndex : 0;
-  }
-
-  updateLightboxImage();
-  box.classList.add('open');
-  document.body.style.overflow = 'hidden';
+ const box=document.getElementById('lightbox');if(!box)return;
+ ecoViewerReturnFocus=document.activeElement;
+ currentGalleryIndex=typeof srcOrIndex==='number'?Math.max(0,Math.min(galleryImages.length-1,srcOrIndex)):Math.max(0,galleryImages.indexOf(String(srcOrIndex)));
+ ecoInitViewerThumbs();
+ box.classList.add('open');box.setAttribute('aria-hidden','false');
+ ecoViewerOriginalOverflow=document.body.style.overflow;document.body.style.overflow='hidden';
+ updateLightboxImage();
+ box.querySelector('.lightbox-close')?.focus({preventScroll:true});
 }
-
-function prevLightboxImage(){
-  currentGalleryIndex = (currentGalleryIndex - 1 + galleryImages.length) % galleryImages.length;
-  updateLightboxImage();
-}
-
-function nextLightboxImage(){
-  currentGalleryIndex = (currentGalleryIndex + 1) % galleryImages.length;
-  updateLightboxImage();
-}
-
+function prevLightboxImage(){currentGalleryIndex=(currentGalleryIndex-1+galleryImages.length)%galleryImages.length;updateLightboxImage()}
+function nextLightboxImage(){currentGalleryIndex=(currentGalleryIndex+1)%galleryImages.length;updateLightboxImage()}
 function closeLightbox(){
-  const box = document.getElementById('lightbox');
-  if(box) box.classList.remove('open');
-  document.body.style.overflow = '';
+ const box=document.getElementById('lightbox');
+ if(box){box.classList.remove('open');box.setAttribute('aria-hidden','true')}
+ document.body.style.overflow=ecoViewerOriginalOverflow;
+ if(ecoViewerReturnFocus?.isConnected)ecoViewerReturnFocus.focus({preventScroll:true});
+ ecoViewerReturnFocus=null;
 }
-
-document.addEventListener('keydown', function(e){
-  const lightbox = document.getElementById('lightbox');
-  if(!lightbox || !lightbox.classList.contains('open')) return;
-
-  if(e.key === 'Escape') closeLightbox();
-  if(e.key === 'ArrowLeft') prevLightboxImage();
-  if(e.key === 'ArrowRight') nextLightboxImage();
+document.addEventListener('keydown',function(e){
+ const box=document.getElementById('lightbox');
+ if(!box?.classList.contains('open'))return;
+ if(e.key==='Escape'){e.preventDefault();closeLightbox()}
+ if(e.key==='ArrowLeft'){e.preventDefault();prevLightboxImage()}
+ if(e.key==='ArrowRight'){e.preventDefault();nextLightboxImage()}
+ if(e.key==='Tab'){
+   const controls=Array.from(box.querySelectorAll('button:not([disabled])'));
+   const first=controls[0],last=controls[controls.length-1];
+   if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus()}
+   else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus()}
+ }
 });
+(function(){
+ const box=document.getElementById('lightbox');
+ if(!box)return;
+ box.addEventListener('touchstart',function(e){if(e.touches.length!==1)return;ecoViewerTouchX=e.touches[0].clientX;ecoViewerTouchY=e.touches[0].clientY},{passive:true});
+ box.addEventListener('touchend',function(e){
+   if(ecoViewerTouchX===null||!e.changedTouches.length)return;
+   const dx=e.changedTouches[0].clientX-ecoViewerTouchX,dy=e.changedTouches[0].clientY-ecoViewerTouchY;
+   ecoViewerTouchX=null;ecoViewerTouchY=null;
+   if(Math.abs(dx)>55&&Math.abs(dx)>Math.abs(dy)*1.35){if(dx<0)nextLightboxImage();else prevLightboxImage()}
+ },{passive:true});
+})();
 function syncEcoMobileMenu(){
   var nav=document.getElementById('links'),button=document.getElementById('ecoMobileMenuToggle');
   if(!nav||!button)return;
