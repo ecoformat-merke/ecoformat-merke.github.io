@@ -105,6 +105,7 @@ function go(step){
  if(!mobile.matches)page=Math.floor(page/2)*2;
  render();
  book.classList.remove('is-turning');
+ book.dataset.turnDirection=step>0?'forward':'back';
  void book.offsetWidth;
  book.classList.add('is-turning');
  if(turnTimer)clearTimeout(turnTimer);
