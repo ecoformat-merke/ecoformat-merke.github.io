@@ -1,4 +1,4 @@
-/* Eco Club — Photo Book v1. Preserves all original photographs and lightbox. */
+/* Eco Club — Photo Book v2. Preserves all original photographs and lightbox. */
 (function(){
 'use strict';
 const section=document.getElementById('gallery');
@@ -17,14 +17,22 @@ const prev=document.createElement('button');prev.type='button';
 const next=document.createElement('button');next.type='button';
 const status=document.createElement('span');status.className='eco-album-status';status.setAttribute('role','status');status.setAttribute('aria-live','polite');
 controls.append(prev,status,next);
+board.appendChild(controls);
 const note=document.createElement('p');note.className='eco-album-note';
-root.append(board,controls,note);
+root.append(board,note);
 grid.parentNode.insertBefore(root,grid);
 const isKz=()=>document.documentElement.lang==='kk';
 const trans=(ru,kz)=>isKz()?kz:ru;
 const mobile=window.matchMedia('(max-width: 720px)');
 let page=0,touchX=null,touchY=null,turnTimer=null;
 const pages=[{type:'cover'},{type:'coverArt'}];
+const chapters=[
+ {ru:'Наши первые шаги',kz:'Алғашқы қадамдар'},
+ {ru:'Учимся беречь природу',kz:'Табиғатты аялауды үйренеміз'},
+ {ru:'Вместе ради природы',kz:'Табиғат үшін біргеміз'},
+ {ru:'Идеи и открытия',kz:'Идеялар мен жаңалықтар'},
+ {ru:'Истории нашей школы',kz:'Мектебіміздің тарихы'}
+];
 for(let i=0;i<pictures.length;i+=3){
  pages.push({type:'photos',start:i,images:[pictures[i]]});
  pages.push({type:'photos',start:i+1,images:pictures.slice(i+1,i+3)});
@@ -44,7 +52,9 @@ function pageNode(p,index){
  const node=el('div','eco-album-page');
  if(p.type==='cover'){
    node.classList.add('eco-album-cover');
-   node.append(el('span','eco-album-leaf','🌿'),el('div','eco-album-overline','ECO CLUB • 2026–2027'));
+   const logo=el('img','eco-album-logo');logo.src='eco-club-logo.png';logo.alt='Eco Club';logo.width=92;logo.height=92;logo.loading='lazy';
+   node.append(logo,el('div','eco-album-overline','ECO CLUB • 2026–2027'));
+
    node.append(el('h3','',trans('Наш зелёный фотоальбом','Біздің жасыл фотоальбомымыз')));
    node.append(el('p','',trans('Школьные истории, которые мы создаём вместе.','Бірге жасайтын мектептегі жарқын сәттер.')));
  }else if(p.type==='coverArt'||p.type==='endArt'){
@@ -53,13 +63,16 @@ function pageNode(p,index){
    selected.forEach(k=>{if(!pictures[k])return;const img=el('img');img.src=pictures[k].src;img.alt=pictures[k].alt;img.loading='lazy';img.decoding='async';node.append(img)});
  }else if(p.type==='end'){
    node.classList.add('eco-album-cover');
-   node.append(el('span','eco-album-leaf','🍃'),el('div','eco-album-overline','ECO CLUB'));
+   const logo=el('img','eco-album-logo');logo.src='eco-club-logo.png';logo.alt='Eco Club';logo.width=92;logo.height=92;logo.loading='lazy';
+   node.append(logo,el('div','eco-album-overline','ECO CLUB'));
    node.append(el('h3','',trans('История продолжается','Тарих жалғасады')));
    node.append(el('p','',trans('Впереди новые экологические проекты и добрые дела.','Алда жаңа экологиялық жобалар мен игі істер бар.')));
  }else{
    const header=el('div','');
    header.append(el('div','eco-album-folio','ECO CLUB • '+String(Math.floor((index-2)/2)+1).padStart(2,'0')));
-   header.append(el('h3','eco-album-page-title',trans('Моменты нашей школы','Мектебіміздің сәттері')));
+   const chapter=chapters[Math.min(chapters.length-1,Math.floor((index-2)/2))];
+   header.append(el('h3','eco-album-page-title',trans(chapter.ru,chapter.kz)));
+   header.append(el('p','eco-album-chapter-note',trans('Фотостраницы Eco Club','Eco Club фотобеттері')));
    const body=el('div','eco-album-page-body');
    p.images.forEach((photo,i)=>body.appendChild(createPhoto(photo,p.start+i,p.images.length>1)));
    node.append(header,body,el('div','eco-album-folio',trans('НАША ИСТОРИЯ','БІЗДІҢ ТАРИХ')+'  •  '+String(index-1).padStart(2,'0')));
@@ -77,8 +90,10 @@ function render(){
  status.textContent=current+' / '+total;
  prev.disabled=start===0;
  next.disabled=start+(isMobile?1:2)>=pages.length;
- prev.textContent=trans('← Назад','← Артқа');
- next.textContent=trans('Вперёд →','Алға →');
+ prev.textContent=trans('‹','‹');
+ next.textContent=trans('›','›');
+ prev.title=trans('Предыдущая страница','Алдыңғы бет');
+ next.title=trans('Следующая страница','Келесі бет');
  prev.setAttribute('aria-label',trans('Предыдущая страница','Алдыңғы бет'));
  next.setAttribute('aria-label',trans('Следующая страница','Келесі бет'));
  note.textContent=trans('Листайте страницы стрелками или свайпом. Нажмите на фото для просмотра.','Беттерді көрсеткілермен немесе саусақпен жылжытып ашыңыз. Фотоны үлкейту үшін басыңыз.');
