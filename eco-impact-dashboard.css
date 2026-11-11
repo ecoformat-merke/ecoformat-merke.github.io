@@ -1,0 +1,25 @@
+/* Eco Club — Impact Dashboard 1.0. All values supplied by existing API update events. */
+#results .eco-impact-dashboard{margin:25px 0 34px;padding:clamp(22px,3.3vw,39px);background:linear-gradient(140deg,#123f30,#092d25 90%);border-radius:27px;color:#effbef;box-shadow:0 20px 48px #052b2030;position:relative;overflow:hidden}
+#results .eco-impact-dashboard::after{content:"";position:absolute;pointer-events:none;right:-110px;top:-150px;width:360px;height:360px;border-radius:50%;border:85px solid #b3e5aa0b}
+#results .eco-impact-header{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;flex-wrap:wrap;position:relative;z-index:1}
+#results .eco-impact-eyebrow{font-size:11px;letter-spacing:.19em;font-weight:850;color:#b8e9ad;margin:0 0 11px}
+#results .eco-impact-title{font-size:clamp(23px,3.3vw,35px);color:#f7fff7;line-height:1.15;margin:0 0 8px;max-width:650px}
+#results .eco-impact-sub{font-size:13px;color:#cee6d3;line-height:1.6;max-width:660px;margin:0}
+#results .eco-impact-source{display:inline-flex;align-items:center;gap:8px;border:1px solid #b9e3b459;background:#ffffff13;border-radius:999px;padding:9px 12px;color:#e4f5df;font-size:11px;font-weight:750;white-space:nowrap}
+#results .eco-impact-source:before{content:"";width:8px;height:8px;border-radius:50%;background:#cdd7c8}
+#results .eco-impact-source.is-live:before{background:#8ff3a0;box-shadow:0 0 0 4px #8ff3a02b}
+#results .eco-impact-tabs{display:flex;gap:8px;flex-wrap:wrap;margin:23px 0 20px;position:relative;z-index:1}
+#results .eco-impact-tab{border:1px solid #d3efcb4f;border-radius:999px;background:#ffffff13;color:#e2f2df;cursor:pointer;padding:11px 17px;font-size:13px;font-weight:850}
+#results .eco-impact-tab[aria-selected="true"]{background:#c9f4b2;color:#13442d;border-color:#c9f4b2}
+#results .eco-impact-tab:focus-visible{outline:3px solid #d1f7b6;outline-offset:3px}
+#results .eco-impact-panel{display:grid;grid-template-columns:minmax(180px,.75fr) minmax(0,1.25fr);gap:30px;align-items:center;position:relative;z-index:1}
+#results .eco-impact-number{display:block;font-size:clamp(42px,6vw,72px);letter-spacing:-.055em;font-weight:900;line-height:1.05;color:#f6fff0;font-variant-numeric:tabular-nums}
+#results .eco-impact-unit{color:#d1ecc6;font-size:15px;font-weight:750;margin-top:10px}
+#results .eco-impact-progress-caption{display:flex;align-items:baseline;justify-content:space-between;gap:10px;flex-wrap:wrap;color:#e4f5e4;font-size:13px;font-weight:750;margin-bottom:15px}
+#results .eco-impact-progress-caption strong{color:#c1e8ad;font-size:17px}
+#results .eco-impact-progress-rail{position:relative;height:16px;border-radius:99px;background:#ffffff28;overflow:hidden;border:1px solid #d0f7ba20}
+#results .eco-impact-progress-bar{height:100%;width:0;background:linear-gradient(90deg,#81d899,#b9ef98);border-radius:99px;transition:width .6s cubic-bezier(.2,.7,.2,1)}
+#results .eco-impact-progress-detail{margin:13px 0 0;color:#d1e7d5;line-height:1.55;font-size:12px}
+#results .eco-impact-disclaimer{font-size:12px;color:#c6e0cc;line-height:1.6;margin:20px 0 0;border-top:1px solid #e2fbe129;padding-top:14px;position:relative;z-index:1}
+@media(max-width:700px){#results .eco-impact-panel{grid-template-columns:1fr;gap:19px}#results .eco-impact-dashboard{border-radius:19px}#results .eco-impact-tabs{gap:6px}#results .eco-impact-tab{padding:9px 12px;font-size:12px}}
+@media(prefers-reduced-motion:reduce){#results .eco-impact-progress-bar{transition:none}}
