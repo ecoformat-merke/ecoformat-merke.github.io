@@ -1701,7 +1701,8 @@ body.eco-teacher-modal-open{overflow:hidden}
 <link rel="stylesheet" href="./eco-projects-premium.css?v=20261104-stickyfix"/>
 <link rel="stylesheet" href="./eco-green-planet-v3.css?v=20261104-autolink"/>
 <link rel="stylesheet" href="eco2-unified.css?v=3">
-<link rel="stylesheet" href="eco-gallery-book.css?v=4"><style id="eco-plan-style">
+<link rel="stylesheet" href="eco-gallery-book.css?v=4">
+<link rel="stylesheet" href="eco-impact-dashboard.css?v=1"><style id="eco-plan-style">
 #schedule.eco-plan-section{padding:clamp(58px,7vw,100px) 0;background:linear-gradient(155deg,#eff8f1,#fafdf9);scroll-margin-top:90px}
 #schedule .eco-plan-lead{max-width:800px;margin:16px 0 30px;color:#4d6759;font-size:clamp(15px,1.5vw,18px);line-height:1.7}
 #schedule .eco-plan-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
@@ -2707,6 +2708,7 @@ if(mainText){
   mainText.textContent=document.documentElement.lang==='kk'?mainText.dataset.kz:mainText.dataset.ru;
 }
 updateContributionStats(data);
+window.dispatchEvent(new CustomEvent('eco:member-update',{detail:{count:count,goal:goal}}));
 renderMembers();
 fillContributionMembers()}
 let ecoClubRefreshBusy=false;
@@ -2874,6 +2876,7 @@ const PUBLIC_BASELINE_CAPS_COUNT=0;
   updateV31(paper,'ecoPaperV31','ecoPaperBarV31','ecoPaperFillV31','ecoPaperProgressV31',100);
   updateV31(caps,'ecoCapsV31','ecoCapsBarV31','ecoCapsFillV31','ecoCapsProgressV31',20000);
   if(window.ecoTreeSetActual && Number.isFinite(paper) && Number.isFinite(caps))window.ecoTreeSetActual(paper,caps);
+window.dispatchEvent(new CustomEvent('eco:impact-update',{detail:{paper:paper,caps:caps}}));
 }
 
 const contributionForm=document.getElementById('contributionForm');
@@ -3392,6 +3395,7 @@ load();
 <script defer src="./eco-projects-globe.js?v=20261104-autolink"></script>
 <script defer src="./eco-earth-webgl.js?v=20261104-3b"></script>
 <script defer src="./eco-gallery-book.js?v=4"></script>
+<script defer src="./eco-impact-dashboard.js?v=1"></script>
 
 <div id="eco2-login">
  <div class="eco2-auth-card"><strong>🌿 ECO CLUB 2.0</strong><h2>Единый вход / Бірыңғай кіру</h2>
