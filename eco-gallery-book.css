@@ -48,3 +48,47 @@
 }
 @media(max-width:440px){#gallery .eco-album-book,#gallery .eco-album-page{min-height:410px}#gallery .eco-album-page{padding:17px}#gallery .eco-album-page-title{font-size:22px}#gallery .eco-album-photo{padding:4px}#gallery .eco-album-photo img{max-height:285px}}
 @media(prefers-reduced-motion:reduce){#gallery .eco-album-book.is-turning .eco-album-page{animation:none}#gallery .eco-album-controls button{transition:none}}
+
+/* Eco PhotoBook 2.0 — compact landscape format, navigation built into the cover. */
+#gallery .eco-album{max-width:1100px;margin-top:25px}
+#gallery .eco-album-board{padding:18px 61px 34px;border-radius:24px;box-shadow:0 22px 55px #08342136,0 4px 0 #092c21}
+#gallery .eco-album-book{height:clamp(370px,38vw,465px);min-height:0;max-width:100%;margin:0 auto}
+#gallery .eco-album-page{height:100%;min-height:0;padding:clamp(17px,2.2vw,26px);justify-content:space-between}
+#gallery .eco-album-cover{gap:7px}
+#gallery .eco-album-cover h3{font-size:clamp(29px,3.6vw,52px);margin:4px 0 8px}
+#gallery .eco-album-cover .eco-album-logo{width:clamp(70px,7vw,92px);height:clamp(70px,7vw,92px);object-fit:contain;background:#f5fff1;border:3px solid #ddf0d1;border-radius:50%;padding:5px;filter:drop-shadow(0 7px 12px #00180d33)}
+#gallery .eco-album-cover .eco-album-overline{font-size:10px}
+#gallery .eco-album-cover p{font-size:clamp(12px,1.3vw,15px)}
+#gallery .eco-album-cover-art img{border-width:4px}
+#gallery .eco-album-page-title{font-size:clamp(21px,2.2vw,29px);margin-bottom:5px}
+#gallery .eco-album-chapter-note{margin:0 0 11px;color:#6e8b74;font-size:12px;font-weight:650}
+#gallery .eco-album-page-body{gap:9px;overflow:hidden}
+#gallery .eco-album-photo{padding:4px;overflow:hidden}
+#gallery .eco-album-photo img{max-height:100%;object-fit:contain}
+#gallery .eco-album-controls{position:absolute;inset:0;z-index:5;display:flex;justify-content:space-between;align-items:center;margin:0;pointer-events:none}
+#gallery .eco-album-controls button{pointer-events:auto;display:grid;place-items:center;width:42px;height:54px;padding:0;border-radius:14px;background:#e4f3dc;color:#0c4c32;border:1px solid #cee3c7;box-shadow:0 3px 12px #00170f44;font-size:37px;line-height:1}
+#gallery .eco-album-controls button:first-child{position:absolute;left:10px;top:calc(50% - 21px);transform:translateY(-50%)}
+#gallery .eco-album-controls button:last-child{position:absolute;right:10px;top:calc(50% - 21px);transform:translateY(-50%)}
+#gallery .eco-album-controls button:hover:not(:disabled){background:#f7ffec;transform:translateY(-50%) scale(1.04)}
+#gallery .eco-album-controls button:disabled{opacity:.28}
+#gallery .eco-album-status{position:absolute;bottom:9px;left:50%;transform:translateX(-50%);font-size:12px;color:#e8f5dc;border:1px solid #d8ead033;border-radius:999px;background:#00190c44;padding:3px 13px;min-width:70px}
+#gallery .eco-album-note{margin-top:14px}
+@media(max-width:900px) and (min-width:721px){
+ #gallery .eco-album-board{padding-left:52px;padding-right:52px}
+ #gallery .eco-album-book{height:clamp(350px,45vw,435px)}
+ #gallery .eco-album-cover h3{font-size:clamp(27px,4vw,39px)}
+}
+@media(max-width:720px){
+ #gallery .eco-album-board{padding:10px 12px 31px;border-radius:18px}
+ #gallery .eco-album-book{height:clamp(385px,115vw,480px);min-height:0}
+ #gallery .eco-album-page{height:100%;min-height:0;padding:22px 43px}
+ #gallery .eco-album-cover h3{font-size:clamp(30px,7.5vw,43px)}
+ #gallery .eco-album-cover .eco-album-logo{width:82px;height:82px}
+ #gallery .eco-album-controls button{width:34px;height:52px;font-size:31px;border-radius:11px;background:#eff8e8f5}
+ #gallery .eco-album-controls button:first-child{left:0;top:calc(50% - 15px)}
+ #gallery .eco-album-controls button:last-child{right:0;top:calc(50% - 15px)}
+ #gallery .eco-album-photo img{max-height:100%}
+ #gallery .eco-album-status{bottom:5px}
+}
+@media(max-width:440px){#gallery .eco-album-book{height:410px;min-height:0}#gallery .eco-album-page{padding:20px 40px}#gallery .eco-album-page-title{font-size:20px}}
+@media(prefers-reduced-motion:reduce){#gallery .eco-album-controls button:hover:not(:disabled){transform:translateY(-50%)}}
