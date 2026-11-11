@@ -1713,7 +1713,7 @@ body.eco-teacher-modal-open{overflow:hidden}
 <header><div class="container nav">
 <a class="brand" href="#home"><img alt="Eco Club" src="eco-club-logo.png"/><span>ECO CLUB</span></a>
 <nav class="links" id="links"><a data-kz="Біз туралы" data-ru="О нас" href="#about">О нас</a><a data-kz="Нәтижелер" data-ru="Результаты" href="#results">Результаты</a><a data-kz="Жобалар" data-ru="Проекты" href="#projects">Проекты</a><a data-kz="Жаңалықтар" data-ru="Новости" href="#news">Новости</a><a data-kz="Жоспар" data-ru="План" href="#schedule">План</a><a data-kz="Мүшелер" data-ru="Участники" href="#members">Участники</a><a data-kz="Команда" data-ru="Команда" href="#team">Команда</a><a data-kz="Қосылу" data-ru="Вступить" href="#application">Вступить</a><a class="eco-login-link" data-kz="Жеке кабинет" data-ru="Личный кабинет" href="login.html">Личный кабинет</a></nav>
-<div class="langs"><button id="kz" onclick="lang('kz')">ҚАЗ</button><button class="active" id="ru" onclick="lang('ru')">РУС</button></div><button class="menu" onclick="toggleMenu()">☰</button>
+<div class="langs" role="group" aria-label="Тіл / Язык"><button type="button" id="kz" onclick="lang('kz')" lang="kk" aria-label="Қазақ тілі" aria-pressed="false">ҚАЗ</button><button type="button" class="active" id="ru" onclick="lang('ru')" lang="ru" aria-label="Русский язык" aria-pressed="true">РУС</button></div><button type="button" class="menu" id="ecoMobileMenuToggle" aria-label="Открыть меню" aria-controls="links" aria-expanded="false" onclick="toggleMenu()">☰</button>
 </div></header>
 <main>
 <section class="ln-home ln-hero" id="home"><div class="ln-hero-inner"><div class="ln-hero-copy"><div class="ln-overline"><i></i><span data-kz="Мектептің экологиялық қауымдастығы" data-ru="Экологическое сообщество школы">Экологическое сообщество школы</span></div><h1 data-rich-kz="Әлемді өзгертеміз,&lt;br&gt;&lt;em&gt;өз мектебімізден бастаймыз.&lt;/em&gt;" data-rich-ru="Меняем мир,&lt;br&gt;&lt;em&gt;начиная со своей школы.&lt;/em&gt;">Меняем мир,<br/><em>начиная со своей школы.</em></h1><p data-kz="Оқушылар мен мұғалімдерді біріктіріп, жасыл кеңістіктер құрамыз, қайта өңделетін қалдықтарды жинаймыз және экологиялық идеяларды нақты іске айналдырамыз." data-ru="Объединяем учеников и педагогов, чтобы создавать зелёные пространства, собирать вторсырьё и превращать экологические идеи в реальные дела.">Объединяем учеников и педагогов, чтобы создавать зелёные пространства, собирать вторсырьё и превращать экологические идеи в реальные дела.</p><p class="ln-school" data-kz="Мұхтар Әуезов атындағы мектеп-лицей · 2026–2027" data-ru="Школа-лицей имени Мухтара Ауэзова · 2026–2027">Школа-лицей имени Мухтара Ауэзова · 2026–2027</p><div class="ln-actions"><a class="ln-cta ln-primary" data-kz="Жобаларды көру ↗" data-ru="Исследовать проекты ↗" href="#projects">Исследовать проекты ↗</a><a class="ln-cta ln-alt" data-kz="Қосылу →" data-ru="Присоединиться →" href="#application">Присоединиться →</a><a class="ln-cta ln-alt" data-kz="Кіру / Тіркелу" data-ru="Войти / Регистрация" href="login.html">Войти / Регистрация</a></div></div>
@@ -2475,6 +2475,9 @@ function lang(l){
   var kzBtn = document.getElementById('kz');
   if(ruBtn) ruBtn.classList.toggle('active', l==='ru');
   if(kzBtn) kzBtn.classList.toggle('active', l==='kz');
+  if(ruBtn) ruBtn.setAttribute('aria-pressed',String(l==='ru'));
+  if(kzBtn) kzBtn.setAttribute('aria-pressed',String(l==='kz'));
+  if(typeof syncEcoMobileMenu==='function') syncEcoMobileMenu();
 
   document.documentElement.lang = l==='kz' ? 'kk' : 'ru';
 
@@ -2559,7 +2562,26 @@ document.addEventListener('keydown', function(e){
   if(e.key === 'ArrowLeft') prevLightboxImage();
   if(e.key === 'ArrowRight') nextLightboxImage();
 });
-function toggleMenu(){document.getElementById('links').classList.toggle('open')}document.querySelectorAll('#links a').forEach(a=>a.onclick=()=>document.getElementById('links').classList.remove('open'));
+function syncEcoMobileMenu(){
+  var nav=document.getElementById('links'),button=document.getElementById('ecoMobileMenuToggle');
+  if(!nav||!button)return;
+  var open=nav.classList.contains('open');
+  button.setAttribute('aria-expanded',String(open));
+  button.setAttribute('aria-label',open?(document.documentElement.lang==='kk'?'Мәзірді жабу':'Закрыть меню'):(document.documentElement.lang==='kk'?'Мәзірді ашу':'Открыть меню'));
+}
+function toggleMenu(force){
+  var nav=document.getElementById('links');
+  if(!nav)return;
+  nav.classList.toggle('open',typeof force==='boolean'?force:!nav.classList.contains('open'));
+  syncEcoMobileMenu();
+}
+document.querySelectorAll('#links a').forEach(function(a){a.addEventListener('click',function(){toggleMenu(false)})});
+document.addEventListener('keydown',function(e){if(e.key==='Escape'&&document.getElementById('links').classList.contains('open')){toggleMenu(false);document.getElementById('ecoMobileMenuToggle').focus()}});
+document.addEventListener('click',function(e){
+  var nav=document.getElementById('links'),button=document.getElementById('ecoMobileMenuToggle');
+  if(nav.classList.contains('open')&&!nav.contains(e.target)&&!button.contains(e.target))toggleMenu(false);
+});
+window.addEventListener('resize',function(){if(window.innerWidth>900)toggleMenu(false)},{passive:true});
 document.querySelectorAll('.reveal').forEach(e=>e.classList.add('visible'));
 const resultCounters=document.querySelectorAll('.counter:not(#paperKgCounter):not(#capsCountCounter)');let countersDone=false;function animateResultCounters(){if(countersDone)return;countersDone=true;resultCounters.forEach(el=>{const target=+el.dataset.target||0,start=performance.now(),duration=1200;function tick(now){const p=Math.min(1,(now-start)/duration),ease=1-Math.pow(1-p,3);el.textContent=Math.round(target*ease).toLocaleString('ru-RU');if(p<1)requestAnimationFrame(tick)}requestAnimationFrame(tick)})}const resultsSection=document.getElementById('results');if('IntersectionObserver'in window&&resultsSection){new IntersectionObserver(entries=>{if(entries[0].isIntersecting)animateResultCounters()},{threshold:.25}).observe(resultsSection)}else animateResultCounters();
 
