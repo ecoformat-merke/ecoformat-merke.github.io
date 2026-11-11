@@ -55,7 +55,7 @@ function pageNode(p,index){
    const logo=el('img','eco-album-logo');logo.src='eco-club-logo.png';logo.alt='Eco Club';logo.width=92;logo.height=92;logo.loading='lazy';
    node.append(logo,el('div','eco-album-overline','ECO CLUB • 2026–2027'));
 
-   node.append(el('h3','',trans('Наш зелёный фотоальбом','Біздің жасыл фотоальбомымыз')));
+   node.append(el('h3','',trans('Наш зелёный фотоальбом','Eco Club фотоальбомы')));
    node.append(el('p','',trans('Школьные истории, которые мы создаём вместе.','Бірге жасайтын мектептегі жарқын сәттер.')));
  }else if(p.type==='coverArt'||p.type==='endArt'){
    node.classList.add('eco-album-cover-art');
