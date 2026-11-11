@@ -1,0 +1,50 @@
+/* Eco Club — Book Gallery v1: progressive enhancement; original mosaic is fallback. */
+#gallery .eco-album{margin:30px auto 0;max-width:1190px;--paper:#fffdf3;--ink:#19442f;--edge:#dfd6bc}
+#gallery .eco-album[hidden],#gallery .gallery-clean-grid[hidden]{display:none!important}
+#gallery .eco-album-board{position:relative;padding:clamp(13px,2.6vw,31px);border-radius:28px;background:linear-gradient(125deg,#164d39,#092d23 70%,#194f39);box-shadow:0 28px 70px #08342136,0 6px 0 #092c21;isolation:isolate}
+#gallery .eco-album-board:before{content:'';position:absolute;inset:8px;border:1px solid #a7c69a55;border-radius:23px;pointer-events:none}
+#gallery .eco-album-book{position:relative;min-height:clamp(410px,50vw,595px);display:grid;grid-template-columns:repeat(2,minmax(0,1fr));overflow:hidden;border-radius:11px;background:var(--paper);box-shadow:0 14px 35px #0004,7px 7px 0 #d9d3be,11px 11px 0 #b0a78f;perspective:1100px}
+#gallery .eco-album-book:after{content:'';position:absolute;z-index:3;pointer-events:none;top:0;bottom:0;left:50%;width:30px;transform:translateX(-50%);background:linear-gradient(90deg,#0000,#4c423c2d 46%,#fff9 53%,#0000)}
+#gallery .eco-album-page{position:relative;min-width:0;display:flex;flex-direction:column;justify-content:space-between;padding:clamp(18px,3vw,37px);overflow:hidden;background:radial-gradient(circle at 8% 7%,#fffef9,#f8f5e9 92%);color:var(--ink)}
+#gallery .eco-album-page:nth-child(odd){box-shadow:inset -15px 0 20px -20px #4b4930}
+#gallery .eco-album-page:nth-child(even){box-shadow:inset 15px 0 20px -20px #4b4930}
+#gallery .eco-album-book.is-turning .eco-album-page{animation:ecoBookTurn .35s ease-out}
+@keyframes ecoBookTurn{0%{opacity:.63;filter:brightness(.94);transform:scale(.985)}100%{opacity:1;filter:none;transform:scale(1)}}
+#gallery .eco-album-cover{position:relative;color:#edf9e6!important;background:linear-gradient(150deg,#185941,#082d25)!important;justify-content:center;align-items:center;text-align:center;gap:12px}
+#gallery .eco-album-cover:before{content:'';position:absolute;inset:16px;border:1px solid #d0e4bd55;pointer-events:none}
+#gallery .eco-album-cover .eco-album-leaf{font-size:38px;line-height:1}
+#gallery .eco-album-cover h3{font:700 clamp(32px,5vw,70px)/1.08 Georgia,'Times New Roman',serif;margin:8px 0 15px;color:#f1f8e7;letter-spacing:-.035em}
+#gallery .eco-album-cover p{max-width:330px;margin:0;line-height:1.5;color:#c8e9d5;font-size:clamp(13px,1.5vw,17px)}
+#gallery .eco-album-cover .eco-album-overline{font-size:11px;font-weight:900;letter-spacing:.22em;color:#c7f4a9}
+#gallery .eco-album-cover-art{background:#d9e9d6!important;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:9px;padding:clamp(17px,2.4vw,28px)}
+#gallery .eco-album-cover-art img{width:100%;height:100%;min-height:0;object-fit:cover;border:5px solid #fff;box-shadow:0 5px 18px #173d2b33;border-radius:4px}
+#gallery .eco-album-cover-art img:first-child{grid-row:span 2}
+#gallery .eco-album-folio{display:flex;justify-content:space-between;gap:10px;color:#6c8170;font:700 11px/1.4 Inter,Segoe UI,Arial,sans-serif;letter-spacing:.12em;text-transform:uppercase}
+#gallery .eco-album-page-title{margin:0 0 16px;font:600 clamp(22px,2.6vw,34px)/1.18 Georgia,'Times New Roman',serif;color:#184a35}
+#gallery .eco-album-page-body{flex:1;display:flex;flex-direction:column;gap:12px;min-height:0}
+#gallery .eco-album-photo{display:block;flex:1;min-height:0;width:100%;padding:6px;border:0;border-radius:5px;background:#fff;cursor:zoom-in;box-shadow:0 5px 17px #3b503c24}
+#gallery .eco-album-photo:focus-visible{outline:3px solid #37794b;outline-offset:3px}
+#gallery .eco-album-photo img{width:100%;height:100%;min-height:0;max-height:430px;object-fit:contain;display:block;background:#ebeee8}
+#gallery .eco-album-photo.eco-album-photo-pair{height:calc(50% - 6px)}
+#gallery .eco-album-photo:not(.eco-album-photo-pair){height:100%}
+#gallery .eco-album-page .eco-album-folio{margin-top:16px}
+#gallery .eco-album-controls{display:flex;justify-content:center;align-items:center;gap:17px;margin-top:23px;flex-wrap:wrap}
+#gallery .eco-album-controls button{border:1px solid #bbd4c5;border-radius:999px;padding:13px 20px;font-weight:800;font-size:14px;background:#fff;color:#185238;cursor:pointer;transition:background .2s,transform .2s}
+#gallery .eco-album-controls button:hover:not(:disabled){background:#e5f2e6;transform:translateY(-2px)}
+#gallery .eco-album-controls button:disabled{opacity:.42;cursor:not-allowed}
+#gallery .eco-album-controls button:focus-visible{outline:3px solid #70b45f;outline-offset:3px}
+#gallery .eco-album-status{font-size:13px;color:#41694f;min-width:110px;text-align:center;font-weight:800;font-variant-numeric:tabular-nums}
+#gallery .eco-album-note{margin:13px 0 0;text-align:center;color:#668274;font-size:13px}
+@media(max-width:720px){
+ #gallery .eco-album-board{padding:12px;border-radius:18px}
+ #gallery .eco-album-book{grid-template-columns:1fr;min-height:480px;box-shadow:0 8px 25px #0003,5px 5px 0 #d8d0b7}
+ #gallery .eco-album-book:after{display:none}
+ #gallery .eco-album-page{min-height:480px;padding:22px}
+ #gallery .eco-album-page[data-mobile-hide]{display:none}
+ #gallery .eco-album-cover-art{grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr}
+ #gallery .eco-album-photo img{max-height:345px}
+ #gallery .eco-album-controls{gap:9px}
+ #gallery .eco-album-controls button{padding:12px 15px}
+}
+@media(max-width:440px){#gallery .eco-album-book,#gallery .eco-album-page{min-height:410px}#gallery .eco-album-page{padding:17px}#gallery .eco-album-page-title{font-size:22px}#gallery .eco-album-photo{padding:4px}#gallery .eco-album-photo img{max-height:285px}}
+@media(prefers-reduced-motion:reduce){#gallery .eco-album-book.is-turning .eco-album-page{animation:none}#gallery .eco-album-controls button{transition:none}}
