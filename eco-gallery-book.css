@@ -92,3 +92,11 @@
 }
 @media(max-width:440px){#gallery .eco-album-book{height:410px;min-height:0}#gallery .eco-album-page{padding:20px 40px}#gallery .eco-album-page-title{font-size:20px}}
 @media(prefers-reduced-motion:reduce){#gallery .eco-album-controls button:hover:not(:disabled){transform:translateY(-50%)}}
+
+/* PhotoBook 2.1: prevent long Cyrillic/Kazakh cover headings from overflowing the paper. */
+#gallery .eco-album-cover{min-width:0;max-width:100%;overflow:hidden}
+#gallery .eco-album-cover h3{display:block;width:100%;max-width:100%;padding:0 8px;box-sizing:border-box;white-space:normal;overflow-wrap:anywhere;word-break:normal;hyphens:auto;font-size:clamp(28px,3vw,43px);line-height:1.12;letter-spacing:-.025em}
+html[lang="kk"] #gallery .eco-album-cover h3{font-size:clamp(26px,2.7vw,38px);line-height:1.16;letter-spacing:-.02em}
+#gallery .eco-album-cover p{max-width:100%;overflow-wrap:break-word}
+@media(max-width:720px){#gallery .eco-album-cover h3{font-size:clamp(27px,6.5vw,39px)}html[lang="kk"] #gallery .eco-album-cover h3{font-size:clamp(25px,6vw,34px)}}
+@media(max-width:440px){#gallery .eco-album-cover h3{font-size:clamp(25px,6.5vw,32px)}html[lang="kk"] #gallery .eco-album-cover h3{font-size:clamp(23px,6vw,29px)}}
