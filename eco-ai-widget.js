@@ -1,0 +1,47 @@
+(()=>{
+"use strict";
+if(document.getElementById("eco-ai-launcher"))return;
+const css=`
+#eco-ai-launcher{position:fixed;right:22px;bottom:22px;z-index:7998;width:76px;height:76px;border:2px solid #cdf7dc;border-radius:50%;padding:3px;background:linear-gradient(145deg,#08553d,#16a177);box-shadow:0 8px 28px #07533b66;cursor:pointer;display:grid;place-items:center;animation:eco-ai-float 4s ease-in-out infinite}
+#eco-ai-launcher:hover{transform:scale(1.06);box-shadow:0 8px 35px #0f9b69aa}
+#eco-ai-launcher:focus-visible,#eco-ai-panel button:focus-visible,#eco-ai-panel a:focus-visible{outline:3px solid #a6ee73;outline-offset:3px}
+#eco-ai-launcher .eco-ai-face{width:100%;height:100%;border-radius:50%;background:radial-gradient(circle at 50% 35%,#d7faff,#60d9ca 65%,#0b7152);display:grid;place-items:center;overflow:hidden}
+#eco-ai-launcher .eco-ai-face svg{width:98%;height:98%}
+#eco-ai-launcher .eco-ai-dot{position:absolute;right:4px;bottom:7px;width:15px;height:15px;background:#c1ff80;border:3px solid #0b6543;border-radius:50%}
+#eco-ai-panel{position:fixed;right:22px;bottom:110px;z-index:7999;width:min(390px,calc(100vw - 24px));max-height:min(650px,calc(100dvh - 130px));overflow:auto;border-radius:22px;background:#fff;color:#163e2d;box-shadow:0 22px 75px #072a2090;border:1px solid #cfe4d5;font-family:Inter,Segoe UI,Arial,sans-serif}
+#eco-ai-panel[hidden]{display:none!important}
+#eco-ai-panel .eco-ai-head{background:linear-gradient(130deg,#083e30,#0a7954);padding:20px;color:white;position:relative;display:flex;gap:14px;align-items:center}
+#eco-ai-panel .eco-ai-avatar{width:74px;height:74px;border-radius:17px;flex:none;background:radial-gradient(circle,#d9fff7,#31bca6);display:grid;place-items:center;overflow:hidden;border:1px solid #aeefcf}
+#eco-ai-panel .eco-ai-avatar svg{width:90%;height:90%}
+#eco-ai-panel .eco-ai-head strong{font-size:20px;display:block;line-height:1.2}
+#eco-ai-panel .eco-ai-head small{font-size:12px;color:#c9edda;display:block;margin-top:5px}
+#eco-ai-panel .eco-ai-close{position:absolute;right:10px;top:8px;border:0;background:#ffffff25;color:white;border-radius:8px;width:30px;height:30px;font-size:20px;cursor:pointer}
+#eco-ai-panel .eco-ai-body{padding:22px}
+#eco-ai-panel .eco-ai-intro{font-size:14px;line-height:1.6;margin:0 0 16px}
+#eco-ai-panel .eco-ai-pills{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+#eco-ai-panel .eco-ai-pill{border-radius:12px;border:1px solid #bcdac7;background:#eff8f0;color:#0a6343;padding:10px 13px;font-weight:800;cursor:pointer}
+#eco-ai-panel .eco-ai-pill[aria-pressed=true]{background:#0a704b;color:white}
+#eco-ai-panel .eco-ai-content{border-radius:14px;background:#f1f8f3;border:1px solid #d9e9dd;padding:14px;font-size:13px;line-height:1.5}
+#eco-ai-panel .eco-ai-content h3{font-size:16px;margin:0 0 8px;color:#0b6245}
+#eco-ai-panel .eco-ai-content p{margin:0 0 12px}
+#eco-ai-panel .eco-ai-link{display:inline-flex;align-items:center;padding:10px 14px;background:#0a714b;color:white;border-radius:10px;text-decoration:none;font-weight:800}
+#eco-ai-panel .eco-ai-note{font-size:11px;color:#667f71;margin:14px 0 0;line-height:1.55}
+@keyframes eco-ai-float{0%,100%{translate:0 0}50%{translate:0 -5px}}
+@media(max-width:650px){#eco-ai-launcher{width:64px;height:64px;right:13px;bottom:13px}#eco-ai-panel{right:12px;bottom:87px;width:calc(100vw - 24px);max-height:calc(100dvh - 108px)}#eco-ai-panel .eco-ai-head{padding:16px}}
+@media(prefers-reduced-motion:reduce){#eco-ai-launcher{animation:none}}
+`;
+const style=document.createElement("style");style.textContent=css;document.head.appendChild(style);
+const robot=`<svg viewBox="0 0 100 100" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="ecoAiSilver"><stop stop-color="#fff"/><stop offset=".7" stop-color="#bed9e8"/><stop offset="1" stop-color="#5689a4"/></radialGradient><radialGradient id="ecoAiEye"><stop stop-color="#e8ffff"/><stop offset=".45" stop-color="#28d6ff"/><stop offset="1" stop-color="#026ba6"/></radialGradient></defs><path d="M26 78 Q14 84 12 99 H88 Q86 84 74 78 L62 74 H38Z" fill="#e6f4f7" stroke="#40758a" stroke-width="2"/><path d="M40 68 H60 V87 L50 95 L40 87Z" fill="#28677d"/><circle cx="50" cy="86" r="5" fill="#75f8a7"/><rect x="18" y="39" width="12" height="23" rx="5" fill="#6bd6c8" stroke="#44839c"/><rect x="70" y="39" width="12" height="23" rx="5" fill="#6bd6c8" stroke="#44839c"/><path d="M24 43 Q24 12 50 11 Q76 12 76 43 L74 60 Q68 78 50 79 Q32 78 26 60Z" fill="url(#ecoAiSilver)" stroke="#4d7a98" stroke-width="2"/><path d="M30 49 Q37 39 45 49 Q39 59 30 49Z" fill="#0c3451"/><path d="M55 49 Q63 39 70 49 Q61 59 55 49Z" fill="#0c3451"/><circle cx="39" cy="49" r="5" fill="url(#ecoAiEye)"/><circle cx="61" cy="49" r="5" fill="url(#ecoAiEye)"/><path d="M44 66 Q50 70 56 66" stroke="#286784" stroke-width="1.6" fill="none" stroke-linecap="round"/><path d="M48 59 Q50 61 52 59" stroke="#46748b" stroke-width="1.3" fill="none"/></svg>`;
+const launcher=document.createElement("button");launcher.id="eco-ai-launcher";launcher.type="button";launcher.setAttribute("aria-haspopup","dialog");launcher.setAttribute("aria-expanded","false");launcher.innerHTML='<span class="eco-ai-face">'+robot+'</span><span class="eco-ai-dot"></span>';document.body.append(launcher);
+const panel=document.createElement("section");panel.id="eco-ai-panel";panel.setAttribute("role","dialog");panel.setAttribute("aria-modal","false");panel.setAttribute("aria-label","Eco AI");panel.hidden=true;
+panel.innerHTML='<div class="eco-ai-head"><div class="eco-ai-avatar">'+robot+'</div><div><strong>Eco AI</strong><small id="eco-ai-subtitle"></small></div><button class="eco-ai-close" type="button" aria-label="Close">×</button></div><div class="eco-ai-body"><p class="eco-ai-intro" id="eco-ai-intro"></p><div class="eco-ai-pills"><button class="eco-ai-pill" data-role="student" type="button"></button><button class="eco-ai-pill" data-role="teacher" type="button"></button></div><div class="eco-ai-content" id="eco-ai-content"></div><p class="eco-ai-note" id="eco-ai-note"></p></div>';
+document.body.append(panel);
+const T={ru:{open:"Открыть помощника Eco AI",close:"Закрыть",subtitle:"Цифровой помощник Eco Club",intro:"Привет! Я Eco AI — твой помощник в мире экологии. Выбери, чем я могу помочь.",student:"🎓 Ученик",teacher:"👩‍🏫 Учитель",studentTitle:"Изучаем экологию вместе",studentText:"Начни с проектов, практических задач и исследований Eco Club.",studentAction:"Посмотреть проекты",teacherTitle:"Материалы для учителя",teacherText:"Создай КСП, рабочий лист, исследовательские задания или тест в Teacher Studio.",teacherAction:"Открыть Teacher Studio",note:"Сейчас доступен навигатор по материалам. Диалоговый ИИ подключим после настройки защищённого сервера и оплаты API."},kk:{open:"Eco AI көмекшісін ашу",close:"Жабу",subtitle:"Eco Club цифрлық көмекшісі",intro:"Сәлем! Мен Eco AI — экология әлеміндегі көмекшіңмін. Қалай көмектесетінімді таңда.",student:"🎓 Оқушы",teacher:"👩‍🏫 Мұғалім",studentTitle:"Экологияны бірге үйренейік",studentText:"Eco Club жобаларын, практикалық тапсырмаларын және зерттеулерін танып біл.",studentAction:"Жобаларды қарау",teacherTitle:"Мұғалімге арналған материалдар",teacherText:"Teacher Studio арқылы ҚМЖ, жұмыс парағы, зерттеу тапсырмалары мен тест құрастырыңыз.",teacherAction:"Teacher Studio ашу",note:"Әзірге бұл оқу материалдарына бағыттайтын көмекші. Сұхбаттасатын ЖИ қорғалған сервер мен API қосылғаннан кейін іске қосылады."}};
+let role="student",lastFocus=null;
+const lang=()=>document.documentElement.lang==="kk"?"kk":"ru";
+function draw(){const t=T[lang()];launcher.setAttribute("aria-label",t.open);panel.querySelector(".eco-ai-close").setAttribute("aria-label",t.close);document.getElementById("eco-ai-subtitle").textContent=t.subtitle;document.getElementById("eco-ai-intro").textContent=t.intro;const btns=panel.querySelectorAll("[data-role]");btns.forEach(b=>{let selected=b.dataset.role===role;b.setAttribute("aria-pressed",selected?"true":"false");b.textContent=t[b.dataset.role]});const selected=role==="student";const content=document.getElementById("eco-ai-content");content.replaceChildren();const h=document.createElement("h3");h.textContent=selected?t.studentTitle:t.teacherTitle;const p=document.createElement("p");p.textContent=selected?t.studentText:t.teacherText;const a=document.createElement("a");a.className="eco-ai-link";a.href=selected?"#projects":"eco-ai-teacher-v2.html";a.textContent=selected?t.studentAction:t.teacherAction;content.append(h,p,a);document.getElementById("eco-ai-note").textContent=t.note;}
+function open(){lastFocus=document.activeElement;draw();panel.hidden=false;launcher.setAttribute("aria-expanded","true");panel.querySelector(".eco-ai-close").focus();}
+function close(){panel.hidden=true;launcher.setAttribute("aria-expanded","false");if(lastFocus&&lastFocus.isConnected)lastFocus.focus();}
+launcher.addEventListener("click",()=>panel.hidden?open():close());panel.querySelector(".eco-ai-close").addEventListener("click",close);panel.querySelectorAll("[data-role]").forEach(b=>b.addEventListener("click",()=>{role=b.dataset.role;draw()}));document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!panel.hidden)close()});document.addEventListener("click",e=>{if(!panel.hidden&&!panel.contains(e.target)&&!launcher.contains(e.target))close()});
+new MutationObserver(()=>{if(!panel.hidden)draw();else launcher.setAttribute("aria-label",T[lang()].open)}).observe(document.documentElement,{attributes:true,attributeFilter:["lang"]});draw();
+})();
