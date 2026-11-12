@@ -123,6 +123,7 @@ launcher.addEventListener("click",()=>panel.hidden?open():close());
 panel.querySelector(".eco-ai-close").addEventListener("click",close);
 panel.querySelectorAll("[data-role]").forEach(b=>b.addEventListener("click",()=>{role=b.dataset.role;try{localStorage.setItem("ecoAiRole",role)}catch(e){}draw();panel.scrollTop=0}));
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!panel.hidden)close()});
-document.addEventListener("click",e=>{if(!panel.hidden&&!panel.contains(e.target)&&!launcher.contains(e.target))close()});
+panel.addEventListener("click",e=>e.stopPropagation());
+document.addEventListener("pointerdown",e=>{if(!panel.hidden&&!e.composedPath().includes(panel)&&!e.composedPath().includes(launcher))close()});
 new MutationObserver(()=>{draw();panel.scrollTop=0}).observe(document.documentElement,{attributes:true,attributeFilter:["lang"]});draw();
 })();
