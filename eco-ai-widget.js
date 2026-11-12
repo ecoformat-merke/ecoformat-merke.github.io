@@ -11,7 +11,7 @@ const css=`
 #eco-ai-launcher .eco-ai-dot{position:absolute;right:4px;bottom:7px;width:15px;height:15px;background:#c1ff80;border:3px solid #0b6543;border-radius:50%}
 #eco-ai-panel{position:fixed;right:22px;top:270px;bottom:auto;z-index:7999;width:min(390px,calc(100vw - 24px));max-height:min(650px,calc(100dvh - 290px));overflow:auto;border-radius:22px;background:#fff;color:#163e2d;box-shadow:0 22px 75px #072a2090;border:1px solid #cfe4d5;font-family:Inter,Segoe UI,Arial,sans-serif}
 #eco-ai-panel[hidden]{display:none!important}
-#eco-ai-panel .eco-ai-head{background:linear-gradient(130deg,#083e30,#0a7954);padding:20px;color:white;position:relative;display:flex;gap:14px;align-items:center}
+#eco-ai-panel .eco-ai-head{position:sticky;top:0;z-index:3;background:linear-gradient(130deg,#083e30,#0a7954);padding:20px;color:white;position:relative;display:flex;gap:14px;align-items:center}
 #eco-ai-panel .eco-ai-avatar{width:74px;height:74px;border-radius:17px;flex:none;background:radial-gradient(circle,#d9fff7,#31bca6);display:grid;place-items:center;overflow:hidden;border:1px solid #aeefcf}
 #eco-ai-panel .eco-ai-avatar svg{width:90%;height:90%}
 #eco-ai-panel .eco-ai-head strong{font-size:20px;display:block;line-height:1.2}
@@ -101,7 +101,7 @@ else{
 add(content,"h3","",t.studentTitle);add(content,"p","",t.studentText);
 add(content,"div","eco-ai-progress",t.choose+":");
 const menu=add(content,"div","eco-ai-topics");
-topics.forEach(topic=>{const b=add(menu,"button","eco-ai-topic",text(topic.label));b.type="button";b.setAttribute("aria-pressed",String(topicId===topic.id));b.onclick=()=>{topicId=topic.id;questionIndex=0;score=0;answered=false;selectedIndex=-1;finished=false;draw()}});
+topics.forEach(topic=>{const b=add(menu,"button","eco-ai-topic",text(topic.label));b.type="button";b.setAttribute("aria-pressed",String(topicId===topic.id));b.onclick=()=>{topicId=topic.id;questionIndex=0;score=0;answered=false;selectedIndex=-1;finished=false;draw();panel.scrollTop=0}});
 const topic=topics.find(x=>x.id===topicId)||topics[0];const q=topic.questions[questionIndex];
 const play=add(content,"div","eco-ai-play");
 if(finished){add(play,"p","eco-ai-score",t.result+": "+score+" / "+topic.questions.length);const retry=add(play,"button","eco-ai-next",t.again);retry.type="button";retry.onclick=()=>{questionIndex=0;score=0;answered=false;finished=false;draw()}}
@@ -117,12 +117,12 @@ const links=add(content,"div","eco-ai-links");[[t.projects,"#projects"],[t.tasks
 }
 document.getElementById("eco-ai-note").textContent=t.note;
 }
-function open(){lastFocus=document.activeElement;draw();panel.hidden=false;launcher.setAttribute("aria-expanded","true");panel.querySelector(".eco-ai-close").focus()}
+function open(){lastFocus=document.activeElement;draw();panel.hidden=false;panel.scrollTop=0;launcher.setAttribute("aria-expanded","true");panel.querySelector(".eco-ai-close").focus()}
 function close(){panel.hidden=true;launcher.setAttribute("aria-expanded","false");if(lastFocus&&lastFocus.isConnected)lastFocus.focus()}
 launcher.addEventListener("click",()=>panel.hidden?open():close());
 panel.querySelector(".eco-ai-close").addEventListener("click",close);
-panel.querySelectorAll("[data-role]").forEach(b=>b.addEventListener("click",()=>{role=b.dataset.role;try{localStorage.setItem("ecoAiRole",role)}catch(e){}draw()}));
+panel.querySelectorAll("[data-role]").forEach(b=>b.addEventListener("click",()=>{role=b.dataset.role;try{localStorage.setItem("ecoAiRole",role)}catch(e){}draw();panel.scrollTop=0}));
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!panel.hidden)close()});
 document.addEventListener("click",e=>{if(!panel.hidden&&!panel.contains(e.target)&&!launcher.contains(e.target))close()});
-new MutationObserver(()=>draw()).observe(document.documentElement,{attributes:true,attributeFilter:["lang"]});draw();
+new MutationObserver(()=>{draw();panel.scrollTop=0}).observe(document.documentElement,{attributes:true,attributeFilter:["lang"]});draw();
 })();
