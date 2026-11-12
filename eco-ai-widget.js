@@ -2,14 +2,14 @@
 "use strict";
 if(document.getElementById("eco-ai-launcher"))return;
 const css=`
-#eco-ai-launcher{position:fixed;right:22px;bottom:111px;z-index:7998;width:76px;height:76px;border:2px solid #cdf7dc;border-radius:50%;padding:3px;background:linear-gradient(145deg,#08553d,#16a177);box-shadow:0 8px 28px #07533b66;cursor:pointer;display:grid;place-items:center;animation:eco-ai-float 4s ease-in-out infinite}
+#eco-ai-launcher{position:fixed;right:22px;top:175px;bottom:auto;z-index:7998;width:76px;height:76px;border:2px solid #cdf7dc;border-radius:50%;padding:3px;background:linear-gradient(145deg,#08553d,#16a177);box-shadow:0 8px 28px #07533b66;cursor:pointer;display:grid;place-items:center;animation:eco-ai-float 4s ease-in-out infinite}
 #eco-ai-launcher::before{content:"Eco AI";position:absolute;right:calc(100% + 9px);top:50%;transform:translateY(-50%);white-space:nowrap;font:800 13px/1 Inter,Segoe UI,Arial,sans-serif;padding:10px 12px;color:#fff;background:#0b6347;border:1px solid #4eaf78;border-radius:12px;box-shadow:0 8px 18px #08472d55;pointer-events:none}
 #eco-ai-launcher:hover{transform:scale(1.06);box-shadow:0 8px 35px #0f9b69aa}
 #eco-ai-launcher:focus-visible,#eco-ai-panel button:focus-visible,#eco-ai-panel a:focus-visible{outline:3px solid #a6ee73;outline-offset:3px}
 #eco-ai-launcher .eco-ai-face{width:100%;height:100%;border-radius:50%;background:radial-gradient(circle at 50% 35%,#d7faff,#60d9ca 65%,#0b7152);display:grid;place-items:center;overflow:hidden}
 #eco-ai-launcher .eco-ai-face svg{width:98%;height:98%}
 #eco-ai-launcher .eco-ai-dot{position:absolute;right:4px;bottom:7px;width:15px;height:15px;background:#c1ff80;border:3px solid #0b6543;border-radius:50%}
-#eco-ai-panel{position:fixed;right:22px;bottom:204px;z-index:7999;width:min(390px,calc(100vw - 24px));max-height:min(650px,calc(100dvh - 225px));overflow:auto;border-radius:22px;background:#fff;color:#163e2d;box-shadow:0 22px 75px #072a2090;border:1px solid #cfe4d5;font-family:Inter,Segoe UI,Arial,sans-serif}
+#eco-ai-panel{position:fixed;right:22px;top:270px;bottom:auto;z-index:7999;width:min(390px,calc(100vw - 24px));max-height:min(650px,calc(100dvh - 290px));overflow:auto;border-radius:22px;background:#fff;color:#163e2d;box-shadow:0 22px 75px #072a2090;border:1px solid #cfe4d5;font-family:Inter,Segoe UI,Arial,sans-serif}
 #eco-ai-panel[hidden]{display:none!important}
 #eco-ai-panel .eco-ai-head{background:linear-gradient(130deg,#083e30,#0a7954);padding:20px;color:white;position:relative;display:flex;gap:14px;align-items:center}
 #eco-ai-panel .eco-ai-avatar{width:74px;height:74px;border-radius:17px;flex:none;background:radial-gradient(circle,#d9fff7,#31bca6);display:grid;place-items:center;overflow:hidden;border:1px solid #aeefcf}
@@ -28,7 +28,7 @@ const css=`
 #eco-ai-panel .eco-ai-link{display:inline-flex;align-items:center;padding:10px 14px;background:#0a714b;color:white;border-radius:10px;text-decoration:none;font-weight:800}
 #eco-ai-panel .eco-ai-note{font-size:11px;color:#667f71;margin:14px 0 0;line-height:1.55}
 @keyframes eco-ai-float{0%,100%{translate:0 0}50%{translate:0 -5px}}
-@media(max-width:650px){#eco-ai-launcher{width:64px;height:64px;right:13px;bottom:90px}#eco-ai-launcher::before{font-size:11px;padding:8px 9px}#eco-ai-panel{right:12px;bottom:163px;width:calc(100vw - 24px);max-height:calc(100dvh - 182px)}#eco-ai-panel .eco-ai-head{padding:16px}}
+@media(max-width:650px){#eco-ai-launcher{width:64px;height:64px;right:13px;top:172px;bottom:auto}#eco-ai-launcher::before{font-size:11px;padding:8px 9px}#eco-ai-panel{right:12px;top:245px;bottom:auto;width:calc(100vw - 24px);max-height:calc(100dvh - 260px)}#eco-ai-panel .eco-ai-head{padding:16px}}
 @media(prefers-reduced-motion:reduce){#eco-ai-launcher{animation:none}}
 `;
 const style=document.createElement("style");style.textContent=css;document.head.appendChild(style);
