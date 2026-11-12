@@ -1,0 +1,14 @@
+{
+  "name": "eco-ai-teacher-api",
+  "main": "src/index.js",
+  "compatibility_date": "2026-11-01",
+  "vars": {
+    "OPENAI_MODEL": "gpt-4.1-mini"
+  },
+  "secrets": {
+    "required": [
+      "OPENAI_API_KEY",
+      "TURNSTILE_SECRET_KEY"
+    ]
+  }
+}
