@@ -2,7 +2,7 @@
  * Eco AI Teacher Studio server
  * Deploy to Cloudflare Workers. Never place OPENAI_API_KEY in GitHub Pages.
  * Required secrets: OPENAI_API_KEY, TURNSTILE_SECRET_KEY
- * Required vars: TURNSTILE_SITE_KEY, OPENAI_MODEL
+ * Required vars: OPENAI_MODEL; required bindings: GLOBAL_AI_LIMIT, CLIENT_AI_LIMIT
  */
 const ORIGIN="https://ecoformat-merke.github.io";
 const json=(body,status=200,headers={})=>new Response(JSON.stringify(body),{status,headers:{"content-type":"application/json; charset=utf-8","cache-control":"no-store","access-control-allow-origin":ORIGIN,"vary":"Origin",...headers}});
@@ -23,9 +23,19 @@ export default {async fetch(request,env){
   const length=Number(request.headers.get("content-length")||0);if(length>10000)return json({error:"Request too large"},413);
   let d;try{d=await request.json()}catch{return json({error:"Invalid JSON"},400)}
   if(!d||!["ksp","work","test","research"].includes(d.kind)||!["ru","kk"].includes(d.lang)||!Number.isInteger(+d.grade)||+d.grade<1||+d.grade>11||!Number.isFinite(+d.duration)||+d.duration<10||+d.duration>120||typeof d.topic!=="string"||!d.topic.trim()||d.topic.length>180||typeof d.subject!=="string"||d.subject.length>80||typeof d.goal!=="string"||d.goal.length>1200)return json({error:"Invalid material fields"},400);
-  if(typeof d.turnstileToken!=="string"||!d.turnstileToken)return json({error:"Verification required"},403);
+  if(typeof d.turnstileToken!=="string"||!d.turnstileToken||d.turnstileToken.length>2048)return json({error:"Verification required"},403);
   let ok=false;try{const verification=new FormData();verification.append("secret",env.TURNSTILE_SECRET_KEY);verification.append("response",d.turnstileToken);verification.append("remoteip",request.headers.get("CF-Connecting-IP")||"");const r=await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify",{method:"POST",body:verification});const v=await r.json();ok=v.success===true&&v.hostname==="ecoformat-merke.github.io"}catch{return json({error:"Verification unavailable"},502)}
   if(!ok)return json({error:"Verification failed. Retry CAPTCHA."},403);
+  // Cloudflare's local rate limiting is approximate. Set an API project budget too.
+  // Both limits are mandatory: refuse chargeable calls if bindings are absent.
+  if(!env.GLOBAL_AI_LIMIT||!env.CLIENT_AI_LIMIT)return json({error:"Rate limits are not configured"},503);
+  try{
+    const global=await env.GLOBAL_AI_LIMIT.limit({key:"all-generations"});
+    if(!global.success)return json({error:"AI quota reached. Try again later."},429,{"retry-after":"60"});
+    const ip=request.headers.get("CF-Connecting-IP")||"unknown";
+    const client=await env.CLIENT_AI_LIMIT.limit({key:ip});
+    if(!client.success)return json({error:"Too many requests. Try again later."},429,{"retry-after":"60"});
+  }catch{return json({error:"Rate limiting unavailable"},503)}
   const model=env.OPENAI_MODEL||"gpt-4.1-mini";
   const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),55000);
   try{
