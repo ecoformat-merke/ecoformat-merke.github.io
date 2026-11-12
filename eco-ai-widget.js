@@ -86,7 +86,7 @@ const topics=[
 {q:{ru:"Что уменьшает расход электричества в классе?",kk:"Сыныпта электр қуатын не үнемдейді?"},a:{ru:["Выключать ненужный свет","Держать все лампы включёнными","Не отключать оборудование"],kk:["Қажетсіз жарықты сөндіру","Барлық шамды жағып қою","Құрылғыларды өшірмеу"]},correct:0,why:{ru:"Выключение ненужных приборов снижает потребление энергии.",kk:"Қажетсіз құрылғыларды өшіру энергия тұтынуды азайтады."}},
 {q:{ru:"Что описывает климат, а не погоду?",kk:"Ауа райын емес, климатты не сипаттайды?"},a:{ru:["Дождь сегодня","Температура в этот час","Средние погодные условия за десятилетия"],kk:["Бүгінгі жаңбыр","Осы сағаттағы температура","Ондаған жылдардағы орташа ауа райы жағдайлары"]},correct:2,why:{ru:"Климат характеризуют многолетние погодные условия.",kk:"Климат көпжылдық ауа райы жағдайларымен сипатталады."}}]}
 ];
-let role="student",topicId="water",questionIndex=0,score=0,answered=false,finished=false,lastFocus=null;
+let role="student",topicId="water",questionIndex=0,score=0,answered=false,selectedIndex=-1,finished=false,lastFocus=null;
 try{if(localStorage.getItem("ecoAiRole")==="teacher")role="teacher"}catch(e){}
 const lang=()=>document.documentElement.lang==="kk"?"kk":"ru";
 const text=(value)=>value[lang()];
@@ -101,7 +101,7 @@ else{
 add(content,"h3","",t.studentTitle);add(content,"p","",t.studentText);
 add(content,"div","eco-ai-progress",t.choose+":");
 const menu=add(content,"div","eco-ai-topics");
-topics.forEach(topic=>{const b=add(menu,"button","eco-ai-topic",text(topic.label));b.type="button";b.setAttribute("aria-pressed",String(topicId===topic.id));b.onclick=()=>{topicId=topic.id;questionIndex=0;score=0;answered=false;finished=false;draw()}});
+topics.forEach(topic=>{const b=add(menu,"button","eco-ai-topic",text(topic.label));b.type="button";b.setAttribute("aria-pressed",String(topicId===topic.id));b.onclick=()=>{topicId=topic.id;questionIndex=0;score=0;answered=false;selectedIndex=-1;finished=false;draw()}});
 const topic=topics.find(x=>x.id===topicId)||topics[0];const q=topic.questions[questionIndex];
 const play=add(content,"div","eco-ai-play");
 if(finished){add(play,"p","eco-ai-score",t.result+": "+score+" / "+topic.questions.length);const retry=add(play,"button","eco-ai-next",t.again);retry.type="button";retry.onclick=()=>{questionIndex=0;score=0;answered=false;finished=false;draw()}}
@@ -109,8 +109,8 @@ else{
 add(play,"div","eco-ai-progress",t.question+" "+(questionIndex+1)+" "+t.of+" "+topic.questions.length);
 add(play,"p","eco-ai-question",text(q.q));
 const choices=add(play,"div","eco-ai-options");
-text(q.a).forEach((option,i)=>{const b=add(choices,"button","eco-ai-option",option);b.type="button";b.disabled=answered;if(answered&&i===q.correct)b.classList.add("correct");b.onclick=()=>{if(answered)return;answered=true;if(i===q.correct)score++;draw()};if(answered&&i===q.correct)b.classList.add("correct")});
-if(answered){add(play,"div","eco-ai-feedback",(score>0?"":"")+text(q.why));const next=add(play,"button","eco-ai-next",questionIndex===topic.questions.length-1?t.finish:t.next);next.type="button";next.onclick=()=>{if(questionIndex===topic.questions.length-1)finished=true;else questionIndex++;answered=false;draw()}}
+text(q.a).forEach((option,i)=>{const b=add(choices,"button","eco-ai-option",option);b.type="button";b.disabled=answered;if(answered&&i===q.correct)b.classList.add("correct");if(answered&&i===selectedIndex&&i!==q.correct)b.classList.add("wrong");b.onclick=()=>{if(answered)return;answered=true;selectedIndex=i;if(i===q.correct)score++;draw()}});
+if(answered){add(play,"div","eco-ai-feedback",(selectedIndex===q.correct?t.good:t.wrong)+" "+text(q.why));const next=add(play,"button","eco-ai-next",questionIndex===topic.questions.length-1?t.finish:t.next);next.type="button";next.onclick=()=>{if(questionIndex===topic.questions.length-1)finished=true;else questionIndex++;answered=false;selectedIndex=-1;draw()}}
 }
 add(content,"div","eco-ai-progress",t.explore);
 const links=add(content,"div","eco-ai-links");[[t.projects,"#projects"],[t.tasks,"#tasks"],[t.results,"#results"]].forEach(([label,href])=>{const a=add(links,"a","",label);a.href=href;a.addEventListener("click",close)});
