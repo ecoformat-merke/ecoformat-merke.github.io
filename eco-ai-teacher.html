@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="kk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#103f2b">
+<title>Eco AI Teacher Studio — Eco Club 2.0</title>
+<style>
+:root{font-family:Inter,system-ui,"Segoe UI",Arial,sans-serif;color:#123a2a;background:#f1f7f1}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 88% -3%,#d9eed9 0,transparent 35%),#f2f7f2;min-height:100vh}
+header{background:#fff;border-bottom:1px solid #d7e5da}
+.header{max-width:1190px;margin:auto;padding:16px 24px;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.brand{font-weight:900;color:#114b32;text-decoration:none;display:flex;align-items:center;gap:10px;letter-spacing:-.02em}
+.brand img{height:40px;width:40px;object-fit:contain}
+.links{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.links a{color:#236247;text-decoration:none;font-size:13px;font-weight:760}
+.lang{display:flex;background:#e9f3ea;padding:4px;border-radius:999px}
+.lang button{border:0;border-radius:999px;background:transparent;color:#346d4c;padding:8px 13px;font-weight:850;cursor:pointer}
+.lang button[aria-pressed="true"]{background:#176343;color:#fff;box-shadow:0 2px 10px #124a3033}
+main{max-width:1190px;padding:34px 24px 70px;margin:auto}
+.banner{padding:clamp(24px,4vw,44px);border-radius:26px;background:linear-gradient(120deg,#10432f,#0b2822);color:#f2ffef;box-shadow:0 18px 44px #0b3d2e25;position:relative;overflow:hidden}
+.banner:after{content:"✳";font-size:220px;position:absolute;right:3%;top:-105px;opacity:.08;pointer-events:none}
+.kicker{font-size:12px;letter-spacing:.18em;color:#c8efb1;font-weight:880}
+.banner h1{font-size:clamp(30px,5vw,49px);line-height:1.1;margin:14px 0 12px;letter-spacing:-.035em}
+.banner p{max-width:700px;color:#d3e9d4;line-height:1.6;margin:0}
+.pill{display:inline-block;margin-top:16px;padding:7px 13px;border-radius:999px;border:1px solid #d5f9cf66;background:#ffffff15;color:#d2f5c7;font-size:12px;font-weight:850}
+.layout{display:grid;grid-template-columns:minmax(285px,400px) minmax(0,1fr);gap:22px;margin-top:26px;align-items:start}
+.panel{background:#fff;border:1px solid #dbe8df;border-radius:22px;padding:23px;box-shadow:0 8px 25px #0a3b2310;min-width:0}
+.panel h2{margin:0 0 7px;font-size:22px;letter-spacing:-.02em}
+.panel .sub{font-size:13px;color:#617c6e;line-height:1.5;margin:0 0 18px}
+.form{display:grid;gap:13px}
+.field{display:grid;gap:6px}
+.field label{font-weight:800;font-size:12px;color:#285b40}
+.field input,.field select,.field textarea{font:inherit;width:100%;background:#fbfdfa;color:#183f2d;border:1px solid #ccdcd0;border-radius:11px;padding:11px 12px;outline-offset:2px}
+.field textarea{resize:vertical;min-height:82px}
+.field input:focus,.field textarea:focus,.field select:focus{outline:2px solid #8ccd91;border-color:#388956}
+.twocol{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tools{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin:0 0 15px}
+.tool{border:1px solid #dce8dd;border-radius:12px;padding:12px 8px;background:#f7fbf7;text-align:center;font-size:12px;color:#246043;font-weight:800}
+.tool.selected{border-color:#599c70;background:#e6f5e6}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:17px}
+button{cursor:pointer;font:inherit}
+.primary{border:0;border-radius:12px;padding:13px 20px;color:#fff;background:#116c47;font-weight:850}
+.secondary{border:1px solid #bad7c3;border-radius:12px;padding:12px 16px;color:#176141;background:#f3faf4;font-weight:800}
+button:disabled{opacity:.46;cursor:not-allowed}
+.help{font-size:12px;color:#567862;line-height:1.6;margin:14px 0 0}
+#status{margin-top:12px;line-height:1.5;font-size:13px;color:#1b6d46;min-height:18px}#status.bad{color:#9a3330}
+.empty{border:2px dashed #d2e5d6;border-radius:17px;min-height:300px;display:grid;place-content:center;text-align:center;padding:36px;color:#718a79}
+.empty span{font-size:44px}
+#preview{background:white;max-height:75vh;overflow:auto;outline:none;padding:4px}
+#preview h2{font-size:19px;color:#0d6544;margin:23px 0 10px;border-bottom:1px solid #bcd8c4;padding-bottom:7px}
+#preview p{line-height:1.65;font-size:14px;color:#243e31;margin:9px 0}
+#preview table{border-collapse:collapse;width:100%;font-size:12px;margin:13px 0;table-layout:fixed}
+#preview th,#preview td{border:1px solid #cbded0;padding:9px;vertical-align:top;overflow-wrap:anywhere}
+#preview th{background:#e6f4e8;color:#215740;text-align:left}
+#preview [contenteditable="true"]:focus{outline:2px solid #9ed9a6;border-radius:3px}
+#access{max-width:640px;margin:70px auto;padding:34px;text-align:center;border-radius:20px;background:#fff;border:1px solid #d9e6db}
+#access h2{margin:0 0 12px}
+#access p{color:#526e5d;line-height:1.6}
+#access a{display:inline-block;background:#116c47;color:white;border-radius:10px;text-decoration:none;padding:12px 20px;font-weight:800}
+[hidden]{display:none!important}
+footer{text-align:center;color:#76917e;font-size:12px;padding:25px}
+@media(max-width:900px){.layout{grid-template-columns:1fr}.banner{padding:26px}}
+@media(max-width:540px){main{padding:16px 12px 45px}.panel{padding:17px}.twocol{grid-template-columns:1fr}.banner{border-radius:18px}.header{padding:13px}.header .links{width:100%}.actions button{flex:1}}
+</style>
+</head>
+<body>
+<header>
+<div class="header">
+<a class="brand" href="./"><img src="./eco-club-logo.png" alt=""> ECO CLUB 2.0 <span style="font-size:12px;color:#72927c">/ TEACHER STUDIO</span></a>
+<div class="links"><a href="./" data-kk="← Сайтқа қайту" data-ru="← На сайт">← Сайтқа қайту</a><a href="dashboard.html" data-kk="Жеке кабинет" data-ru="Личный кабинет">Жеке кабинет</a>
+<div class="lang" role="group" aria-label="Тіл / Язык"><button id="kk" type="button" aria-pressed="true">ҚАЗ</button><button id="ru" type="button" aria-pressed="false">РУС</button></div></div>
+</div>
+</header>
+<section id="access"><h2 data-kk="Рұқсат тексерілуде…" data-ru="Проверка доступа…">Рұқсат тексерілуде…</h2><p id="accessMsg" data-kk="Google аккаунты және педагог рөлі тексерілуде." data-ru="Проверяем Google-аккаунт и роль педагога.">Google аккаунты және педагог рөлі тексерілуде.</p><a href="login.html" id="loginLink" hidden data-kk="Кіру" data-ru="Войти">Кіру</a></section>
+<main id="app" hidden>
+<div class="banner"><div class="kicker">ECO AI • TEACHER STUDIO 1.0</div><h1 data-kk="Мұғалімнің цифрлық шеберханасы" data-ru="Цифровая мастерская педагога">Мұғалімнің цифрлық шеберханасы</h1>
+<p data-kk="ҚМЖ, жұмыс парақтары, 15 тапсырмадан тұратын тесттер және зерттеу тапсырмалары. Нәтижені өңдеп, Word құжатын жүктеңіз." data-ru="КСП, рабочие листы, тесты на 15 заданий и исследования. Редактируйте результат и скачивайте документ Word.">ҚМЖ, жұмыс парақтары, 15 тапсырмадан тұратын тесттер және зерттеу тапсырмалары. Нәтижені өңдеп, Word құжатын жүктеңіз.</p>
+<span class="pill" data-kk="Үлгі негізіндегі нұсқа · AI API қосылмаған" data-ru="Шаблонная версия · AI API ещё не подключён">Үлгі негізіндегі нұсқа · AI API қосылмаған</span></div>
+<div class="layout">
+<section class="panel"><h2 data-kk="Материал құрастыру" data-ru="Создание материалов">Материал құрастыру</h2><p class="sub" data-kk="Тақырып пен оқу мақсатын енгізіңіз. Оқу мақсаты ресми бағдарламадан автоматты түрде алынбайды." data-ru="Введите тему и учебную цель. Учебная цель не подгружается автоматически из официальной программы.">Тақырып пен оқу мақсатын енгізіңіз. Оқу мақсаты ресми бағдарламадан автоматты түрде алынбайды.</p>
+<div class="tools"><div class="tool selected" data-tool="lesson" data-kk="📘 ҚМЖ" data-ru="📘 КСП">📘 ҚМЖ</div><div class="tool" data-tool="worksheet" data-kk="📝 Жұмыс парағы" data-ru="📝 Рабочий лист">📝 Жұмыс парағы</div><div class="tool" data-tool="test" data-kk="✅ 15 тапсырма" data-ru="✅ 15 заданий">✅ 15 тапсырма</div><div class="tool" data-tool="research" data-kk="🔬 Зерттеу" data-ru="🔬 Исследование">🔬 Зерттеу</div></div>
+<div class="form">
+<div class="field"><label for="mode" data-kk="Материал түрі" data-ru="Тип материала">Материал түрі</label><select id="mode"><option value="lesson">КСП / ҚМЖ</option><option value="worksheet">Рабочий лист / Жұмыс парағы</option><option value="test">15 заданий / 15 тапсырма</option><option value="research">Исследование / Зерттеу</option></select></div>
+<div class="twocol"><div class="field"><label for="grade" data-kk="Сынып" data-ru="Класс">Сынып</label><select id="grade"><option>5</option><option>6</option><option selected>7</option><option>8</option><option>9</option><option>10</option><option>11</option></select></div>
+<div class="field"><label for="duration" data-kk="Ұзақтығы, минут" data-ru="Длительность, минут">Ұзақтығы, минут</label><input id="duration" type="number" value="45" min="20" max="120"></div></div>
+<div class="field"><label for="subject" data-kk="Пән" data-ru="Предмет">Пән</label><select id="subject"><option value="Экология">Экология</option><option value="Биология" selected>Биология</option><option value="География">География</option><option value="Математика">Математика</option><option value="Химия">Химия</option><option value="Жаратылыстану">Жаратылыстану</option></select></div>
+<div class="field"><label for="topic" data-kk="Сабақтың тақырыбы" data-ru="Тема урока">Сабақтың тақырыбы</label><input id="topic" type="text" maxlength="160" value="Судың ластануы және суды қорғау" data-placeholder-kk="Мысалы: Судың ластануы" data-placeholder-ru="Например: Загрязнение воды"></div>
+<div class="field"><label for="goal" data-kk="Оқу мақсаты (бағдарламадан)" data-ru="Учебная цель (из программы)">Оқу мақсаты (бағдарламадан)</label><textarea id="goal" maxlength="600" data-placeholder-kk="Қолданыстағы оқу бағдарламасынан оқу мақсатын енгізіңіз" data-placeholder-ru="Впишите учебную цель из действующей программы"></textarea></div>
+<div class="twocol"><div class="field"><label for="teacher" data-kk="Педагог (міндетті емес)" data-ru="Педагог (необязательно)">Педагог (міндетті емес)</label><input id="teacher" type="text" maxlength="100" data-placeholder-kk="Аты-жөні" data-placeholder-ru="ФИО"></div>
+<div class="field"><label for="lessonDate" data-kk="Күні" data-ru="Дата">Күні</label><input id="lessonDate" type="date"></div></div>
+</div>
+<div class="actions"><button type="button" class="primary" id="make" data-kk="✦ Материал дайындау" data-ru="✦ Создать материал">✦ Материал дайындау</button></div>
+<p class="help" data-kk="Мәтін жергілікті браузерде құрастырылады. Бұл нұсқа жасанды интеллектке сұрау жібермейді және дайын ҚМЖ-ны ресми талаптарға толық сәйкестігін тексермейді." data-ru="Материал формируется локально в браузере. Эта версия не отправляет запросы модели ИИ и не подтверждает соответствие готового КСП всем официальным требованиям.">Мәтін жергілікті браузерде құрастырылады. Бұл нұсқа жасанды интеллектке сұрау жібермейді және дайын ҚМЖ-ны ресми талаптарға толық сәйкестігін тексермейді.</p>
+</section>
+<section class="panel"><h2 data-kk="Дайын материал" data-ru="Готовый материал">Дайын материал</h2><p class="sub" data-kk="Тақырыптарды, мәтінді және кесте ұяшықтарын бірден өңдей аласыз." data-ru="Редактируйте заголовки, текст и ячейки таблиц прямо в просмотре.">Тақырыптарды, мәтінді және кесте ұяшықтарын бірден өңдей аласыз.</p>
+<div class="empty" id="empty"><span>📄</span><h3 data-kk="Материалды құрастырыңыз" data-ru="Создайте материал">Материалды құрастырыңыз</h3><p data-kk="Қажетті параметрлерді толтырып, сол жақтағы батырманы басыңыз." data-ru="Заполните параметры и нажмите кнопку слева.">Қажетті параметрлерді толтырып, сол жақтағы батырманы басыңыз.</p></div>
+<div id="preview" hidden aria-label="Редактируемый материал"></div>
+<div class="actions"><button type="button" class="primary" id="download" disabled data-kk="↓ Word (.docx)" data-ru="↓ Word (.docx)">↓ Word (.docx)</button><button type="button" class="secondary" id="copy" disabled data-kk="Көшіру" data-ru="Копировать">Көшіру</button></div>
+<div id="status" role="status" aria-live="polite"></div>
+<p class="help" data-kk="Word құжаты өңделетін мәтін мен кестелер ретінде сақталады. Экспорттау үшін JSZip кітапханасы интернеттен жүктеледі." data-ru="Word сохраняет редактируемые текст и таблицы. Для экспорта библиотека JSZip загружается из интернета.">Word құжаты өңделетін мәтін мен кестелер ретінде сақталады. Экспорттау үшін JSZip кітапханасы интернеттен жүктеледі.</p>
+</section>
+</div>
+</main>
+<footer>Eco Club 2.0 · Teacher Studio · 2026–2027</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" defer></script>
+<script type="module">
+import {initializeApp} from 'https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js';
+import {getAuth,onAuthStateChanged} from 'https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js';
+import {getFirestore,doc,getDoc} from 'https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js';
+const fb=initializeApp({apiKey:'AIzaSyCo05dvjXihGbfYhU_FHQ4OXg6SO_oRCU0',authDomain:'eco-club-40261.firebaseapp.com',projectId:'eco-club-40261',appId:'1:289680452873:web:c4fe4d451f1a488b9d37d8'});
+const auth=getAuth(fb),db=getFirestore(fb);
+const gate=document.getElementById('access'),app=document.getElementById('app'),msg=document.getElementById('accessMsg'),link=document.getElementById('loginLink');
+onAuthStateChanged(auth,async user=>{
+ if(!user){msg.textContent='Тек расталған педагогтер үшін. / Только для подтверждённых педагогов.';link.hidden=false;return}
+ try{
+ const snap=await getDoc(doc(db,'profiles',user.uid));
+ if(!snap.exists()||snap.data().status!=='active'||!['teacher','leader','admin'].includes(snap.data().role)){
+ msg.textContent='Рұқсат жоқ: мұғалім рөлі қажет. / Доступ запрещён: необходима роль педагога.';link.hidden=false;link.href='dashboard.html';link.textContent='Жеке кабинет / Кабинет';return}
+ gate.hidden=true;app.hidden=false;
+ const script=document.createElement('script');script.src='./eco-ai-teacher.js?v=1';script.defer=true;document.body.append(script);
+ }catch(e){msg.textContent='Аккаунтты тексеру қатесі. / Ошибка проверки аккаунта.';link.hidden=false;link.href='dashboard.html';}
+},()=>{msg.textContent='Google авторизациясы қолжетімсіз. / Ошибка авторизации Google.';link.hidden=false;});
+</script>
+</body>
+</html>
