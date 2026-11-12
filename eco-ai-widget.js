@@ -52,6 +52,16 @@ const css=`
 #eco-ai-panel .eco-ai-links{display:flex;flex-wrap:wrap;gap:7px;margin-top:13px}
 #eco-ai-panel .eco-ai-links a{color:#086542;background:#fff;padding:7px 9px;border:1px solid #bdddc5;border-radius:9px;font-size:11px;font-weight:750;text-decoration:none}
 #eco-ai-panel .eco-ai-score{font-weight:800;color:#096b4a}
+
+#eco-ai-panel .eco-ai-levels{display:flex;gap:7px;margin:9px 0}
+#eco-ai-panel .eco-ai-level{flex:1;border:1px solid #bedac5;border-radius:9px;padding:9px 5px;background:#fff;color:#0d6245;font-weight:800;cursor:pointer}
+#eco-ai-panel .eco-ai-level[aria-pressed="true"]{background:#0b7050;color:#fff}
+#eco-ai-panel .eco-ai-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:12px 0}
+#eco-ai-panel .eco-ai-stat{text-align:center;border:1px solid #c7e0d0;background:white;border-radius:9px;padding:8px 3px;font-size:10px}
+#eco-ai-panel .eco-ai-stat b{display:block;font-size:19px;color:#0c704d}
+#eco-ai-panel .eco-ai-badges{font-size:12px;line-height:1.8;margin-bottom:8px}
+#eco-ai-panel .eco-ai-bar{height:7px;background:#d8e9dc;border-radius:8px;overflow:hidden;margin:8px 0}
+#eco-ai-panel .eco-ai-bar span{height:100%;background:#1fa370;display:block;transition:width .3s}
 @keyframes eco-ai-aura{0%,100%{opacity:.3;scale:1}50%{opacity:.8;scale:1.08}}
 @keyframes eco-ai-breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.035)}}
 @keyframes eco-ai-hello{from{transform:scale(.86) rotate(-6deg);opacity:.3}to{transform:scale(1) rotate(0);opacity:1}}
@@ -66,8 +76,8 @@ panel.innerHTML='<div class="eco-ai-head"><div class="eco-ai-avatar"><img src="e
 document.body.append(panel);
 
 const T={
-ru:{open:"Открыть Eco AI",close:"Закрыть",subtitle:"Цифровой помощник Eco Club",intro:"Привет! Я Eco AI — помощник в мире экологии. Выбери свою роль.",student:"🎓 Ученик",teacher:"👩‍🏫 Учитель",studentTitle:"Экологическая лаборатория",studentText:"Выбери тему и проверь свои знания. Всё работает бесплатно и без регистрации.",teacherTitle:"Материалы для учителя",teacherText:"Создавайте КСП, рабочие листы, тесты и исследования в Teacher Studio.",teacherAction:"Открыть Teacher Studio",choose:"Выберите тему",question:"Вопрос",of:"из",good:"Правильно!",wrong:"Не совсем.",next:"Следующий вопрос",finish:"Посмотреть результат",again:"Пройти заново",result:"Результат",explore:"Материалы на сайте",projects:"Проекты",tasks:"Практические задачи",results:"Наши результаты",note:"Экологическая викторина работает бесплатно и без нейросети. Ответы заранее подготовлены. Полноценный ИИ подключим отдельно."},
-kk:{open:"Eco AI көмекшісін ашу",close:"Жабу",subtitle:"Eco Club цифрлық көмекшісі",intro:"Сәлем! Мен Eco AI — экология әлеміндегі көмекшіңмін. Өз рөліңді таңда.",student:"🎓 Оқушы",teacher:"👩‍🏫 Мұғалім",studentTitle:"Экологиялық зертхана",studentText:"Тақырыпты таңда да, біліміңді тексер. Тегін және тіркеусіз жұмыс істейді.",teacherTitle:"Мұғалімге арналған материалдар",teacherText:"Teacher Studio арқылы ҚМЖ, жұмыс парағы, тест және зерттеу жұмысын дайындаңыз.",teacherAction:"Teacher Studio ашу",choose:"Тақырыпты таңда",question:"Сұрақ",of:"ішінен",good:"Дұрыс!",wrong:"Дәл емес.",next:"Келесі сұрақ",finish:"Нәтижені көру",again:"Қайта өту",result:"Нәтиже",explore:"Сайт материалдары",projects:"Жобалар",tasks:"Практикалық тапсырмалар",results:"Біздің нәтижелер",note:"Экологиялық викторина тегін және нейрожелісіз жұмыс істейді. Жауаптар алдын ала дайындалған. Толыққанды ЖИ кейін қосылады."}};
+ru:{open:"Открыть Eco AI",close:"Закрыть",subtitle:"Цифровой помощник Eco Club",intro:"Привет! Я Eco AI — помощник в мире экологии. Выбери свою роль.",student:"🎓 Ученик",teacher:"👩‍🏫 Учитель",studentTitle:"Экологическая лаборатория",studentText:"Выбери тему и проверь свои знания. Всё работает бесплатно и без регистрации.",teacherTitle:"Материалы для учителя",teacherText:"Создавайте КСП, рабочие листы, тесты и исследования в Teacher Studio.",teacherAction:"Открыть Teacher Studio",choose:"Выберите тему",difficulty:"Уровень",basic:"Базовый",advanced:"Продвинутый",completed:"Пройдено",perfect:"Без ошибок",points:"Баллы",achievement:"Достижения",stored:"Результат сохранён в браузере",question:"Вопрос",of:"из",good:"Правильно!",wrong:"Не совсем.",next:"Следующий вопрос",finish:"Посмотреть результат",again:"Пройти заново",result:"Результат",explore:"Материалы на сайте",projects:"Проекты",tasks:"Практические задачи",results:"Наши результаты",note:"Экологическая викторина работает бесплатно и без нейросети. Ответы заранее подготовлены. Полноценный ИИ подключим отдельно."},
+kk:{open:"Eco AI көмекшісін ашу",close:"Жабу",subtitle:"Eco Club цифрлық көмекшісі",intro:"Сәлем! Мен Eco AI — экология әлеміндегі көмекшіңмін. Өз рөліңді таңда.",student:"🎓 Оқушы",teacher:"👩‍🏫 Мұғалім",studentTitle:"Экологиялық зертхана",studentText:"Тақырыпты таңда да, біліміңді тексер. Тегін және тіркеусіз жұмыс істейді.",teacherTitle:"Мұғалімге арналған материалдар",teacherText:"Teacher Studio арқылы ҚМЖ, жұмыс парағы, тест және зерттеу жұмысын дайындаңыз.",teacherAction:"Teacher Studio ашу",choose:"Тақырыпты таңда",difficulty:"Деңгей",basic:"Бастапқы",advanced:"Күрделі",completed:"Аяқталды",perfect:"Қатесіз",points:"Ұпай",achievement:"Жетістіктер",stored:"Нәтиже браузерде сақталды",question:"Сұрақ",of:"ішінен",good:"Дұрыс!",wrong:"Дәл емес.",next:"Келесі сұрақ",finish:"Нәтижені көру",again:"Қайта өту",result:"Нәтиже",explore:"Сайт материалдары",projects:"Жобалар",tasks:"Практикалық тапсырмалар",results:"Біздің нәтижелер",note:"Экологиялық викторина тегін және нейрожелісіз жұмыс істейді. Жауаптар алдын ала дайындалған. Толыққанды ЖИ кейін қосылады."}};
 const topics=[
 {id:"water",label:{ru:"💧 Вода",kk:"💧 Су"},questions:[
 {q:{ru:"Что помогает экономить воду дома?",kk:"Үйде суды үнемдеуге не көмектеседі?"},a:{ru:["Оставлять кран открытым","Закрывать кран при чистке зубов","Мыть посуду под постоянной струёй"],kk:["Кранды ашық қалдыру","Тіс тазалағанда кранды жабу","Ыдысты ағып тұрған су астында жуу"]},correct:1,why:{ru:"Закрытый кран сокращает ненужный расход воды.",kk:"Кранды жабу судың босқа ағуын азайтады."}},
@@ -86,8 +96,14 @@ const topics=[
 {q:{ru:"Что уменьшает расход электричества в классе?",kk:"Сыныпта электр қуатын не үнемдейді?"},a:{ru:["Выключать ненужный свет","Держать все лампы включёнными","Не отключать оборудование"],kk:["Қажетсіз жарықты сөндіру","Барлық шамды жағып қою","Құрылғыларды өшірмеу"]},correct:0,why:{ru:"Выключение ненужных приборов снижает потребление энергии.",kk:"Қажетсіз құрылғыларды өшіру энергия тұтынуды азайтады."}},
 {q:{ru:"Что описывает климат, а не погоду?",kk:"Ауа райын емес, климатты не сипаттайды?"},a:{ru:["Дождь сегодня","Температура в этот час","Средние погодные условия за десятилетия"],kk:["Бүгінгі жаңбыр","Осы сағаттағы температура","Ондаған жылдардағы орташа ауа райы жағдайлары"]},correct:2,why:{ru:"Климат характеризуют многолетние погодные условия.",kk:"Климат көпжылдық ауа райы жағдайларымен сипатталады."}}]}
 ];
-let role="student",topicId="water",questionIndex=0,score=0,answered=false,selectedIndex=-1,finished=false,lastFocus=null;
-try{if(localStorage.getItem("ecoAiRole")==="teacher")role="teacher"}catch(e){}
+let role="student",level="basic",topicId="water",questionIndex=0,score=0,answered=false,selectedIndex=-1,finished=false,lastFocus=null;
+try{if(localStorage.getItem("ecoAiRole")==="teacher")role="teacher";if(localStorage.getItem("ecoAiLevel")==="advanced")level="advanced"}catch(e){}
+const progressKey="ecoAiProgressV1";
+let progress={runs:0,perfect:0,points:0,completed:{}};
+try{const v=JSON.parse(localStorage.getItem(progressKey)||"null");if(v&&Number.isFinite(v.runs)&&Number.isFinite(v.perfect)&&Number.isFinite(v.points))progress={runs:v.runs,perfect:v.perfect,points:v.points,completed:v.completed||{}}}catch(e){}
+const resetRound=()=>{questionIndex=0;score=0;answered=false;selectedIndex=-1;finished=false};
+function saveResult(total){progress.runs++;progress.points+=score;if(score===total)progress.perfect++;progress.completed[topicId+":"+level]=Math.max(score,progress.completed[topicId+":"+level]||0);try{localStorage.setItem(progressKey,JSON.stringify(progress))}catch(e){}}
+
 const lang=()=>document.documentElement.lang==="kk"?"kk":"ru";
 const text=(value)=>value[lang()];
 const add=(parent,tag,cls,textContent)=>{const el=document.createElement(tag);if(cls)el.className=cls;if(textContent!==undefined)el.textContent=textContent;parent.append(el);return el};
@@ -101,16 +117,22 @@ else{
 add(content,"h3","",t.studentTitle);add(content,"p","",t.studentText);
 add(content,"div","eco-ai-progress",t.choose+":");
 const menu=add(content,"div","eco-ai-topics");
-topics.forEach(topic=>{const b=add(menu,"button","eco-ai-topic",text(topic.label));b.type="button";b.setAttribute("aria-pressed",String(topicId===topic.id));b.onclick=()=>{topicId=topic.id;questionIndex=0;score=0;answered=false;selectedIndex=-1;finished=false;draw();panel.scrollTop=0}});
-const topic=topics.find(x=>x.id===topicId)||topics[0];const q=topic.questions[questionIndex];
+topics.forEach(topic=>{const b=add(menu,"button","eco-ai-topic",text(topic.label));b.type="button";b.setAttribute("aria-pressed",String(topicId===topic.id));b.onclick=()=>{topicId=topic.id;resetRound();draw();panel.scrollTop=0}});
+const levels=add(content,"div","eco-ai-levels");
+[["basic",t.basic],["advanced",t.advanced]].forEach(([name,label])=>{const b=add(levels,"button","eco-ai-level",label);b.type="button";b.setAttribute("aria-pressed",String(level===name));b.onclick=()=>{level=name;try{localStorage.setItem("ecoAiLevel",level)}catch(e){}resetRound();draw();panel.scrollTop=0}});
+const stats=add(content,"div","eco-ai-stats");
+[[t.completed,progress.runs],[t.perfect,progress.perfect],[t.points,progress.points]].forEach(([name,val])=>{const el=add(stats,"div","eco-ai-stat");add(el,"b","",String(val));add(el,"span","",name)});
+const badges=add(content,"div","eco-ai-badges");
+badges.textContent=t.achievement+": "+(progress.runs>0?"🌱 ":"🔒 ")+(progress.perfect>0?"🏆 ":"🔒 ")+(Object.keys(progress.completed).length>=4?"🌍":"🔒");
+const topic=topics.find(x=>x.id===topicId)||topics[0];const questions=level==="advanced"?topic.advancedQuestions:topic.questions;const q=questions[questionIndex];
 const play=add(content,"div","eco-ai-play");
-if(finished){add(play,"p","eco-ai-score",t.result+": "+score+" / "+topic.questions.length);const retry=add(play,"button","eco-ai-next",t.again);retry.type="button";retry.onclick=()=>{questionIndex=0;score=0;answered=false;finished=false;draw()}}
+if(finished){add(play,"p","eco-ai-score",t.result+": "+score+" / "+questions.length);add(play,"div","eco-ai-progress",t.stored);const retry=add(play,"button","eco-ai-next",t.again);retry.type="button";retry.onclick=()=>{resetRound();draw()}}
 else{
-add(play,"div","eco-ai-progress",t.question+" "+(questionIndex+1)+" "+t.of+" "+topic.questions.length);
+add(play,"div","eco-ai-progress",t.question+" "+(questionIndex+1)+" "+t.of+" "+questions.length);
 add(play,"p","eco-ai-question",text(q.q));
-const choices=add(play,"div","eco-ai-options");
+const bar=add(play,"div","eco-ai-bar");const fill=add(bar,"span");fill.style.width=String(100*(questionIndex+(answered?1:0))/questions.length)+"%";const choices=add(play,"div","eco-ai-options");
 text(q.a).forEach((option,i)=>{const b=add(choices,"button","eco-ai-option",option);b.type="button";b.disabled=answered;if(answered&&i===q.correct)b.classList.add("correct");if(answered&&i===selectedIndex&&i!==q.correct)b.classList.add("wrong");b.onclick=()=>{if(answered)return;answered=true;selectedIndex=i;if(i===q.correct)score++;draw()}});
-if(answered){add(play,"div","eco-ai-feedback",(selectedIndex===q.correct?t.good:t.wrong)+" "+text(q.why));const next=add(play,"button","eco-ai-next",questionIndex===topic.questions.length-1?t.finish:t.next);next.type="button";next.onclick=()=>{if(questionIndex===topic.questions.length-1)finished=true;else questionIndex++;answered=false;selectedIndex=-1;draw()}}
+if(answered){add(play,"div","eco-ai-feedback",(selectedIndex===q.correct?t.good:t.wrong)+" "+text(q.why));const next=add(play,"button","eco-ai-next",questionIndex===questions.length-1?t.finish:t.next);next.type="button";next.onclick=()=>{if(questionIndex===questions.length-1){finished=true;saveResult(questions.length)}else questionIndex++;answered=false;selectedIndex=-1;draw()}}
 }
 add(content,"div","eco-ai-progress",t.explore);
 const links=add(content,"div","eco-ai-links");[[t.projects,"#projects"],[t.tasks,"#tasks"],[t.results,"#results"]].forEach(([label,href])=>{const a=add(links,"a","",label);a.href=href;a.addEventListener("click",close)});
